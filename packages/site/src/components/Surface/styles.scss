@@ -1,0 +1,22 @@
+@use 'sass:color';
+
+@import '../../styles';
+
+.c-surface {
+  padding: rem(12px) rem(16px);
+  border: 0.5px solid $g-colors-border;
+  background-color: color.adjust($g-colors-white, $alpha: -0.5);
+  border-radius: 2px;
+  box-shadow: $g-shadow-default;
+
+  &--no-shadow {
+    box-shadow: none;
+  }
+
+  &_content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+  }
+}
