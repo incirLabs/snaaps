@@ -1,0 +1,14 @@
+@import '../../styles';
+
+.c-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: spacing(3xlarge) 0;
+
+  &_logo {
+    margin: 0;
+    font-size: rem(24px);
+    font-weight: 700;
+  }
+}
