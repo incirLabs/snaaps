@@ -1,0 +1,69 @@
+@use 'sass:color';
+
+@import '../../styles';
+
+.c-button {
+  padding: spacing(xsmall);
+  border: 0.5px solid $g-colors-border;
+  background-color: color.adjust($g-colors-white, $alpha: -0.5);
+  box-shadow: $g-shadow-default;
+  color: $g-colors-text-light;
+  font-size: rem(16px);
+  font-weight: 600;
+  text-align: left;
+
+  &--block {
+    display: block;
+    width: 100%;
+  }
+
+  &--primary {
+    border-radius: 2px;
+    transition: background-color $g-transition-default;
+
+    &:hover {
+      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+    }
+
+    &:active {
+      background-color: $g-colors-white;
+    }
+  }
+
+  &--chip {
+    padding: spacing(xsmall) spacing(3xlarge);
+    border-radius: 999px;
+    transition: background-color $g-transition-default;
+
+    &:hover {
+      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+    }
+
+    &:active {
+      background-color: $g-colors-white;
+    }
+  }
+
+  &--text {
+    border: 0;
+    background-color: transparent;
+    box-shadow: none;
+    font-size: rem(14px);
+    font-weight: 700;
+    transition: color $g-transition-default;
+
+    &:hover {
+      color: $g-colors-text-strong;
+    }
+
+    &:active {
+      color: $g-colors-text;
+    }
+  }
+
+  &_color {
+    &--danger {
+      color: $g-colors-error-text;
+    }
+  }
+}
