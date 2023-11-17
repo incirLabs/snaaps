@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2020", "DOM"],
+    "target": "ESNext",
     "module": "CommonJS",
-    "moduleResolution": "node",
-    "noEmit": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": false,
     "noErrorTruncation": true,
     "noUncheckedIndexedAccess": true,
-    "strict": true,
-    "target": "es2020"
+    "noEmit": true,
+    "lib": ["ESNext", "ESNext.String", "DOM", "DOM.Iterable"]
   }
 }
