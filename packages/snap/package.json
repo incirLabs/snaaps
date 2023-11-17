@@ -1,5 +1,5 @@
 {
-  "name": "@metamask/snap-simple-keyring-snap",
+  "name": "snap",
   "version": "1.1.0",
   "description": "A simple keyring snap that integrates with MetaMask accounts.",
   "keywords": [
