@@ -1,10 +1,15 @@
 import cx from 'classnames';
+import {PageCard} from './PageCard';
 
 export type PageContainerProps = JSX.IntrinsicElements['div'] & {
   area: 'top' | 'left' | 'center' | 'right';
 };
 
-export const PageContainer: React.FC<PageContainerProps> = ({
+export type PageContainerSubComponents = {
+  Card: typeof PageCard;
+};
+
+export const PageContainer: React.FC<PageContainerProps> & PageContainerSubComponents = ({
   area,
   children,
   className,
@@ -16,3 +21,5 @@ export const PageContainer: React.FC<PageContainerProps> = ({
     </div>
   );
 };
+
+PageContainer.Card = PageCard;
