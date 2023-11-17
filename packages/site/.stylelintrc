@@ -38,6 +38,12 @@
       "/^border/": ["none"],
       "/^transition/": ["/all/"]
     },
+    "unit-no-unknown": [
+      true,
+      {
+        "ignoreUnits": ["xsmall", "xlarge"]
+      }
+    ],
     "font-family-name-quotes": "always-where-recommended",
     "font-weight-notation": "numeric",
     "function-comma-newline-after": "always-multi-line",

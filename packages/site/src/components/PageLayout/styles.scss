@@ -1,0 +1,38 @@
+@import '../../styles';
+
+.c-page-layout {
+  display: grid;
+  grid-template-areas:
+    '. top .'
+    'left center right';
+  grid-template-rows: auto 1fr;
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties, meowtec/no-px */
+  grid-template-columns: 1fr 800px 1fr;
+  gap: spacing(4xsmall);
+
+  &_left {
+    grid-area: left;
+  }
+
+  &_center {
+    grid-area: center;
+  }
+
+  &_right {
+    grid-area: right;
+  }
+
+  &_top {
+    grid-area: top;
+  }
+
+  &_sidebar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  &_card {
+    min-height: rem(420px);
+  }
+}
