@@ -3,7 +3,7 @@
  */
 {
   "root": true,
-  "extends": ["custom", "plugin:react/jsx-runtime"],
+  "extends": ["../../.eslintrc", "plugin:react/jsx-runtime"],
   "plugins": ["react", "react-hooks", "jsx-a11y"],
   "env": {
     "node": false,
