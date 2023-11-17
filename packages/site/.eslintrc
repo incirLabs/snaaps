@@ -1,0 +1,35 @@
+/**
+ * @type {import("eslint").Linter.Config}
+ */
+{
+  "root": true,
+  "extends": ["custom", "plugin:react/jsx-runtime"],
+  "plugins": ["react", "react-hooks", "jsx-a11y"],
+  "env": {
+    "node": false,
+    "browser": true,
+    "jest": false
+  },
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/jsx-filename-extension": ["error", {"extensions": [".js", ".jsx", ".ts", ".tsx"]}],
+    "react/jsx-props-no-spreading": "off",
+    "react/display-name": "off",
+    "react/prop-types": "off",
+    "react/function-component-definition": ["error", {"namedComponents": "arrow-function"}],
+    "react/require-default-props": "off",
+    "react/destructuring-assignment": "warn",
+    "react/jsx-one-expression-per-line": "off",
+    "jsx-a11y/alt-text": "warn",
+    "jsx-a11y/label-has-associated-control": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/redux/**/*"],
+      "rules": {
+        "no-param-reassign": "off"
+      }
+    }
+  ]
+}

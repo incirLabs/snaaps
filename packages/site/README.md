@@ -1,43 +1,30 @@
-# TypeScript Example Snap Front-end
+# React + TypeScript + Vite
 
-This project was bootstrapped with [Gatsby](https://www.gatsbyjs.com/).
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Available Scripts
+Currently, two official plugins are available:
 
-In the project directory, you can run:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### `yarn start`
+## Expanding the ESLint configuration
 
-Runs the app in the development mode.\
-Open [http://localhost:8000](http://localhost:8000) to view it in the browser.
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Configure the top-level `parserOptions` property like this:
 
-### `yarn build`
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
+```
 
-Builds the app for production to the `public` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/) for more information.
-
-## Environment variables
-
-Gatsby has built-in support for loading environment variables into the browser and Functions. Loading environment variables into Node.js requires a small code snippet.
-
-In development, Gatsby will load environment variables from a file named `.env.development`. For builds, it will load from `.env.production`.
-
-By default you can use the `SNAP_ORIGIN` variable (used in `src/config/snap.ts`) to define a production origin for you snap (eg. `npm:MyPackageName`). If not defined it will defaults to `local:http://localhost:8080`.
-
-A `.env` file template is available, to use it rename `.env.production.dist` to `.env.production`
-
-To learn more visit [Gatsby documentation](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/)
-
-## Learn More
-
-You can learn more in the [Gatsby documentation](https://www.gatsbyjs.com/docs/).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

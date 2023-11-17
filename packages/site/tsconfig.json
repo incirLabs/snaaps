@@ -1,9 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "jsx": "react"
+    "baseUrl": "./",
+    "target": "es5",
+    "module": "ESNext",
+    "incremental": true,
+    "jsx": "react-jsx"
   },
-  "include": ["src/", "gatsby-*.ts", "gatsby-*.tsx"]
+  "include": ["src", "src/vite-env.d.ts"],
+  "references": [{"path": "./tsconfig.node.json"}]
 }

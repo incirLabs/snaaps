@@ -1,0 +1,8 @@
+// Durations
+$g-transition-duration-default: 0.3s !default;
+
+// Easings
+$g-transition-ease-cubic-quintic: cubic-bezier(0.25, 0.8, 0.25, 1) !default;
+
+// Transitions
+$g-transition-default: $g-transition-duration-default $g-transition-ease-cubic-quintic;

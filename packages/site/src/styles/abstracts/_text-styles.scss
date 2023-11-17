@@ -1,0 +1,15 @@
+@use 'sass:math';
+
+// Font Sizes
+$g-font-size-root: null !default;
+$g-font-size-base: 1rem !default;
+$g-line-height-base: 1.5 !default;
+
+// Heads
+$g-head-font-family: null !default;
+$g-head-margin-bottom: 1rem !default;
+$g-head-font-weight: 700 !default;
+$g-head-line-height: null !default;
+
+// Default font family
+$g-font-family-base: 'Poppins', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif' !default;

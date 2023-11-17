@@ -1,0 +1,19 @@
+@mixin padding-vertical($size: $g-base-padding) {
+  padding-top: $size;
+  padding-bottom: $size;
+}
+
+@mixin padding-horizontal($size: $g-base-padding) {
+  padding-right: $size;
+  padding-left: $size;
+}
+
+@mixin margin-vertical($size: $g-base-gap) {
+  margin-top: $size;
+  margin-bottom: $size;
+}
+
+@mixin margin-horizontal($size: $g-base-gap) {
+  margin-right: $size;
+  margin-left: $size;
+}

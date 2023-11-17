@@ -1,0 +1,108 @@
+// BASE
+// --------------------------------------------------
+
+html {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+@at-root {
+  // stylelint-disable at-rule-no-vendor-prefix
+  @-ms-viewport {
+    width: device-width;
+  }
+}
+
+// Root
+:root {
+  font-size: $g-font-size-root;
+}
+
+// Body
+body {
+  background-color: $g-colors-body-background;
+  color: $g-colors-text;
+  font-family: $g-font-family-base;
+  font-size: $g-font-size-base;
+  line-height: $g-line-height-base;
+  text-align: left;
+}
+
+// Color of selection
+::selection {
+  background-color: $g-colors-selection-background;
+  color: $g-colors-selection;
+}
+
+button,
+[role='button'] {
+  cursor: pointer;
+}
+
+// Anchor
+a {
+  color: $g-colors-link;
+  text-decoration: none;
+  transition: color $g-transition-default;
+
+  &:hover {
+    color: $g-colors-link-hover;
+  }
+}
+
+img {
+  vertical-align: middle;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid;
+  color: $g-colors-hr;
+}
+
+// Typography
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.heading {
+  margin-top: 0;
+  margin-bottom: $g-head-margin-bottom;
+  color: $g-colors-text-strong;
+  font-family: $g-head-font-family;
+  font-weight: $g-head-font-weight;
+  line-height: $g-head-line-height;
+}
+
+// P
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+// Form Elements
+button,
+label,
+input,
+textarea,
+select,
+option,
+optgroup {
+  font-family: $g-font-family-base;
+  font-size: 1rem;
+}

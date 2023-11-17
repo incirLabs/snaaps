@@ -1,0 +1,34 @@
+@use 'sass:map';
+@use 'sass:string';
+
+$font-formats-map: (
+  woff2: 'woff2',
+  woff: 'woff',
+  ttf: 'truetype',
+  otf: 'opentype',
+);
+
+@mixin font-face(
+  $font-family,
+  $font-src-without-extension,
+  $font-weight: normal,
+  $font-style: normal,
+  $font-formats: map.keys($font-formats-map)
+) {
+  $fonts-src: '';
+
+  @each $font-format in $font-formats {
+    $format: map.get($font-formats-map, $font-format);
+    $fonts-src: '#{$fonts-src} url(#{$font-src-without-extension}.#{$font-format}) format(#{$format}),';
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: $font-family;
+    font-style: $font-style;
+    font-weight: $font-weight;
+
+    // Remove the last comma
+    src: #{string.slice($fonts-src, 1, -2)};
+  }
+}

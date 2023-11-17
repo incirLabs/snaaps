@@ -1,0 +1,301 @@
+@import './partials';
+
+// Spacing
+.h-100 {
+  height: 100%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.w-auto {
+  width: auto;
+}
+
+.h-none {
+  height: none;
+}
+
+.w-none {
+  width: none;
+}
+
+// Display
+.d-block {
+  display: block;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-inline {
+  display: inline;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.d-flex-inline-flex {
+  display: inline-flex;
+}
+
+// Flex
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.flex-3 {
+  flex: 3;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.flex-grow-2 {
+  flex-grow: 2;
+}
+
+.flex-grow-3 {
+  flex-grow: 3;
+}
+
+// Flex Direciton
+.f-dir-row {
+  flex-direction: row;
+}
+
+.f-dir-row-rev {
+  flex-direction: row-reverse;
+}
+
+.f-dir-col {
+  flex-direction: column;
+}
+
+.f-dir-col-rev {
+  flex-direction: column-reverse;
+}
+
+// Align
+.align-center {
+  align-items: center;
+}
+
+.align-start {
+  align-items: flex-start;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+// Justify
+.justify-center {
+  justify-content: center;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
+}
+
+.justify-evenly {
+  justify-content: space-evenly;
+}
+
+// Margin
+.m-0 {
+  margin: 0;
+}
+
+.m-auto {
+  margin: auto;
+}
+
+// Padding
+.p-0 {
+  padding: 0;
+}
+
+.p-auto {
+  padding: auto;
+}
+
+// Font Weight
+.font-thin {
+  font-weight: 100;
+}
+
+.font-extra-light {
+  font-weight: 200;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semi-bold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extra-bold {
+  font-weight: 800;
+}
+
+.font-black {
+  font-weight: 900;
+}
+
+// Text Align
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+// Opacity
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-40 {
+  opacity: 0.4;
+}
+
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+// Cursor
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-text {
+  cursor: text;
+}
+
+// Overflow
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-visible {
+  overflow: visible;
+}
+
+.overflow-x-visible {
+  overflow-y: hidden;
+  overflow-x: visible;
+}
+
+.overflow-y-visible {
+  overflow-y: visible;
+  overflow-x: hidden;
+}
+
+.btn-clean {
+  @extend %button-clean;
+}
+
+.font-inherit {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.hidden-input {
+  position: absolute;
+  top: rem(-9999px);
+  left: rem(-9999px);
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.all-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gap-8 {
+  gap: rem(8px);
+}
+
+.gap-16 {
+  gap: rem(16px);
+}
+
+.gap-24 {
+  gap: rem(24px);
+}
+
+// Fill
+
+.absolute-fill {
+  @extend %fill;
+
+  position: absolute;
+}
+
+.fixed-fill {
+  @extend %fill;
+
+  position: fixed;
+}
+
+.img-fluid {
+  @extend %img-fluid;
+}

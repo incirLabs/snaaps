@@ -1,0 +1,76 @@
+@use 'sass:math';
+@use 'sass:map';
+@use 'sass:meta';
+
+@function strip-unit($number) {
+  @if meta.type-of($number) == 'number' and not math.is-unitless($number) {
+    @return math.div($number, ($number * 0 + 1));
+  }
+
+  @return $number;
+}
+
+@function rem($value, $base-value: $g-font-size-root) {
+  @if not $base-value {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: 16px;
+  }
+
+  @if math.unit($base-value) == '%' {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: math.div($base-value, 100%) * 16px;
+  }
+
+  @if math.unit($base-value) == 'rem' or math.unit($base-value) == 'em' {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: strip-unit($base-value) * 16px;
+  }
+
+  $value: math.div(strip-unit($value), strip-unit($base-value)) * 1rem;
+
+  @if strip-unit($value) == 0 {
+    $value: 0;
+  }
+
+  @return $value;
+}
+
+@function px($value, $base-value: $g-font-size-root) {
+  @if not $base-value {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: 16px;
+  }
+
+  @if math.unit($base-value) == '%' {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: ($base-value / 100%) * 16px;
+  }
+
+  @if math.unit($base-value) == 'rem' or math.unit($base-value) == 'em' {
+    // stylelint-disable-next-line meowtec/no-px
+    $base-value: strip-unit($base-value) * 16px;
+  }
+
+  $value: strip-unit($value) * strip-unit($base-value) * 1px;
+
+  @if strip-unit($value) == 0 {
+    $value: 0;
+  }
+
+  @return $value;
+}
+
+@function em($value, $base-value: $g-font-size-base) {
+  $unit: math.unit($base-value);
+
+  @if $unit == 'rem' {
+    $base-value: rem-to-px($base-value);
+  }
+
+  @return ($value / $base-value) * 1em;
+}
+
+// Spacings
+@function spacing($size: normal) {
+  @return map.get($g-spacings, $size);
+}

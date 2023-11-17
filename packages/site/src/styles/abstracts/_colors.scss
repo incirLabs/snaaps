@@ -1,0 +1,39 @@
+// Constants
+$g-colors-white: #fff !default;
+$g-colors-black: #000 !default;
+$g-colors-gray: #bbb !default;
+
+// Background
+$g-colors-body-background: #f6f6f6 !default;
+$g-colors-background: #fff !default;
+$g-colors-secondary-background: #fafafa !default;
+
+// Text
+$g-colors-text: #181818 !default;
+$g-colors-text-light: #242424 !default;
+$g-colors-text-strong: #323232 !default;
+$g-colors-text-dark: #000 !default;
+
+// Head
+$g-colors-head: #323232 !default;
+$g-colors-head-hover: #323232 !default;
+
+// Accent
+$g-colors-accent: #ff5858 !default;
+$g-colors-accent-hover: #ff7171 !default;
+
+// Link
+$g-colors-link: #618eff !default;
+$g-colors-link-hover: #004280 !default;
+
+// Selection
+$g-colors-selection-background: #e6edfc !default;
+$g-colors-selection: #67759e !default;
+
+// Borders
+$g-colors-border: #e9e1cb !default;
+$g-colors-hr: $g-colors-border !default;
+
+// Errors
+$g-colors-error-border: #ff8a8a !default;
+$g-colors-error-text: #ff4747 !default;

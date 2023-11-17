@@ -1,0 +1,22 @@
+@use 'sass:math';
+@use 'sass:map';
+
+$g-spacings: (
+  4xsmall: rem(2px),
+  3xsmall: rem(4px),
+  2xsmall: rem(5px),
+  xsmall: rem(8px),
+  small: rem(10px),
+  normal: rem(12px),
+  medium: rem(16px),
+  large: rem(24px),
+  xlarge: rem(32px),
+  2xlarge: rem(36px),
+  3xlarge: rem(42px),
+  4xlarge: rem(48px),
+  5xlarge: rem(54px),
+  6xlarge: rem(60px),
+  7xlarge: rem(66px),
+) !default;
+$g-base-padding: map.get($g-spacings, normal) !default;
+$g-base-gap: map.get($g-spacings, normal) !default;
