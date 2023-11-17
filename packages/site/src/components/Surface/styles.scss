@@ -3,7 +3,7 @@
 @import '../../styles';
 
 .c-surface {
-  padding: rem(12px) rem(16px);
+  padding: spacing(normal) spacing(medium);
   border: 0.5px solid $g-colors-border;
   background-color: color.adjust($g-colors-white, $alpha: -0.5);
   border-radius: 2px;
