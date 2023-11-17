@@ -11,6 +11,10 @@
     {
       "name": "Snap",
       "path": "packages/snap"
+    },
+    {
+      "name": "Contracts",
+      "path": "packages/contracts"
     }
   ],
   "settings": {
