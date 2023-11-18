@@ -1,9 +1,8 @@
 /* eslint no-restricted-syntax: "off" */
 
+import {Env} from 'common';
 import type {MetaMaskInpageProvider} from '@metamask/providers';
 import {GetSnapsResponse, Snap} from '../types';
-
-const SNAP_ORIGIN = 'local:';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -24,7 +23,7 @@ export const getSnaps = async (provider?: MetaMaskInpageProvider): Promise<GetSn
  * @param params - The params to pass with the snap to connect.
  */
 export const connectSnap = (
-  snapId: string = SNAP_ORIGIN,
+  snapId: string = Env.SNAP_ORIGIN,
   params: Record<'version' | string, unknown> = {},
 ) => {
   return window.ethereum.request({
@@ -46,7 +45,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
     const snaps = await getSnaps();
 
     return Object.values(snaps).find(
-      (snap) => snap.id === SNAP_ORIGIN && (!version || snap.version === version),
+      (snap) => snap.id === Env.SNAP_ORIGIN && (!version || snap.version === version),
     );
   } catch (error) {
     console.error('Failed to obtain installed snap', error);

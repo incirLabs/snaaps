@@ -15,6 +15,10 @@
     {
       "name": "Contracts",
       "path": "packages/contracts"
+    },
+    {
+      "name": "Common",
+      "path": "packages/common"
     }
   ],
   "settings": {
@@ -32,7 +36,7 @@
       "esbenp.prettier-vscode",
       "mikestead.dotenv",
       "stylelint.vscode-stylelint",
-			"juanblanco.solidity"
+      "juanblanco.solidity"
     ]
   }
 }

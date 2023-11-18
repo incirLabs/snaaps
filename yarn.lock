@@ -7999,6 +7999,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"common@*, common@workspace:packages/common":
+  version: 0.0.0-use.local
+  resolution: "common@workspace:packages/common"
+  languageName: unknown
+  linkType: soft
+
 "component-emitter@npm:^1.2.1":
   version: 1.3.1
   resolution: "component-emitter@npm:1.3.1"
@@ -18321,6 +18327,7 @@ __metadata:
     babel-eslint: ^10.1.0
     bootstrap: ^5.1.3
     classnames: ^2.3.1
+    common: "*"
     dotenv: ^16.3.1
     dotenv-cli: ^7.3.0
     eslint: ^8.7.0
