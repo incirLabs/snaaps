@@ -4,6 +4,7 @@ import {Paths} from './Paths';
 
 import Landing from './Landing/Landing';
 import MySnaap from './MySnaap/MySnaap';
+import Plugins from './Plugins/Plugins';
 
 const Router: React.FC = () => (
   <Routes>
@@ -13,6 +14,7 @@ const Router: React.FC = () => (
 
     <Route path={Paths.MySnaap.Root} element={<PageLayout showSidebar />}>
       <Route path={Paths.MySnaap.MySnaap} element={<MySnaap />} />
+      <Route path={Paths.MySnaap.Plugins} element={<Plugins />} />
     </Route>
 
     <Route path="*" element={<Navigate to={Paths.Landing.Root} />} />

@@ -14,7 +14,7 @@ export const MySnaapSidebar: React.FC = () => {
           🎭 MMy SnAAp
         </Button>
 
-        <Button as={Link} to={Paths.MySnaap.MySnaap} theme="primary" block>
+        <Button as={Link} to={Paths.MySnaap.Plugins} theme="primary" block>
           🔌 MMy Plugins
         </Button>
 
