@@ -1,0 +1,9 @@
+@import '../../styles';
+
+.c-sidebar {
+  display: flex;
+  gap: spacing(2xsmall);
+  flex-direction: column;
+  padding: spacing(xsmall);
+  margin-bottom: spacing(xsmall);
+}
