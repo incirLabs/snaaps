@@ -1,5 +1,5 @@
-import { Common, Hardfork } from '@ethereumjs/common';
-import { TransactionFactory } from '@ethereumjs/tx';
+import {Common, Hardfork} from '@ethereumjs/common';
+import {TransactionFactory} from '@ethereumjs/tx';
 import {
   Address,
   ecsign,
@@ -9,7 +9,7 @@ import {
   isValidPrivate,
   addHexPrefix,
 } from '@ethereumjs/util';
-import type { TypedDataV1, TypedMessage } from '@metamask/eth-sig-util';
+import type {TypedDataV1, TypedMessage} from '@metamask/eth-sig-util';
 import {
   SignTypedDataVersion,
   concatSig,
@@ -23,24 +23,14 @@ import type {
   KeyringRequest,
   SubmitRequestResponse,
 } from '@metamask/keyring-api';
-import {
-  EthAccountType,
-  EthMethod,
-  emitSnapKeyringEvent,
-} from '@metamask/keyring-api';
-import { KeyringEvent } from '@metamask/keyring-api/dist/events';
-import { type Json, type JsonRpcRequest } from '@metamask/utils';
-import { Buffer } from 'buffer';
-import { v4 as uuid } from 'uuid';
+import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
+import {KeyringEvent} from '@metamask/keyring-api/dist/events';
+import {type Json, type JsonRpcRequest} from '@metamask/utils';
+import {Buffer} from 'buffer';
+import {v4 as uuid} from 'uuid';
 
-import { saveState } from './stateManagement';
-import {
-  isEvmChain,
-  serializeTransaction,
-  isUniqueAddress,
-  throwError,
-  runSensitive,
-} from './util';
+import {saveState} from './stateManagement';
+import {isEvmChain, serializeTransaction, isUniqueAddress, throwError, runSensitive} from './util';
 import packageInfo from '../package.json';
 
 export type KeyringState = {
@@ -66,18 +56,12 @@ export class SimpleKeyring implements Keyring {
   }
 
   async getAccount(id: string): Promise<KeyringAccount> {
-    return (
-      this.#state.wallets[id]?.account ??
-      throwError(`Account '${id}' not found`)
-    );
+    return this.#state.wallets[id]?.account ?? throwError(`Account '${id}' not found`);
   }
 
-  async createAccount(
-    options: Record<string, Json> = {},
-  ): Promise<KeyringAccount> {
-    const { privateKey, address } = this.#getKeyPair(
-      options?.privateKey as string | undefined,
-    );
+  async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
+    const address = options?.address as string;
+    const privateKey = options?.privateKey as string;
 
     if (!isUniqueAddress(address, Object.values(this.#state.wallets))) {
       throw new Error(`Account address already in use: ${address}`);
@@ -104,8 +88,8 @@ export class SimpleKeyring implements Keyring {
         ],
         type: EthAccountType.Eoa,
       };
-      await this.#emitEvent(KeyringEvent.AccountCreated, { account });
-      this.#state.wallets[account.id] = { account, privateKey };
+      await this.#emitEvent(KeyringEvent.AccountCreated, {account});
+      this.#state.wallets[account.id] = {account, privateKey};
       await this.#saveState();
       return account;
     } catch (error) {
@@ -121,8 +105,7 @@ export class SimpleKeyring implements Keyring {
 
   async updateAccount(account: KeyringAccount): Promise<void> {
     const wallet =
-      this.#state.wallets[account.id] ??
-      throwError(`Account '${account.id}' not found`);
+      this.#state.wallets[account.id] ?? throwError(`Account '${account.id}' not found`);
 
     const newAccount: KeyringAccount = {
       ...wallet.account,
@@ -144,7 +127,7 @@ export class SimpleKeyring implements Keyring {
 
   async deleteAccount(id: string): Promise<void> {
     try {
-      await this.#emitEvent(KeyringEvent.AccountDeleted, { id });
+      await this.#emitEvent(KeyringEvent.AccountDeleted, {id});
       delete this.#state.wallets[id];
       await this.#saveState();
     } catch (error) {
@@ -157,9 +140,7 @@ export class SimpleKeyring implements Keyring {
   }
 
   async getRequest(id: string): Promise<KeyringRequest> {
-    return (
-      this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`)
-    );
+    return this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`);
   }
 
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
@@ -169,17 +150,12 @@ export class SimpleKeyring implements Keyring {
   }
 
   async approveRequest(id: string): Promise<void> {
-    const { request } =
-      this.#state.pendingRequests[id] ??
-      throwError(`Request '${id}' not found`);
+    const {request} = this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`);
 
-    const result = this.#handleSigningRequest(
-      request.method,
-      request.params ?? [],
-    );
+    const result = this.#handleSigningRequest(request.method, request.params ?? []);
 
     await this.#removePendingRequest(id);
-    await this.#emitEvent(KeyringEvent.RequestApproved, { id, result });
+    await this.#emitEvent(KeyringEvent.RequestApproved, {id, result});
   }
 
   async rejectRequest(id: string): Promise<void> {
@@ -188,7 +164,7 @@ export class SimpleKeyring implements Keyring {
     }
 
     await this.#removePendingRequest(id);
-    await this.#emitEvent(KeyringEvent.RequestRejected, { id });
+    await this.#emitEvent(KeyringEvent.RequestRejected, {id});
   }
 
   async #removePendingRequest(id: string): Promise<void> {
@@ -211,9 +187,7 @@ export class SimpleKeyring implements Keyring {
     return dappUrlPrefix as string;
   }
 
-  async #asyncSubmitRequest(
-    request: KeyringRequest,
-  ): Promise<SubmitRequestResponse> {
+  async #asyncSubmitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     this.#state.pendingRequests[request.id] = request;
     await this.#saveState();
     const dappUrl = this.#getCurrentUrl();
@@ -226,10 +200,8 @@ export class SimpleKeyring implements Keyring {
     };
   }
 
-  async #syncSubmitRequest(
-    request: KeyringRequest,
-  ): Promise<SubmitRequestResponse> {
-    const { method, params = [] } = request.request as JsonRpcRequest;
+  async #syncSubmitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
+    const {method, params = []} = request.request as JsonRpcRequest;
     const signature = this.#handleSigningRequest(method, params);
     return {
       pending: false,
@@ -239,8 +211,7 @@ export class SimpleKeyring implements Keyring {
 
   #getWalletByAddress(address: string): Wallet {
     const match = Object.values(this.#state.wallets).find(
-      (wallet) =>
-        wallet.account.address.toLowerCase() === address.toLowerCase(),
+      (wallet) => wallet.account.address.toLowerCase() === address.toLowerCase(),
     );
 
     return match ?? throwError(`Account '${address}' not found`);
@@ -262,10 +233,8 @@ export class SimpleKeyring implements Keyring {
       throw new Error('Invalid private key');
     }
 
-    const address = toChecksumAddress(
-      Address.fromPrivateKey(privateKeyBuffer).toString(),
-    );
-    return { privateKey: privateKeyBuffer.toString('hex'), address };
+    const address = toChecksumAddress(Address.fromPrivateKey(privateKeyBuffer).toString());
+    return {privateKey: privateKeyBuffer.toString('hex'), address};
   }
 
   #handleSigningRequest(method: string, params: Json): Json {
@@ -321,12 +290,9 @@ export class SimpleKeyring implements Keyring {
     const wallet = this.#getWalletByAddress(tx.from);
     const privateKey = Buffer.from(wallet.privateKey, 'hex');
     const common = Common.custom(
-      { chainId: tx.chainId },
+      {chainId: tx.chainId},
       {
-        hardfork:
-          tx.maxPriorityFeePerGas || tx.maxFeePerGas
-            ? Hardfork.London
-            : Hardfork.Istanbul,
+        hardfork: tx.maxPriorityFeePerGas || tx.maxFeePerGas ? Hardfork.London : Hardfork.Istanbul,
       },
     );
 
@@ -340,11 +306,11 @@ export class SimpleKeyring implements Keyring {
   #signTypedData(
     from: string,
     data: Json,
-    opts: { version: SignTypedDataVersion } = {
+    opts: {version: SignTypedDataVersion} = {
       version: SignTypedDataVersion.V1,
     },
   ): string {
-    const { privateKey } = this.#getWalletByAddress(from);
+    const {privateKey} = this.#getWalletByAddress(from);
     const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
     return signTypedData({
@@ -355,7 +321,7 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signPersonalMessage(from: string, request: string): string {
-    const { privateKey } = this.#getWalletByAddress(from);
+    const {privateKey} = this.#getWalletByAddress(from);
     const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     const messageBuffer = Buffer.from(request.slice(2), 'hex');
 
@@ -378,7 +344,7 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signMessage(from: string, data: string): string {
-    const { privateKey } = this.#getWalletByAddress(from);
+    const {privateKey} = this.#getWalletByAddress(from);
     const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     const message = stripHexPrefix(data);
     const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
@@ -389,10 +355,7 @@ export class SimpleKeyring implements Keyring {
     await saveState(this.#state);
   }
 
-  async #emitEvent(
-    event: KeyringEvent,
-    data: Record<string, Json>,
-  ): Promise<void> {
+  async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
     await emitSnapKeyringEvent(snap, event, data);
   }
 

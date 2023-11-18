@@ -1,4 +1,4 @@
-import { KeyringRpcMethod } from '@metamask/keyring-api';
+import {KeyringRpcMethod} from '@metamask/keyring-api';
 
 export enum InternalMethod {
   ToggleSyncApprovals = 'snap.internal.toggleSynchronousApprovals',
@@ -21,7 +21,7 @@ export const originPermissions = new Map<string, string[]>([
     ],
   ],
   [
-    'http://localhost:8000',
+    'http://localhost:3000',
     [
       // Keyring methods
       KeyringRpcMethod.ListAccounts,

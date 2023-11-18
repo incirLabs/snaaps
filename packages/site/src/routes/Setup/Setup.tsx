@@ -1,7 +1,9 @@
+import {Env} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
-import {Wallet} from 'ethers';
-import {useAccount, useContractWrite} from '@incirlabs/react-ethooks';
+import {Wallet, utils} from 'ethers';
+import {KeyringSnapRpcClient} from '@metamask/keyring-api';
+import {useAccount, useContractWrite, useSigner} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
 import {useSimpleAccountFactory} from '../../hooks/Contracts';
 
@@ -9,6 +11,7 @@ import './styles.scss';
 
 const Setup: React.FC = () => {
   const {address} = useAccount();
+  const {signer} = useSigner();
   const [wallet, setWallet] = useState<Wallet | null>(null);
 
   const AccountFactory = useSimpleAccountFactory();
@@ -22,6 +25,8 @@ const Setup: React.FC = () => {
   const onDeployClick = async () => {
     if (!wallet) return;
 
+    console.log(Env.SNAP_ORIGIN);
+
     const tx = await createAccount([wallet.address, 0]);
     if (!tx.status) {
       console.log('tx error', tx.error);
@@ -31,9 +36,38 @@ const Setup: React.FC = () => {
     const receipt = await tx.data.wait();
     console.log('receipt', receipt);
 
-    const aaAddress = getAccountAddress([wallet.address, 0]);
+    const aaAddress = await getAccountAddress([wallet.address, 0]);
 
-    console.log('aaAddress', aaAddress);
+    if (!aaAddress.status) {
+      console.error("Couldn't get AA address", aaAddress.error);
+      return;
+    }
+
+    console.log('aaAddress', aaAddress.data);
+    console.log('priv key', wallet.privateKey);
+
+    try {
+      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+
+      const account = await client.createAccount({
+        type: 'eip155:eip4337',
+        address: aaAddress.data,
+        privateKey: wallet.privateKey,
+      });
+
+      console.log(account);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSendTransactionClick = async () => {
+    if (!signer) return;
+
+    signer.sendTransaction({
+      to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      value: utils.parseEther('1'),
+    });
   };
 
   return (
@@ -58,6 +92,10 @@ const Setup: React.FC = () => {
             + Create a new AA signer
           </Button>
         )}
+
+        <Button theme="chip" onClick={onSendTransactionClick}>
+          Send transaction
+        </Button>
       </Surface>
     </PageContainer>
   );

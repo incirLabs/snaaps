@@ -1,13 +1,13 @@
 {
   "version": "1.1.0",
-  "description": "An example of a key management snap for a simple keyring.",
-  "proposedName": "MetaMask Simple Snap Keyring",
+  "description": "An example Snap written in TypeScript.",
+  "proposedName": "AA Snap Test",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MetaMask/snap-simple-keyring.git"
   },
   "source": {
-    "shasum": "DRmOoCsL1TRiEpiYpyQurby/3TE4a+sKXc719XtxYjo=",
+    "shasum": "9dofr+2nXaWZOp30yBvDZQinTRLtLojxoosScKxl+FU=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,16 +18,21 @@
     }
   },
   "initialPermissions": {
+    "snap_dialog": {},
     "endowment:keyring": {
       "allowedOrigins": [
-        "https://metamask.github.io"
+        "http://localhost:3000"
       ]
     },
     "endowment:rpc": {
       "dapps": true
     },
+    "endowment:transaction-insight": {
+      "allowTransactionOrigin": true
+    },
     "snap_manageAccounts": {},
-    "snap_manageState": {}
+    "snap_manageState": {},
+    "snap_notify": {}
   },
   "manifestVersion": "0.1"
 }

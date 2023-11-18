@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import {Link} from 'react-router-dom';
 import {useAccount, useConnect} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
 import {useMetamask} from '../../hooks';
@@ -48,7 +49,7 @@ const Landing: React.FC = () => {
         </Surface>
       ) : null}
 
-      {isConnected && !isSnapInstalled ? (
+      {isConnected ? (
         <Surface className="p-landing_content">
           <span className="p-landing_subtitle">Install SnAAp To Continue</span>
 
@@ -59,6 +60,8 @@ const Landing: React.FC = () => {
           </Button>
         </Surface>
       ) : null}
+
+      <Link to="/setup">Go to setup</Link>
     </PageContainer>
   );
 };
