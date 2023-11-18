@@ -1,0 +1,19 @@
+@import '../../styles';
+
+$l-divider-size: rem(1px) !default;
+
+.c-divider {
+  background-color: $g-colors-border;
+
+  &--vertical {
+    width: $l-divider-size;
+    height: 100%;
+    margin: 0 spacing(4xsmall);
+  }
+
+  &--horizontal {
+    width: 100%;
+    height: $l-divider-size;
+    margin: spacing(4xsmall) 0;
+  }
+}
