@@ -13,7 +13,15 @@ const Landing: React.FC = () => {
           You need to install <b>MetaMask Flask</b> to use this DAPP
         </span>
 
-        <Button theme="chip">Install 🦊 Flask</Button>
+        <Button
+          theme="chip"
+          as="a"
+          href="https://metamask.io/flask/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Install 🦊 Flask
+        </Button>
       </Surface>
     </PageContainer>
   );
