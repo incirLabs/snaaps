@@ -3589,6 +3589,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts-upgradeable@npm:v4.8.3":
+  version: 4.8.3
+  resolution: "@openzeppelin/contracts-upgradeable@npm:4.8.3"
+  checksum: 022c99bac4828980e771ddf3426a58b5a6f27932a1b1ec93dd2ed3f11c89d8e407867b845bedd0660bdd11c683971d566737c10504db8a1f144f61daec8b5ed6
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts@npm:3.4.2-solc-0.7":
   version: 3.4.2-solc-0.7
   resolution: "@openzeppelin/contracts@npm:3.4.2-solc-0.7"
@@ -8115,6 +8122,7 @@ __metadata:
     "@nomiclabs/hardhat-etherscan": ^2.1.6
     "@nomiclabs/hardhat-waffle": ^2.0.1
     "@openzeppelin/contracts": ^4.2.0
+    "@openzeppelin/contracts-upgradeable": v4.8.3
     "@thehubbleproject/bls": ^0.5.1
     "@typechain/ethers-v5": ^10.1.0
     "@typechain/hardhat": ^2.3.0
