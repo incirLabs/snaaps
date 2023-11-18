@@ -8,6 +8,7 @@
   background-color: color.adjust($g-colors-white, $alpha: -0.5);
   box-shadow: $g-shadow-default;
   color: $g-colors-text-light;
+  cursor: pointer;
   font-size: rem(16px);
   font-weight: 600;
   text-align: left;
