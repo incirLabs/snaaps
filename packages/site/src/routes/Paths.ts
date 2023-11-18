@@ -2,6 +2,7 @@ export const RawPaths = {
   Landing: {
     Root: '/',
     Landing: '/',
+    Setup: '/setup',
   },
   MySnaap: {
     Root: '/my-snaap',
