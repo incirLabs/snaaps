@@ -22,7 +22,7 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     'SimpleAccount', {
       from,
       args: [entryPointAddress],
-      gasLimit: 2e6,
+      gasLimit: 6e6,
       deterministicDeployment: true
     })
 
