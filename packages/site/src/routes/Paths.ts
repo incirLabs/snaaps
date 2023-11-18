@@ -3,6 +3,10 @@ export const RawPaths = {
     Root: '/',
     Landing: '/',
   },
+  MySnaap: {
+    Root: '/my-snaap',
+    MySnaap: '/',
+  },
 };
 
 export const Paths: typeof RawPaths = Object.fromEntries(
