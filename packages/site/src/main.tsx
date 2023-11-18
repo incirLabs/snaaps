@@ -1,6 +1,7 @@
-import {StrictMode, useRef} from 'react';
+import {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter} from 'react-router-dom';
+import {Web3Providers} from './Web3Providers';
 import App from './App';
 
 import 'bootstrap/scss/bootstrap-grid.scss';
@@ -13,7 +14,9 @@ const Root: React.FC = () => {
   return (
     <StrictMode>
       <BrowserRouter>
-        <App />
+        <Web3Providers>
+          <App />
+        </Web3Providers>
       </BrowserRouter>
     </StrictMode>
   );
