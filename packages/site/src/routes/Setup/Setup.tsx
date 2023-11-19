@@ -1,14 +1,26 @@
+import {useEffect} from 'react';
 import {Env} from 'common';
 import cx from 'classnames';
 import {Wallet} from 'ethers';
+import {useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
-import {useContractWrite} from '@incirlabs/react-ethooks';
+import {useAccount, useContractWrite} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
-import {useSimpleAccountFactory} from '../../hooks/Contracts';
+import {useSnaapAddress, useSimpleAccountFactory} from '../../hooks';
+import {Paths} from '../Paths';
 
 import './styles.scss';
 
 const Setup: React.FC = () => {
+  const {address} = useAccount();
+  const navigate = useNavigate();
+  const snaapAddress = useSnaapAddress();
+
+  useEffect(() => {
+    if (!address) navigate('/', {replace: true});
+    if (snaapAddress) navigate(Paths.MySnaap.Root, {replace: true});
+  }, [address, snaapAddress, navigate]);
+
   const AccountFactory = useSimpleAccountFactory();
   const createAccount = useContractWrite(AccountFactory, 'createAccount');
   const getAccountAddress = useContractWrite(AccountFactory, 'getAddress');
