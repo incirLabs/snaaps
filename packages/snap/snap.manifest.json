@@ -7,7 +7,7 @@
     "url": "git+https://github.com/MetaMask/snap-simple-keyring.git"
   },
   "source": {
-    "shasum": "bzEWwY98QOBoJV0fKZG+ef5+8OnhM56PPsSMyn92E3k=",
+    "shasum": "vsHJcF8KJYic4iT5U5UOpdm6pyNaZfAbVhkXh8FG/sc=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -28,12 +28,9 @@
     "endowment:rpc": {
       "dapps": true
     },
-    "endowment:transaction-insight": {
-      "allowTransactionOrigin": true
-    },
+    "endowment:ethereum-provider": {},
     "snap_manageAccounts": {},
-    "snap_manageState": {},
-    "snap_notify": {}
+    "snap_manageState": {}
   },
   "manifestVersion": "0.1"
 }

@@ -3,6 +3,7 @@ import {pimlicoBundlerActions, pimlicoPaymasterActions} from 'permissionless/act
 import {Hex, createClient, encodeFunctionData, http} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import {goerli} from 'viem/chains';
+import {createExecuteCall} from './callData';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY;
 const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS;
@@ -30,29 +31,10 @@ export const getGasPrice = async () => {
 
 export type GasPrice = Awaited<ReturnType<typeof getGasPrice>>;
 
-export const createCallData = (to: Hex, value: bigint, data: Hex) => {
-  return encodeFunctionData({
-    abi: [
-      {
-        inputs: [
-          {name: 'dest', type: 'address'},
-          {name: 'value', type: 'uint256'},
-          {name: 'func', type: 'bytes'},
-        ],
-        name: 'execute',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ],
-    args: [to, value, data],
-  });
-};
-
-export const createUserOp = (sender: Hex, callData: Hex, gasPrice: GasPrice) => {
+export const createUserOp = (sender: Hex, callData: Hex, gasPrice: GasPrice, nonce: bigint) => {
   return {
     sender,
-    nonce: 0n,
+    nonce,
     initCode: '0x' as Hex,
     callData,
     maxFeePerGas: gasPrice.fast.maxFeePerGas,
@@ -63,14 +45,20 @@ export const createUserOp = (sender: Hex, callData: Hex, gasPrice: GasPrice) => 
   };
 };
 
-export const generateUserOp = async (from: Hex, to: Hex, value: bigint, data: Hex) => {
+export const generateUserOp = async (
+  from: Hex,
+  to: Hex,
+  value: bigint,
+  data: Hex,
+  nonce: bigint,
+) => {
   console.log('generateUserOp');
-  const callData = createCallData(to, value, data);
+  const callData = createExecuteCall(to, value, data);
   console.log('callData', callData);
   const gasPrice = await getGasPrice();
   console.log('gasPrice', gasPrice);
 
-  const userOp = createUserOp(from, callData, gasPrice);
+  const userOp = createUserOp(from, callData, gasPrice, nonce);
   console.log('userOp', userOp);
 
   return userOp;

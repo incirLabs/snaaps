@@ -26,20 +26,20 @@ import type {
 import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
 import {KeyringEvent} from '@metamask/keyring-api/dist/events';
 import {hexToBigInt, type Json, type JsonRpcRequest} from '@metamask/utils';
+import {SnapsGlobalObject} from '@metamask/snaps-types';
 import {Buffer} from 'buffer';
 import {v4 as uuid} from 'uuid';
+import {Hex} from 'viem';
 
 import {saveState} from './stateManagement';
 import {isEvmChain, serializeTransaction, isUniqueAddress, throwError, runSensitive} from './util';
-import packageInfo from '../package.json';
 import {generateUserOp, getReceipt, getSponsoredUserOp, sendUserOp, signUserOp} from './pimlico';
-import {Hex} from 'viem';
-import {Env} from 'common';
+import {createGetNonceCall} from './callData';
+import {logger} from './logger';
 
 export type KeyringState = {
   wallets: Record<string, Wallet>;
   pendingRequests: Record<string, KeyringRequest>;
-  useSyncApprovals: boolean;
 };
 
 export type Wallet = {
@@ -147,13 +147,7 @@ export class SimpleKeyring implements Keyring {
   }
 
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
-    console.log('submit request');
-
-    const res = this.#state.useSyncApprovals
-      ? this.#syncSubmitRequest(request)
-      : this.#asyncSubmitRequest(request);
-
-    console.log('submit res', await res);
+    const res = this.#syncSubmitRequest(request);
 
     return await res;
   }
@@ -161,9 +155,7 @@ export class SimpleKeyring implements Keyring {
   async approveRequest(id: string): Promise<void> {
     const {request} = this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`);
 
-    const result = this.#handleSigningRequest(request.method, request.params ?? []);
-
-    console.log('result', result);
+    const result = await this.#handleSigningRequest(request.method, request.params ?? []);
 
     await this.#removePendingRequest(id);
     await this.#emitEvent(KeyringEvent.RequestApproved, {id, result});
@@ -183,42 +175,10 @@ export class SimpleKeyring implements Keyring {
     await this.#saveState();
   }
 
-  #getCurrentUrl(): string {
-    const dappUrlPrefix =
-      process.env.NODE_ENV === 'production'
-        ? process.env.DAPP_ORIGIN_PRODUCTION
-        : process.env.DAPP_ORIGIN_DEVELOPMENT;
-    const dappVersion: string = packageInfo.version;
-
-    // Ensuring that both dappUrlPrefix and dappVersion are truthy
-    if (dappUrlPrefix && dappVersion && process.env.NODE_ENV === 'production') {
-      return `${dappUrlPrefix}${dappVersion}/`;
-    }
-    // Default URL if dappUrlPrefix or dappVersion are falsy, or if URL construction fails
-    return dappUrlPrefix as string;
-  }
-
-  async #asyncSubmitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
-    console.log('async request');
-
-    this.#state.pendingRequests[request.id] = request;
-    await this.#saveState();
-    const dappUrl = this.#getCurrentUrl();
-    return {
-      pending: true,
-      redirect: {
-        url: dappUrl,
-        message: 'Redirecting to Snap Simple Keyring to sign transaction',
-      },
-    };
-  }
-
   async #syncSubmitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     const {method, params = []} = request.request as JsonRpcRequest;
 
     const signature = await this.#handleSigningRequest(method, params);
-
-    console.log('signature', signature);
 
     return {
       pending: false,
@@ -227,7 +187,6 @@ export class SimpleKeyring implements Keyring {
   }
 
   #getWalletByAddress(address: string): Wallet {
-    console.log('wallets', Object.values(this.#state.wallets));
     const match = Object.values(this.#state.wallets).find(
       (wallet) => wallet.account.address.toLowerCase() === address.toLowerCase(),
     );
@@ -265,7 +224,6 @@ export class SimpleKeyring implements Keyring {
       case EthMethod.SignTransaction: {
         const [tx] = params as [any];
         const signedTx = await this.#signTransaction(tx);
-        console.log('signedTx', signedTx);
         return signedTx;
       }
 
@@ -302,7 +260,6 @@ export class SimpleKeyring implements Keyring {
   }
 
   async #signTransaction(tx: any): Promise<Json> {
-    console.log('!!!!tx!!!!!', tx);
     // Patch the transaction to make sure that the `chainId` is a hex string.
     if (!tx.chainId.startsWith('0x')) {
       tx.chainId = `0x${parseInt(tx.chainId, 10).toString(16)}`;
@@ -321,48 +278,40 @@ export class SimpleKeyring implements Keyring {
       common,
     }).sign(privateKey);
 
-    console.log('signed tx', signedTx, signedTx.toJSON(), signedTx.type);
+    const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
 
     try {
-      const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
-
-      console.log('serialized', serialized);
-
-      const value = hexToBigInt(serialized.value);
-
-      console.log('value', value);
+      const nonce = await ethereum.request({
+        method: 'eth_call',
+        params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
+      });
 
       const userOp = await generateUserOp(
         wallet.account.address as Hex,
         serialized.to,
-        value,
+        hexToBigInt(serialized.value),
         serialized.data,
+        hexToBigInt(nonce as Hex),
       );
 
-      console.log('userOp', userOp);
-
       const sponsoredUserOp = await getSponsoredUserOp(userOp);
-
-      console.log('sponsoredUserOp', sponsoredUserOp);
 
       const signedUserOp = await signUserOp(
         (wallet.privateKey.startsWith('0x') ? wallet.privateKey : `0x${wallet.privateKey}`) as Hex,
         sponsoredUserOp,
       );
 
-      console.log('signedUserOp', signedUserOp);
-
       const userOpHash = await sendUserOp(signedUserOp);
-
-      console.log('userOpHash', userOpHash);
 
       const {receipt, txHash} = await getReceipt(userOpHash);
 
-      console.log('receipt', receipt, txHash);
+      logger.debug('Receipt', JSON.stringify(receipt, null, 2));
+      logger.debug('Transaction Hash', txHash);
 
       return serialized;
     } catch (err) {
-      console.error(err);
+      logger.error('Error on bundler', err);
+      return {};
     }
   }
 
@@ -419,15 +368,6 @@ export class SimpleKeyring implements Keyring {
   }
 
   async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
-    await emitSnapKeyringEvent(snap, event, data);
-  }
-
-  async toggleSyncApprovals(): Promise<void> {
-    this.#state.useSyncApprovals = !this.#state.useSyncApprovals;
-    await this.#saveState();
-  }
-
-  isSynchronousMode(): boolean {
-    return this.#state.useSyncApprovals;
+    await emitSnapKeyringEvent(snap as SnapsGlobalObject, event, data);
   }
 }
