@@ -1,8 +1,10 @@
+import {useEffect} from 'react';
 import cx from 'classnames';
-import {Link} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useAccount, useConnect} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
 import {useMetamask} from '../../hooks';
+import {Paths} from '../Paths';
 
 import './styles.scss';
 
@@ -10,10 +12,15 @@ const Landing: React.FC = () => {
   const [metamaskState, , installSnap] = useMetamask();
   const {connect} = useConnect();
   const {address} = useAccount();
+  const navigate = useNavigate();
 
   const isFlaskInstalled = metamaskState.snapsDetected && metamaskState.isFlask;
   const isConnected = isFlaskInstalled && address;
   const isSnapInstalled = isConnected && metamaskState.installedSnap;
+
+  useEffect(() => {
+    if (isSnapInstalled) navigate(Paths.Landing.Setup);
+  }, [isSnapInstalled, navigate]);
 
   return (
     <PageContainer area="center" className={cx('p-landing')}>
@@ -60,8 +67,6 @@ const Landing: React.FC = () => {
           </Button>
         </Surface>
       ) : null}
-
-      <Link to="/setup">Go to setup</Link>
     </PageContainer>
   );
 };
