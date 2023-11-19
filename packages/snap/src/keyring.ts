@@ -33,7 +33,7 @@ import {Hex} from 'viem';
 
 import {saveState} from './stateManagement';
 import {isEvmChain, serializeTransaction, isUniqueAddress, throwError, runSensitive} from './util';
-import {generateUserOp, getReceipt, getSponsoredUserOp, sendUserOp, signUserOp} from './pimlico';
+import {PimlicoClient} from './pimlico';
 import {createGetNonceCall} from './callData';
 import {logger} from './logger';
 
@@ -194,26 +194,6 @@ export class SimpleKeyring implements Keyring {
     return match ?? throwError(`Account '${address}' not found`);
   }
 
-  #getKeyPair(privateKey?: string): {
-    privateKey: string;
-    address: string;
-  } {
-    const privateKeyBuffer: Buffer = runSensitive(
-      () =>
-        privateKey
-          ? toBuffer(addHexPrefix(privateKey))
-          : Buffer.from(crypto.getRandomValues(new Uint8Array(32))),
-      'Invalid private key',
-    );
-
-    if (!isValidPrivate(privateKeyBuffer)) {
-      throw new Error('Invalid private key');
-    }
-
-    const address = toChecksumAddress(Address.fromPrivateKey(privateKeyBuffer).toString());
-    return {privateKey: privateKeyBuffer.toString('hex'), address};
-  }
-
   async #handleSigningRequest(method: string, params: Json): Promise<Json> {
     switch (method) {
       case EthMethod.PersonalSign: {
@@ -281,12 +261,22 @@ export class SimpleKeyring implements Keyring {
     const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
 
     try {
+      if (serialized.chainId !== '0x5' && serialized.chainId !== '0x14a33') {
+        throw new Error('Unsupported chain');
+      }
+
+      if (serialized.type === '0x14a33') {
+        logger.debug("Using Base's paymaster for the Base Goerli chain");
+      }
+
+      const pimlico = new PimlicoClient(serialized.chainId === '0x5' ? 'goerli' : 'base-goerli');
+
       const nonce = await ethereum.request({
         method: 'eth_call',
         params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
       });
 
-      const userOp = await generateUserOp(
+      const userOp = await pimlico.generateUserOp(
         wallet.account.address as Hex,
         serialized.to,
         hexToBigInt(serialized.value),
@@ -294,16 +284,16 @@ export class SimpleKeyring implements Keyring {
         hexToBigInt(nonce as Hex),
       );
 
-      const sponsoredUserOp = await getSponsoredUserOp(userOp);
+      const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
 
-      const signedUserOp = await signUserOp(
+      const signedUserOp = await pimlico.signUserOp(
         (wallet.privateKey.startsWith('0x') ? wallet.privateKey : `0x${wallet.privateKey}`) as Hex,
         sponsoredUserOp,
       );
 
-      const userOpHash = await sendUserOp(signedUserOp);
+      const userOpHash = await pimlico.sendUserOp(signedUserOp);
 
-      const {receipt, txHash} = await getReceipt(userOpHash);
+      const {receipt, txHash} = await pimlico.getReceipt(userOpHash);
 
       logger.debug('Receipt', JSON.stringify(receipt, null, 2));
       logger.debug('Transaction Hash', txHash);

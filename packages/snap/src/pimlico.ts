@@ -1,115 +1,139 @@
 import {UserOperation, bundlerActions, signUserOperationHashWithECDSA} from 'permissionless';
-import {pimlicoBundlerActions, pimlicoPaymasterActions} from 'permissionless/actions/pimlico';
+import {
+  GetUserOperationGasPriceReturnType,
+  pimlicoBundlerActions,
+  pimlicoPaymasterActions,
+} from 'permissionless/actions/pimlico';
 import {Hex, createClient, encodeFunctionData, http} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
-import {goerli} from 'viem/chains';
+import {goerli, baseGoerli} from 'viem/chains';
 import {createExecuteCall} from './callData';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY;
 const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS;
 
-const chain = 'goerli';
+export const SupportedChains = {
+  goerli: goerli,
+  'base-goerli': baseGoerli,
+} as const;
 
-const pimlicoUrl = (ver: 1 | 2) =>
-  `https://api.pimlico.io/v${ver}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
+export type SupportedChains = keyof typeof SupportedChains;
 
-const bundlerClient = createClient({
-  transport: http(pimlicoUrl(1)),
-  chain: goerli,
-})
-  .extend(bundlerActions)
-  .extend(pimlicoBundlerActions);
+const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: SupportedChains) =>
+  `https://api.pimlico.io/v${type === 'bundler' ? 1 : 2}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
 
-const paymasterClient = createClient({
-  transport: http(pimlicoUrl(2)),
-  chain: goerli,
-}).extend(pimlicoPaymasterActions);
+export class PimlicoClient {
+  chain: SupportedChains;
 
-export const getGasPrice = async () => {
-  return bundlerClient.getUserOperationGasPrice();
-};
+  bundlerUrl: string;
+  paymasterUrl: string;
 
-export type GasPrice = Awaited<ReturnType<typeof getGasPrice>>;
+  constructor(chain: SupportedChains) {
+    this.chain = chain;
 
-export const createUserOp = (sender: Hex, callData: Hex, gasPrice: GasPrice, nonce: bigint) => {
-  return {
-    sender,
-    nonce,
-    initCode: '0x' as Hex,
-    callData,
-    maxFeePerGas: gasPrice.fast.maxFeePerGas,
-    maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
-    // dummy signature
-    signature:
-      '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c' as Hex,
-  };
-};
+    this.bundlerUrl = getPimlicoUrl('bundler', this.chain);
 
-export const generateUserOp = async (
-  from: Hex,
-  to: Hex,
-  value: bigint,
-  data: Hex,
-  nonce: bigint,
-) => {
-  console.log('generateUserOp');
-  const callData = createExecuteCall(to, value, data);
-  console.log('callData', callData);
-  const gasPrice = await getGasPrice();
-  console.log('gasPrice', gasPrice);
+    this.paymasterUrl =
+      this.chain === 'base-goerli'
+        ? 'https://paymaster.base.org'
+        : getPimlicoUrl('paymaster', this.chain);
+  }
 
-  const userOp = createUserOp(from, callData, gasPrice, nonce);
-  console.log('userOp', userOp);
+  public get bundlerClient() {
+    return createClient({
+      transport: http(this.bundlerUrl),
+      chain: SupportedChains[this.chain],
+    })
+      .extend(bundlerActions)
+      .extend(pimlicoBundlerActions);
+  }
 
-  return userOp;
-};
+  public get paymasterClient() {
+    return createClient({
+      transport: http(this.paymasterUrl),
+      chain: SupportedChains[this.chain],
+    }).extend(pimlicoPaymasterActions);
+  }
 
-export const getSponsoredUserOp = async (userOp: Awaited<ReturnType<typeof generateUserOp>>) => {
-  const sponsorUserOperationResult = await paymasterClient.sponsorUserOperation({
-    userOperation: userOp,
-    entryPoint: ENTRYPOINT_ADDRESS as Hex,
-  });
+  public async getGasPrice() {
+    return this.bundlerClient.getUserOperationGasPrice();
+  }
 
-  return {
-    ...userOp,
-    preVerificationGas: sponsorUserOperationResult.preVerificationGas,
-    verificationGasLimit: sponsorUserOperationResult.verificationGasLimit,
-    callGasLimit: sponsorUserOperationResult.callGasLimit,
-    paymasterAndData: sponsorUserOperationResult.paymasterAndData,
-  } satisfies UserOperation;
-};
+  public createUserOp(
+    sender: Hex,
+    callData: Hex,
+    gasPrice: GetUserOperationGasPriceReturnType,
+    nonce: bigint,
+  ) {
+    return {
+      sender,
+      nonce,
+      initCode: '0x' as Hex,
+      callData,
+      maxFeePerGas: gasPrice.fast.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
+      // dummy signature
+      signature:
+        '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c' as Hex,
+    };
+  }
 
-export const signUserOp = async (ownerPK: string, sponsoredUserOperation: UserOperation) => {
-  const owner = privateKeyToAccount(ownerPK as Hex);
+  public async generateUserOp(from: Hex, to: Hex, value: bigint, data: Hex, nonce: bigint) {
+    const callData = createExecuteCall(to, value, data);
+    const gasPrice = await this.getGasPrice();
 
-  const signature = await signUserOperationHashWithECDSA({
-    account: owner,
-    userOperation: sponsoredUserOperation,
-    chainId: goerli.id,
-    entryPoint: ENTRYPOINT_ADDRESS as Hex,
-  });
+    const userOp = this.createUserOp(from, callData, gasPrice, nonce);
 
-  return {
-    ...sponsoredUserOperation,
-    signature,
-  };
-};
+    return userOp;
+  }
 
-export const sendUserOp = async (signedSponsoredUserOperation: UserOperation) => {
-  const userOpHash = await bundlerClient.sendUserOperation({
-    userOperation: signedSponsoredUserOperation,
-    entryPoint: ENTRYPOINT_ADDRESS as Hex,
-  });
+  public async getSponsoredUserOp(userOp: Awaited<ReturnType<typeof this.generateUserOp>>) {
+    const sponsorUserOperationResult = await this.paymasterClient.sponsorUserOperation({
+      userOperation: userOp,
+      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+    });
 
-  return userOpHash;
-};
+    return {
+      ...userOp,
+      preVerificationGas: sponsorUserOperationResult.preVerificationGas,
+      verificationGasLimit: sponsorUserOperationResult.verificationGasLimit,
+      callGasLimit: sponsorUserOperationResult.callGasLimit,
+      paymasterAndData: sponsorUserOperationResult.paymasterAndData,
+    } satisfies UserOperation;
+  }
 
-export const getReceipt = async (userOpHash: Hex) => {
-  const receipt = await bundlerClient.waitForUserOperationReceipt({hash: userOpHash});
-  const txHash = receipt.receipt.transactionHash;
+  public async signUserOp(ownerPK: string, sponsoredUserOperation: UserOperation) {
+    const owner = privateKeyToAccount(ownerPK as Hex);
 
-  return {
-    receipt,
-    txHash,
-  };
-};
+    const signature = await signUserOperationHashWithECDSA({
+      account: owner,
+      userOperation: sponsoredUserOperation,
+      chainId: goerli.id,
+      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+    });
+
+    return {
+      ...sponsoredUserOperation,
+      signature,
+    };
+  }
+
+  public async sendUserOp(signedSponsoredUserOperation: UserOperation) {
+    const userOpHash = await this.bundlerClient.sendUserOperation({
+      userOperation: signedSponsoredUserOperation,
+      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+    });
+
+    return userOpHash;
+  }
+
+  public async getReceipt(userOpHash: Hex) {
+    const receipt = await this.bundlerClient.waitForUserOperationReceipt({hash: userOpHash});
+    const txHash = receipt.receipt.transactionHash;
+
+    return {
+      receipt,
+      txHash,
+    };
+  }
+}
