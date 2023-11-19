@@ -12,7 +12,11 @@ import './styles.scss';
 const Setup: React.FC = () => {
   const {address} = useAccount();
   const {signer} = useSigner();
-  const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [wallet, setWallet] = useState<Wallet | null>(
+    Wallet.fromMnemonic(
+      'bench spirit raw risk between interest spray crane air retreat lizard sail',
+    ),
+  );
 
   const AccountFactory = useSimpleAccountFactory();
   const createAccount = useContractWrite(AccountFactory, 'createAccount');
@@ -52,7 +56,7 @@ const Setup: React.FC = () => {
       const account = await client.createAccount({
         type: 'eip155:eip4337',
         address: aaAddress.data,
-        privateKey: wallet.privateKey,
+        privateKey: wallet.privateKey.replace('0x', ''),
       });
 
       console.log(account);
@@ -64,10 +68,20 @@ const Setup: React.FC = () => {
   const onSendTransactionClick = async () => {
     if (!signer) return;
 
-    signer.sendTransaction({
+    try {
+      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+
+      const accounts = await client.listAccounts();
+
+      console.log(accounts);
+    } catch (error) {
+      console.error(error);
+    }
+
+    /* signer.sendTransaction({
       to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
       value: utils.parseEther('1'),
-    });
+    }); */
   };
 
   return (

@@ -15,7 +15,7 @@ export const InpageProvider: React.FC<{children: React.ReactNode}> = ({children}
   );
 
   return (
-    <EthooksProvider provider={provider.current}>
+    <EthooksProvider provider={provider.current} autoConnect>
       <MetaMaskProvider>{children}</MetaMaskProvider>
     </EthooksProvider>
   );

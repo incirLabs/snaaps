@@ -24,7 +24,7 @@
     "snap.manifest.json"
   ],
   "scripts": {
-    "build": "mm-snap build",
+    "build": "dotenv -e ../../.env mm-snap build",
     "build:clean": "yarn clean && yarn build",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc && yarn lint:deps && yarn lint:types",
@@ -33,8 +33,8 @@
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' '!snap.manifest.json' --check",
     "lint:types": "tsc --noEmit",
-    "serve": "mm-snap serve",
-    "start": "NODE_ENV='development' mm-snap watch"
+    "serve": "dotenv -e ../../.env mm-snap serve",
+    "start": "NODE_ENV='development' dotenv -e ../../.env mm-snap watch"
   },
   "dependencies": {
     "@ethereumjs/common": "^3.1.2",
@@ -44,7 +44,10 @@
     "@metamask/keyring-api": "^1.0.0-rc.1",
     "@metamask/snaps-types": "^3.0.0",
     "@metamask/utils": "^8.1.0",
-    "uuid": "^9.0.0"
+    "common": "*",
+    "permissionless": "^0.0.12",
+    "uuid": "^9.0.0",
+    "viem": "^1.19.3"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",
