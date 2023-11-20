@@ -1,12 +1,13 @@
 import {UserOperation, bundlerActions, signUserOperationHashWithECDSA} from 'permissionless';
 import {
   GetUserOperationGasPriceReturnType,
+  SponsorUserOperationReturnType,
   pimlicoBundlerActions,
   pimlicoPaymasterActions,
 } from 'permissionless/actions/pimlico';
 import {Hex, createClient, encodeFunctionData, http} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
-import {goerli, baseGoerli} from 'viem/chains';
+import {goerli, baseGoerli, lineaTestnet} from 'viem/chains';
 import {createExecuteCall} from './callData';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY;
@@ -15,6 +16,7 @@ const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS;
 export const SupportedChains = {
   goerli: goerli,
   'base-goerli': baseGoerli,
+  'linea-testnet': lineaTestnet,
 } as const;
 
 export type SupportedChains = keyof typeof SupportedChains;
@@ -33,10 +35,7 @@ export class PimlicoClient {
 
     this.bundlerUrl = getPimlicoUrl('bundler', this.chain);
 
-    this.paymasterUrl =
-      this.chain === 'base-goerli'
-        ? 'https://paymaster.base.org'
-        : getPimlicoUrl('paymaster', this.chain);
+    this.paymasterUrl = getPimlicoUrl('paymaster', this.chain);
   }
 
   public get bundlerClient() {
@@ -88,10 +87,11 @@ export class PimlicoClient {
   }
 
   public async getSponsoredUserOp(userOp: Awaited<ReturnType<typeof this.generateUserOp>>) {
-    const sponsorUserOperationResult = await this.paymasterClient.sponsorUserOperation({
-      userOperation: userOp,
-      entryPoint: ENTRYPOINT_ADDRESS as Hex,
-    });
+    const sponsorUserOperationResult: SponsorUserOperationReturnType =
+      await this.paymasterClient.sponsorUserOperation({
+        userOperation: userOp,
+        entryPoint: ENTRYPOINT_ADDRESS as Hex,
+      });
 
     return {
       ...userOp,
@@ -108,7 +108,7 @@ export class PimlicoClient {
     const signature = await signUserOperationHashWithECDSA({
       account: owner,
       userOperation: sponsoredUserOperation,
-      chainId: goerli.id,
+      chainId: SupportedChains[this.chain].id,
       entryPoint: ENTRYPOINT_ADDRESS as Hex,
     });
 

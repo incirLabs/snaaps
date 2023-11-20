@@ -203,8 +203,7 @@ export class SimpleKeyring implements Keyring {
 
       case EthMethod.SignTransaction: {
         const [tx] = params as [any];
-        const signedTx = await this.#signTransaction(tx);
-        return signedTx;
+        return this.#signTransaction(tx);
       }
 
       case EthMethod.SignTypedDataV1: {
@@ -242,6 +241,7 @@ export class SimpleKeyring implements Keyring {
   async #signTransaction(tx: any): Promise<Json> {
     // Patch the transaction to make sure that the `chainId` is a hex string.
     if (!tx.chainId.startsWith('0x')) {
+      // eslint-disable-next-line no-param-reassign
       tx.chainId = `0x${parseInt(tx.chainId, 10).toString(16)}`;
     }
 
@@ -261,7 +261,11 @@ export class SimpleKeyring implements Keyring {
     const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
 
     try {
-      if (serialized.chainId !== '0x5' && serialized.chainId !== '0x14a33') {
+      if (
+        serialized.chainId !== '0x5' &&
+        serialized.chainId !== '0x14a33' &&
+        serialized.chainId !== '0xe704'
+      ) {
         throw new Error('Unsupported chain');
       }
 
@@ -295,7 +299,14 @@ export class SimpleKeyring implements Keyring {
 
       const {receipt, txHash} = await pimlico.getReceipt(userOpHash);
 
-      logger.debug('Receipt', JSON.stringify(receipt, null, 2));
+      logger.debug(
+        'Receipt',
+        JSON.stringify(
+          receipt,
+          (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+          2,
+        ),
+      );
       logger.debug('Transaction Hash', txHash);
 
       return serialized;
