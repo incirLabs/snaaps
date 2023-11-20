@@ -1,0 +1,652 @@
+diff --git a/_cjs/clients/transports/webSocket.js b/_cjs/clients/transports/webSocket.js
+index 0f776ee7d393963ac447b16502269054b448e405..29d294baad15086766643f95a43ab844d5863774 100644
+--- a/_cjs/clients/transports/webSocket.js
++++ b/_cjs/clients/transports/webSocket.js
+@@ -1,81 +1,3 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.webSocket = void 0;
+\ No newline at end of file
+-const request_js_1 = require("../../errors/request.js");
+-const transport_js_1 = require("../../errors/transport.js");
+-const rpc_js_1 = require("../../utils/rpc.js");
+-const createTransport_js_1 = require("./createTransport.js");
+-function webSocket(url, config = {}) {
+-    const { key = 'webSocket', name = 'WebSocket JSON-RPC', retryDelay } = config;
+-    return ({ chain, retryCount: retryCount_, timeout: timeout_ }) => {
+-        const retryCount = config.retryCount ?? retryCount_;
+-        const timeout = timeout_ ?? config.timeout ?? 10000;
+-        const url_ = url || chain?.rpcUrls.default.webSocket?.[0];
+-        if (!url_)
+-            throw new transport_js_1.UrlRequiredError();
+-        return (0, createTransport_js_1.createTransport)({
+-            key,
+-            name,
+-            async request({ method, params }) {
+-                const body = { method, params };
+-                const socket = await (0, rpc_js_1.getSocket)(url_);
+-                const { error, result } = await rpc_js_1.rpc.webSocketAsync(socket, {
+-                    body,
+-                    timeout,
+-                });
+-                if (error)
+-                    throw new request_js_1.RpcRequestError({
+-                        body,
+-                        error,
+-                        url: url_,
+-                    });
+-                return result;
+-            },
+-            retryCount,
+-            retryDelay,
+-            timeout,
+-            type: 'webSocket',
+-        }, {
+-            getSocket() {
+-                return (0, rpc_js_1.getSocket)(url_);
+-            },
+-            async subscribe({ params, onData, onError }) {
+-                const socket = await (0, rpc_js_1.getSocket)(url_);
+-                const { result: subscriptionId } = await new Promise((resolve, reject) => rpc_js_1.rpc.webSocket(socket, {
+-                    body: {
+-                        method: 'eth_subscribe',
+-                        params,
+-                    },
+-                    onResponse(response) {
+-                        if (response.error) {
+-                            reject(response.error);
+-                            onError?.(response.error);
+-                            return;
+-                        }
+-                        if (typeof response.id === 'number') {
+-                            resolve(response);
+-                            return;
+-                        }
+-                        if (response.method !== 'eth_subscription')
+-                            return;
+-                        onData(response.params);
+-                    },
+-                }));
+-                return {
+-                    subscriptionId,
+-                    async unsubscribe() {
+-                        return new Promise((resolve) => rpc_js_1.rpc.webSocket(socket, {
+-                            body: {
+-                                method: 'eth_unsubscribe',
+-                                params: [subscriptionId],
+-                            },
+-                            onResponse: resolve,
+-                        }));
+-                    },
+-                };
+-            },
+-        });
+-    };
+-}
+-exports.webSocket = webSocket;
+-//# sourceMappingURL=webSocket.js.map
+\ No newline at end of file
+diff --git a/_cjs/index.js b/_cjs/index.js
+index d4137a0878bcf9953249b403aedb97edf0e91381..cd5e0501471f75c5b18964c1a5e97db0fcce22f0 100644
+--- a/_cjs/index.js
++++ b/_cjs/index.js
+@@ -51,8 +51,6 @@ var createTransport_js_1 = require("./clients/transports/createTransport.js");
+ Object.defineProperty(exports, "createTransport", { enumerable: true, get: function () { return createTransport_js_1.createTransport; } });
+ var createWalletClient_js_1 = require("./clients/createWalletClient.js");
+ Object.defineProperty(exports, "createWalletClient", { enumerable: true, get: function () { return createWalletClient_js_1.createWalletClient; } });
+-var webSocket_js_1 = require("./clients/transports/webSocket.js");
+-Object.defineProperty(exports, "webSocket", { enumerable: true, get: function () { return webSocket_js_1.webSocket; } });
+ var abis_js_1 = require("./constants/abis.js");
+ Object.defineProperty(exports, "multicall3Abi", { enumerable: true, get: function () { return abis_js_1.multicall3Abi; } });
+ var address_js_1 = require("./constants/address.js");
+diff --git a/_cjs/utils/rpc.js b/_cjs/utils/rpc.js
+index 4b8c75ef204ae874cfaf900a1f2afe6a29a828ce..43c5368f7592046b0624c737d15525b607fa230e 100644
+--- a/_cjs/utils/rpc.js
++++ b/_cjs/utils/rpc.js
+@@ -1,9 +1,7 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.rpc = exports.getSocket = exports.socketsCache = void 0;
+-const isows_1 = require("isows");
+ const request_js_1 = require("../errors/request.js");
+-const createBatchScheduler_js_1 = require("./promise/createBatchScheduler.js");
+ const withTimeout_js_1 = require("./promise/withTimeout.js");
+ const stringify_js_1 = require("./stringify.js");
+ let id = 0;
+@@ -63,92 +61,8 @@ async function http(url, { body, fetchOptions = {}, timeout = 10000 }) {
+         });
+     }
+ }
+-exports.socketsCache = new Map();
+-async function getSocket(url) {
+-    let socket = exports.socketsCache.get(url);
+-    if (socket)
+-        return socket;
+-    const { schedule } = (0, createBatchScheduler_js_1.createBatchScheduler)({
+-        id: url,
+-        fn: async () => {
+-            const webSocket = new isows_1.WebSocket(url);
+-            const requests = new Map();
+-            const subscriptions = new Map();
+-            const onMessage = ({ data }) => {
+-                const message = JSON.parse(data);
+-                const isSubscription = message.method === 'eth_subscription';
+-                const id = isSubscription ? message.params.subscription : message.id;
+-                const cache = isSubscription ? subscriptions : requests;
+-                const callback = cache.get(id);
+-                if (callback)
+-                    callback({ data });
+-                if (!isSubscription)
+-                    cache.delete(id);
+-            };
+-            const onClose = () => {
+-                exports.socketsCache.delete(url);
+-                webSocket.removeEventListener('close', onClose);
+-                webSocket.removeEventListener('message', onMessage);
+-            };
+-            webSocket.addEventListener('close', onClose);
+-            webSocket.addEventListener('message', onMessage);
+-            if (webSocket.readyState === isows_1.WebSocket.CONNECTING) {
+-                await new Promise((resolve, reject) => {
+-                    if (!webSocket)
+-                        return;
+-                    webSocket.onopen = resolve;
+-                    webSocket.onerror = reject;
+-                });
+-            }
+-            socket = Object.assign(webSocket, {
+-                requests,
+-                subscriptions,
+-            });
+-            exports.socketsCache.set(url, socket);
+-            return [socket];
+-        },
+-    });
+-    const [_, [socket_]] = await schedule();
+-    return socket_;
+-}
+-exports.getSocket = getSocket;
+-function webSocket(socket, { body, onResponse }) {
+-    if (socket.readyState === socket.CLOSED ||
+-        socket.readyState === socket.CLOSING)
+-        throw new request_js_1.WebSocketRequestError({
+-            body,
+-            url: socket.url,
+-            details: 'Socket is closed.',
+-        });
+-    const id_ = id++;
+-    const callback = ({ data }) => {
+-        const message = JSON.parse(data);
+-        if (typeof message.id === 'number' && id_ !== message.id)
+-            return;
+-        onResponse?.(message);
+-        if (body.method === 'eth_subscribe' && typeof message.result === 'string') {
+-            socket.subscriptions.set(message.result, callback);
+-        }
+-        if (body.method === 'eth_unsubscribe') {
+-            socket.subscriptions.delete(body.params?.[0]);
+-        }
+-    };
+-    socket.requests.set(id_, callback);
+-    socket.send(JSON.stringify({ jsonrpc: '2.0', ...body, id: id_ }));
+-    return socket;
+-}
+-async function webSocketAsync(socket, { body, timeout = 10000 }) {
+-    return (0, withTimeout_js_1.withTimeout)(() => new Promise((onResponse) => exports.rpc.webSocket(socket, {
+-        body,
+-        onResponse,
+-    })), {
+-        errorInstance: new request_js_1.TimeoutError({ body, url: socket.url }),
+-        timeout,
+-    });
+-}
++
+ exports.rpc = {
+     http,
+-    webSocket,
+-    webSocketAsync,
+ };
+ //# sourceMappingURL=rpc.js.map
+\ No newline at end of file
+diff --git a/_esm/clients/transports/webSocket.js b/_esm/clients/transports/webSocket.js
+index 8ccf4d61027a7df3f6480c3ddbafa54b28a474a7..25bc13d1d4912d258b1ba0c3c12fbb8186683544 100644
+--- a/_esm/clients/transports/webSocket.js
++++ b/_esm/clients/transports/webSocket.js
+@@ -1,82 +1,8 @@
+-import { RpcRequestError } from '../../errors/request.js';
+-import { UrlRequiredError, } from '../../errors/transport.js';
+-import { getSocket, rpc } from '../../utils/rpc.js';
+-import { createTransport, } from './createTransport.js';
+ /**
+  * @description Creates a WebSocket transport that connects to a JSON-RPC API.
+  */
+ export function webSocket(
+ /** URL of the JSON-RPC API. Defaults to the chain's public RPC URL. */
+ url, config = {}) {
+-    const { key = 'webSocket', name = 'WebSocket JSON-RPC', retryDelay } = config;
+-    return ({ chain, retryCount: retryCount_, timeout: timeout_ }) => {
+-        const retryCount = config.retryCount ?? retryCount_;
+-        const timeout = timeout_ ?? config.timeout ?? 10000;
+-        const url_ = url || chain?.rpcUrls.default.webSocket?.[0];
+-        if (!url_)
+-            throw new UrlRequiredError();
+-        return createTransport({
+-            key,
+-            name,
+-            async request({ method, params }) {
+-                const body = { method, params };
+-                const socket = await getSocket(url_);
+-                const { error, result } = await rpc.webSocketAsync(socket, {
+-                    body,
+-                    timeout,
+-                });
+-                if (error)
+-                    throw new RpcRequestError({
+-                        body,
+-                        error,
+-                        url: url_,
+-                    });
+-                return result;
+-            },
+-            retryCount,
+-            retryDelay,
+-            timeout,
+-            type: 'webSocket',
+-        }, {
+-            getSocket() {
+-                return getSocket(url_);
+-            },
+-            async subscribe({ params, onData, onError }) {
+-                const socket = await getSocket(url_);
+-                const { result: subscriptionId } = await new Promise((resolve, reject) => rpc.webSocket(socket, {
+-                    body: {
+-                        method: 'eth_subscribe',
+-                        params,
+-                    },
+-                    onResponse(response) {
+-                        if (response.error) {
+-                            reject(response.error);
+-                            onError?.(response.error);
+-                            return;
+-                        }
+-                        if (typeof response.id === 'number') {
+-                            resolve(response);
+-                            return;
+-                        }
+-                        if (response.method !== 'eth_subscription')
+-                            return;
+-                        onData(response.params);
+-                    },
+-                }));
+-                return {
+-                    subscriptionId,
+-                    async unsubscribe() {
+-                        return new Promise((resolve) => rpc.webSocket(socket, {
+-                            body: {
+-                                method: 'eth_unsubscribe',
+-                                params: [subscriptionId],
+-                            },
+-                            onResponse: resolve,
+-                        }));
+-                    },
+-                };
+-            },
+-        });
+-    };
++    //
+ }
+\ No newline at end of file
+-//# sourceMappingURL=webSocket.js.map
+\ No newline at end of file
+diff --git a/_esm/index.js b/_esm/index.js
+index fba58cfe33d76a2cde69ff2a1998d9c5d995d9f0..1253f48f2becbf16ed705453080bcca781485aac 100644
+--- a/_esm/index.js
++++ b/_esm/index.js
+@@ -13,7 +13,6 @@ export { testActions, } from './clients/decorators/test.js';
+ export { walletActions, } from './clients/decorators/wallet.js';
+ export { createTransport, } from './clients/transports/createTransport.js';
+ export { createWalletClient, } from './clients/createWalletClient.js';
+-export { webSocket, } from './clients/transports/webSocket.js';
+ export { multicall3Abi } from './constants/abis.js';
+ export { zeroAddress } from './constants/address.js';
+ export { etherUnits, gweiUnits, weiUnits } from './constants/unit.js';
+diff --git a/_esm/utils/rpc.js b/_esm/utils/rpc.js
+index 78cc58d4d93aba74cccf278e539ba31952c36e53..37700664ce76cfa446cf42d3defe7dc9ba579177 100644
+--- a/_esm/utils/rpc.js
++++ b/_esm/utils/rpc.js
+@@ -1,6 +1,4 @@
+-import { WebSocket } from 'isows';
+-import { HttpRequestError, TimeoutError, WebSocketRequestError, } from '../errors/request.js';
+-import { createBatchScheduler, } from './promise/createBatchScheduler.js';
++import { HttpRequestError, TimeoutError, } from '../errors/request.js';
+ import { withTimeout, } from './promise/withTimeout.js';
+ import { stringify } from './stringify.js';
+ let id = 0;
+@@ -60,101 +58,9 @@ async function http(url, { body, fetchOptions = {}, timeout = 10000 }) {
+         });
+     }
+ }
+-export const socketsCache = /*#__PURE__*/ new Map();
+-export async function getSocket(url) {
+-    let socket = socketsCache.get(url);
+-    // If the socket already exists, return it.
+-    if (socket)
+-        return socket;
+-    const { schedule } = createBatchScheduler({
+-        id: url,
+-        fn: async () => {
+-            const webSocket = new WebSocket(url);
+-            // Set up a cache for incoming "synchronous" requests.
+-            const requests = new Map();
+-            // Set up a cache for subscriptions (eth_subscribe).
+-            const subscriptions = new Map();
+-            const onMessage = ({ data }) => {
+-                const message = JSON.parse(data);
+-                const isSubscription = message.method === 'eth_subscription';
+-                const id = isSubscription ? message.params.subscription : message.id;
+-                const cache = isSubscription ? subscriptions : requests;
+-                const callback = cache.get(id);
+-                if (callback)
+-                    callback({ data });
+-                if (!isSubscription)
+-                    cache.delete(id);
+-            };
+-            const onClose = () => {
+-                socketsCache.delete(url);
+-                webSocket.removeEventListener('close', onClose);
+-                webSocket.removeEventListener('message', onMessage);
+-            };
+-            // Setup event listeners for RPC & subscription responses.
+-            webSocket.addEventListener('close', onClose);
+-            webSocket.addEventListener('message', onMessage);
+-            // Wait for the socket to open.
+-            if (webSocket.readyState === WebSocket.CONNECTING) {
+-                await new Promise((resolve, reject) => {
+-                    if (!webSocket)
+-                        return;
+-                    webSocket.onopen = resolve;
+-                    webSocket.onerror = reject;
+-                });
+-            }
+-            // Create a new socket instance.
+-            socket = Object.assign(webSocket, {
+-                requests,
+-                subscriptions,
+-            });
+-            socketsCache.set(url, socket);
+-            return [socket];
+-        },
+-    });
+-    const [_, [socket_]] = await schedule();
+-    return socket_;
+-}
+-function webSocket(socket, { body, onResponse }) {
+-    if (socket.readyState === socket.CLOSED ||
+-        socket.readyState === socket.CLOSING)
+-        throw new WebSocketRequestError({
+-            body,
+-            url: socket.url,
+-            details: 'Socket is closed.',
+-        });
+-    const id_ = id++;
+-    const callback = ({ data }) => {
+-        const message = JSON.parse(data);
+-        if (typeof message.id === 'number' && id_ !== message.id)
+-            return;
+-        onResponse?.(message);
+-        // If we are subscribing to a topic, we want to set up a listener for incoming
+-        // messages.
+-        if (body.method === 'eth_subscribe' && typeof message.result === 'string') {
+-            socket.subscriptions.set(message.result, callback);
+-        }
+-        // If we are unsubscribing from a topic, we want to remove the listener.
+-        if (body.method === 'eth_unsubscribe') {
+-            socket.subscriptions.delete(body.params?.[0]);
+-        }
+-    };
+-    socket.requests.set(id_, callback);
+-    socket.send(JSON.stringify({ jsonrpc: '2.0', ...body, id: id_ }));
+-    return socket;
+-}
+-async function webSocketAsync(socket, { body, timeout = 10000 }) {
+-    return withTimeout(() => new Promise((onResponse) => rpc.webSocket(socket, {
+-        body,
+-        onResponse,
+-    })), {
+-        errorInstance: new TimeoutError({ body, url: socket.url }),
+-        timeout,
+-    });
+-}
++
+ ///////////////////////////////////////////////////
+ export const rpc = {
+     http,
+-    webSocket,
+-    webSocketAsync,
+ };
+ //# sourceMappingURL=rpc.js.map
+\ No newline at end of file
+diff --git a/_types/index.d.ts b/_types/index.d.ts
+index f42598304124cc262727403f780262ab7291d955..24e542fc9d3af69cbc58b7a6f15aef5f0a8e3e84 100644
+--- a/_types/index.d.ts
++++ b/_types/index.d.ts
+@@ -105,7 +105,6 @@ export { type TestActions, testActions, } from './clients/decorators/test.js';
+ export { type WalletActions, walletActions, } from './clients/decorators/wallet.js';
+ export { type Transport, type TransportConfig, type CreateTransportErrorType, createTransport, } from './clients/transports/createTransport.js';
+ export { type WalletClient, type WalletClientConfig, type CreateWalletClientErrorType, createWalletClient, } from './clients/createWalletClient.js';
+-export { type WebSocketTransport, type WebSocketTransportConfig, type WebSocketTransportErrorType, webSocket, } from './clients/transports/webSocket.js';
+ export { multicall3Abi } from './constants/abis.js';
+ export { zeroAddress } from './constants/address.js';
+ export { etherUnits, gweiUnits, weiUnits } from './constants/unit.js';
+diff --git a/index.ts b/index.ts
+index 3641ac4446bce465c506770b047686de7f561a96..8bb1fb7ad94d6b513fb4ef9f00e2c737307bfbb9 100644
+--- a/index.ts
++++ b/index.ts
+@@ -475,12 +475,6 @@ export {
+   type CreateWalletClientErrorType,
+   createWalletClient,
+ } from './clients/createWalletClient.js'
+-export {
+-  type WebSocketTransport,
+-  type WebSocketTransportConfig,
+-  type WebSocketTransportErrorType,
+-  webSocket,
+-} from './clients/transports/webSocket.js'
+ export { multicall3Abi } from './constants/abis.js'
+ export { zeroAddress } from './constants/address.js'
+ export { etherUnits, gweiUnits, weiUnits } from './constants/unit.js'
+diff --git a/utils/rpc.ts b/utils/rpc.ts
+index 74e2ab69e36966255baba7b6787ae98d52383d10..b1d1aa68557c5fcfac728a1c38407ddb656540a0 100644
+--- a/utils/rpc.ts
++++ b/utils/rpc.ts
+@@ -1,18 +1,10 @@
+-import { WebSocket } from 'isows'
+-import type { MessageEvent } from 'isows'
+-
+ import {
+   HttpRequestError,
+   type HttpRequestErrorType,
+   TimeoutError,
+   type TimeoutErrorType,
+-  WebSocketRequestError,
+ } from '../errors/request.js'
+ import type { ErrorType } from '../errors/utils.js'
+-import {
+-  type CreateBatchSchedulerErrorType,
+-  createBatchScheduler,
+-} from './promise/createBatchScheduler.js'
+ import {
+   type WithTimeoutErrorType,
+   withTimeout,
+@@ -148,171 +140,6 @@ async function http<TBody extends RpcRequest | RpcRequest[]>(
+ }
+ 
+ ///////////////////////////////////////////////////
+-// WebSocket
+-
+-type Id = string | number
+-type CallbackFn = (message: any) => void
+-type CallbackMap = Map<Id, CallbackFn>
+-
+-export type Socket = WebSocket & {
+-  requests: CallbackMap
+-  subscriptions: CallbackMap
+-}
+-
+-export type GetSocketErrorType = CreateBatchSchedulerErrorType | ErrorType
+-
+-export const socketsCache = /*#__PURE__*/ new Map<string, Socket>()
+-
+-export async function getSocket(url: string) {
+-  let socket = socketsCache.get(url)
+-
+-  // If the socket already exists, return it.
+-  if (socket) return socket
+-
+-  const { schedule } = createBatchScheduler<undefined, [Socket]>({
+-    id: url,
+-    fn: async () => {
+-      const webSocket = new WebSocket(url)
+-
+-      // Set up a cache for incoming "synchronous" requests.
+-      const requests = new Map<Id, CallbackFn>()
+-
+-      // Set up a cache for subscriptions (eth_subscribe).
+-      const subscriptions = new Map<Id, CallbackFn>()
+-
+-      const onMessage: (event: MessageEvent) => void = ({ data }) => {
+-        const message: RpcResponse = JSON.parse(data as string)
+-        const isSubscription = message.method === 'eth_subscription'
+-        const id = isSubscription ? message.params.subscription : message.id
+-        const cache = isSubscription ? subscriptions : requests
+-        const callback = cache.get(id)
+-        if (callback) callback({ data })
+-        if (!isSubscription) cache.delete(id)
+-      }
+-      const onClose = () => {
+-        socketsCache.delete(url)
+-        webSocket.removeEventListener('close', onClose)
+-        webSocket.removeEventListener('message', onMessage)
+-      }
+-
+-      // Setup event listeners for RPC & subscription responses.
+-      webSocket.addEventListener('close', onClose)
+-      webSocket.addEventListener('message', onMessage)
+-
+-      // Wait for the socket to open.
+-      if (webSocket.readyState === WebSocket.CONNECTING) {
+-        await new Promise((resolve, reject) => {
+-          if (!webSocket) return
+-          webSocket.onopen = resolve
+-          webSocket.onerror = reject
+-        })
+-      }
+-
+-      // Create a new socket instance.
+-      socket = Object.assign(webSocket, {
+-        requests,
+-        subscriptions,
+-      })
+-      socketsCache.set(url, socket)
+-
+-      return [socket]
+-    },
+-  })
+-
+-  const [_, [socket_]] = await schedule()
+-  return socket_
+-}
+-
+-export type WebSocketOptions = {
+-  /** The RPC request body. */
+-  body: RpcRequest
+-  /** The callback to invoke on response. */
+-  onResponse?: (message: RpcResponse) => void
+-}
+-
+-export type WebSocketReturnType = Socket
+-
+-export type WebSocketErrorType = WebSocketRequestError | ErrorType
+-
+-function webSocket(
+-  socket: Socket,
+-  { body, onResponse }: WebSocketOptions,
+-): WebSocketReturnType {
+-  if (
+-    socket.readyState === socket.CLOSED ||
+-    socket.readyState === socket.CLOSING
+-  )
+-    throw new WebSocketRequestError({
+-      body,
+-      url: socket.url,
+-      details: 'Socket is closed.',
+-    })
+-
+-  const id_ = id++
+-
+-  const callback = ({ data }: { data: any }) => {
+-    const message: RpcResponse = JSON.parse(data)
+-
+-    if (typeof message.id === 'number' && id_ !== message.id) return
+-
+-    onResponse?.(message)
+-
+-    // If we are subscribing to a topic, we want to set up a listener for incoming
+-    // messages.
+-    if (body.method === 'eth_subscribe' && typeof message.result === 'string') {
+-      socket.subscriptions.set(message.result, callback)
+-    }
+-
+-    // If we are unsubscribing from a topic, we want to remove the listener.
+-    if (body.method === 'eth_unsubscribe') {
+-      socket.subscriptions.delete(body.params?.[0])
+-    }
+-  }
+-  socket.requests.set(id_, callback)
+-
+-  socket.send(JSON.stringify({ jsonrpc: '2.0', ...body, id: id_ }))
+-
+-  return socket
+-}
+-
+-export type WebSocketAsyncOptions = {
+-  /** The RPC request body. */
+-  body: RpcRequest
+-  /** The timeout (in ms) for the request. */
+-  timeout?: number
+-}
+-
+-export type WebSocketAsyncReturnType = RpcResponse
+-
+-export type WebSocketAsyncErrorType =
+-  | WebSocketErrorType
+-  | TimeoutErrorType
+-  | WithTimeoutErrorType
+-  | ErrorType
+-
+-async function webSocketAsync(
+-  socket: Socket,
+-  { body, timeout = 10_000 }: WebSocketAsyncOptions,
+-): Promise<WebSocketAsyncReturnType> {
+-  return withTimeout(
+-    () =>
+-      new Promise<RpcResponse>((onResponse) =>
+-        rpc.webSocket(socket, {
+-          body,
+-          onResponse,
+-        }),
+-      ),
+-    {
+-      errorInstance: new TimeoutError({ body, url: socket.url }),
+-      timeout,
+-    },
+-  )
+-}
+-
+-///////////////////////////////////////////////////
+-
+ export const rpc = {
+   http,
+-  webSocket,
+-  webSocketAsync,
+ }
