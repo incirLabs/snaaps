@@ -25,7 +25,7 @@ import type {
 } from '@metamask/keyring-api';
 import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
 import {KeyringEvent} from '@metamask/keyring-api/dist/events';
-import {hexToBigInt, type Json, type JsonRpcRequest} from '@metamask/utils';
+import {hexToBigInt, hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
 import {SnapsGlobalObject} from '@metamask/snaps-types';
 import {Buffer} from 'buffer';
 import {v4 as uuid} from 'uuid';
@@ -33,7 +33,7 @@ import {Hex} from 'viem';
 
 import {saveState} from './stateManagement';
 import {isEvmChain, serializeTransaction, isUniqueAddress, throwError, runSensitive} from './util';
-import {PimlicoClient} from './pimlico';
+import {PimlicoClient, SupportedChains} from './pimlico';
 import {createGetNonceCall} from './callData';
 import {logger} from './logger';
 
@@ -261,19 +261,15 @@ export class SimpleKeyring implements Keyring {
     const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
 
     try {
-      if (
-        serialized.chainId !== '0x5' &&
-        serialized.chainId !== '0x14a33' &&
-        serialized.chainId !== '0xe704'
-      ) {
+      const currentChain = (Object.keys(SupportedChains) as SupportedChains[]).find(
+        (chainName) => SupportedChains[chainName].id === hexToNumber(tx.chainId),
+      );
+
+      if (!currentChain) {
         throw new Error('Unsupported chain');
       }
 
-      if (serialized.type === '0x14a33') {
-        logger.debug("Using Base's paymaster for the Base Goerli chain");
-      }
-
-      const pimlico = new PimlicoClient(serialized.chainId === '0x5' ? 'goerli' : 'base-goerli');
+      const pimlico = new PimlicoClient(currentChain);
 
       const nonce = await ethereum.request({
         method: 'eth_call',
