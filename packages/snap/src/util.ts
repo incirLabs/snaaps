@@ -1,7 +1,7 @@
-import type { JsonTx } from '@ethereumjs/tx';
-import type { Json } from '@metamask/utils';
+import type {JsonTx} from '@ethereumjs/tx';
+import type {Json} from '@metamask/utils';
 
-import type { Wallet } from './keyring';
+import type {Wallet} from './keyring';
 
 /**
  * Serializes a transaction by removing undefined properties and converting them to null.
@@ -67,10 +67,7 @@ export function throwError(message: string): never {
  * @param message - Error message to throw if the callback fails.
  * @returns The result of the callback.
  */
-export function runSensitive<Type>(
-  callback: () => Type,
-  message?: string,
-): Type {
+export function runSensitive<Type>(callback: () => Type, message?: string): Type {
   try {
     return callback();
   } catch (error) {

@@ -1,5 +1,5 @@
-import type { KeyringState } from './keyring';
-import { logger } from './logger';
+import type {KeyringState} from './keyring';
+import {logger} from './logger';
 
 /**
  * Default keyring state.
@@ -18,7 +18,7 @@ const defaultState: KeyringState = {
 export async function getState(): Promise<KeyringState> {
   const state = (await snap.request({
     method: 'snap_manageState',
-    params: { operation: 'get' },
+    params: {operation: 'get'},
   })) as any;
 
   logger.debug('Retrieved state:', JSON.stringify(state));
@@ -37,6 +37,6 @@ export async function getState(): Promise<KeyringState> {
 export async function saveState(state: KeyringState) {
   await snap.request({
     method: 'snap_manageState',
-    params: { operation: 'update', newState: state },
+    params: {operation: 'update', newState: state},
   });
 }

@@ -14,10 +14,10 @@ let keyring: SimpleKeyring;
 async function getKeyring(): Promise<SimpleKeyring> {
   if (!keyring) {
     const state = await getState();
-    if (!keyring) {
-      keyring = new SimpleKeyring(state);
-    }
+
+    keyring = new SimpleKeyring(state);
   }
+
   return keyring;
 }
 

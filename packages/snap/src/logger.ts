@@ -1,3 +1,5 @@
+/* eslint no-console: "off" */
+
 /**
  * Logging levels.
  */
@@ -27,9 +29,7 @@ type LoggerContext = {
  * @returns The default logging level.
  */
 function getDefaultLevel(): LogLevel {
-  return process.env.NODE_ENV === 'development'
-    ? LogLevel.DEBUG
-    : LogLevel.WARN;
+  return process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.WARN;
 }
 
 /**
@@ -71,12 +71,8 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  #log(
-    level: LogLevel = LogLevel.DEBUG,
-    message?: any,
-    ...optionalParams: any[]
-  ): void {
-    const { threshold, handlers } = this.#context;
+  #log(level: LogLevel = LogLevel.DEBUG, message?: any, ...optionalParams: any[]): void {
+    const {threshold, handlers} = this.#context;
     if (level >= threshold) {
       handlers[level](message, ...optionalParams);
     }

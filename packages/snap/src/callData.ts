@@ -1,4 +1,4 @@
-import {Hex, encodeFunctionData} from 'viem';
+import {encodeFunctionData, type Hex} from 'viem';
 
 export const createExecuteCall = (to: Hex, value: bigint, data: Hex) => {
   return encodeFunctionData({

@@ -1,20 +1,20 @@
-import {UserOperation, bundlerActions, signUserOperationHashWithECDSA} from 'permissionless';
+import {bundlerActions, signUserOperationHashWithECDSA, type UserOperation} from 'permissionless';
 import {
-  GetUserOperationGasPriceReturnType,
-  SponsorUserOperationReturnType,
   pimlicoBundlerActions,
   pimlicoPaymasterActions,
+  type GetUserOperationGasPriceReturnType,
+  type SponsorUserOperationReturnType,
 } from 'permissionless/actions/pimlico';
-import {Hex, createClient, encodeFunctionData, http} from 'viem';
+import {createClient, http, type Hex} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import {goerli, baseGoerli, lineaTestnet} from 'viem/chains';
 import {createExecuteCall} from './callData';
 
-const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY;
-const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS;
+const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
+const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS ?? '';
 
 export const SupportedChains = {
-  goerli: goerli,
+  goerli,
   'base-goerli': baseGoerli,
   'linea-testnet': lineaTestnet,
 } as const;
@@ -71,6 +71,7 @@ export class PimlicoClient {
       callData,
       maxFeePerGas: gasPrice.fast.maxFeePerGas,
       maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
+
       // dummy signature
       signature:
         '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c' as Hex,

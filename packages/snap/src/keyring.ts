@@ -1,14 +1,6 @@
 import {Common, Hardfork} from '@ethereumjs/common';
 import {TransactionFactory} from '@ethereumjs/tx';
-import {
-  Address,
-  ecsign,
-  stripHexPrefix,
-  toBuffer,
-  toChecksumAddress,
-  isValidPrivate,
-  addHexPrefix,
-} from '@ethereumjs/util';
+import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import type {TypedDataV1, TypedMessage} from '@metamask/eth-sig-util';
 import {
   SignTypedDataVersion,
@@ -26,13 +18,15 @@ import type {
 import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
 import {KeyringEvent} from '@metamask/keyring-api/dist/events';
 import {hexToBigInt, hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
-import {SnapsGlobalObject} from '@metamask/snaps-types';
-import {Buffer} from 'buffer';
+import type {SnapsGlobalObject} from '@metamask/snaps-types';
 import {v4 as uuid} from 'uuid';
-import {Hex} from 'viem';
+import type {Hex} from 'viem';
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+import {Buffer} from 'buffer';
 
 import {saveState} from './stateManagement';
-import {isEvmChain, serializeTransaction, isUniqueAddress, throwError, runSensitive} from './util';
+import {isEvmChain, serializeTransaction, isUniqueAddress, throwError} from './util';
 import {PimlicoClient, SupportedChains} from './pimlico';
 import {createGetNonceCall} from './callData';
 import {logger} from './logger';
@@ -73,6 +67,7 @@ export class SimpleKeyring implements Keyring {
     // account object is exposed to external components, such as MetaMask and
     // the snap UI.
     if (options?.privateKey) {
+      // eslint-disable-next-line no-param-reassign
       delete options.privateKey;
     }
 
@@ -149,7 +144,7 @@ export class SimpleKeyring implements Keyring {
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     const res = this.#syncSubmitRequest(request);
 
-    return await res;
+    return res;
   }
 
   async approveRequest(id: string): Promise<void> {
