@@ -20695,6 +20695,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"viem@patch:viem@npm%3A1.19.3#./.yarn/patches/viem-npm-1.19.3-0e33e44bf3.patch::locator=root%40workspace%3A.":
+  version: 1.19.3
+  resolution: "viem@patch:viem@npm%3A1.19.3#./.yarn/patches/viem-npm-1.19.3-0e33e44bf3.patch::version=1.19.3&hash=34a908&locator=root%40workspace%3A."
+  dependencies:
+    "@adraffy/ens-normalize": 1.10.0
+    "@noble/curves": 1.2.0
+    "@noble/hashes": 1.3.2
+    "@scure/bip32": 1.3.2
+    "@scure/bip39": 1.2.1
+    abitype: 0.9.8
+    isows: 1.0.3
+    ws: 8.13.0
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: e5aa2ce648d4ba823a0f9b8efc6abeeaf25d691e7c4df3bdf097643872c8ae6ed5d81f12cf2c0dac283bd8271b59eea6555c4c04191b7aeaa20ab005a3394490
+  languageName: node
+  linkType: hard
+
 "vite@npm:^4.4.5":
   version: 4.5.0
   resolution: "vite@npm:4.5.0"
