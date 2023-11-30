@@ -2,13 +2,13 @@ import {bundlerActions, signUserOperationHashWithECDSA, type UserOperation} from
 import {
   pimlicoBundlerActions,
   pimlicoPaymasterActions,
-  type GetUserOperationGasPriceReturnType,
   type SponsorUserOperationReturnType,
 } from 'permissionless/actions/pimlico';
 import {createClient, http, type Hex} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import {goerli, baseGoerli, lineaTestnet} from 'viem/chains';
 import {createExecuteCall} from './callData';
+import {fillUserOp} from './userOp';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
 const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS ?? '';
@@ -58,33 +58,17 @@ export class PimlicoClient {
     return this.bundlerClient.getUserOperationGasPrice();
   }
 
-  public createUserOp(
-    sender: Hex,
-    callData: Hex,
-    gasPrice: GetUserOperationGasPriceReturnType,
-    nonce: bigint,
-  ) {
-    return {
-      sender,
-      nonce,
-      initCode: '0x' as Hex,
-      callData,
-      maxFeePerGas: gasPrice.fast.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
-
-      // dummy signature
-      signature:
-        '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c' as Hex,
-    };
-  }
-
   public async generateUserOp(from: Hex, to: Hex, value: bigint, data: Hex, nonce: bigint) {
     const callData = createExecuteCall(to, value, data);
     const gasPrice = await this.getGasPrice();
 
-    const userOp = this.createUserOp(from, callData, gasPrice, nonce);
-
-    return userOp;
+    return fillUserOp({
+      sender: from,
+      nonce,
+      callData,
+      maxFeePerGas: gasPrice.fast.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
+    });
   }
 
   public async getSponsoredUserOp(userOp: Awaited<ReturnType<typeof this.generateUserOp>>) {
