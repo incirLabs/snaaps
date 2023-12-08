@@ -4,7 +4,7 @@ import cx from 'classnames';
 import {Wallet} from 'ethers';
 import {useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
-import {useAccount, useContractWrite} from '@incirlabs/react-ethooks';
+import {useAccount, useContractRead, useContractWrite} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
 import {useSnaapAddress, useSimpleAccountFactory} from '../../hooks';
 import {Paths} from '../Paths';
@@ -23,7 +23,7 @@ const Setup: React.FC = () => {
 
   const AccountFactory = useSimpleAccountFactory();
   const createAccount = useContractWrite(AccountFactory, 'createAccount');
-  const getAccountAddress = useContractWrite(AccountFactory, 'getAddress');
+  const getAccountAddress = useContractRead(AccountFactory, 'getAddress');
 
   const onDeployClick = async () => {
     const wallet = Wallet.createRandom();
