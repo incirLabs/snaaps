@@ -1,9 +1,5 @@
 import {bundlerActions, signUserOperationHashWithECDSA, type UserOperation} from 'permissionless';
-import {
-  pimlicoBundlerActions,
-  pimlicoPaymasterActions,
-  type SponsorUserOperationReturnType,
-} from 'permissionless/actions/pimlico';
+import {pimlicoBundlerActions, pimlicoPaymasterActions} from 'permissionless/actions/pimlico';
 import {createClient, http, type Hex} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import {goerli, baseGoerli, lineaTestnet} from 'viem/chains';
@@ -72,11 +68,10 @@ export class PimlicoClient {
   }
 
   public async getSponsoredUserOp(userOp: Awaited<ReturnType<typeof this.generateUserOp>>) {
-    const sponsorUserOperationResult: SponsorUserOperationReturnType =
-      await this.paymasterClient.sponsorUserOperation({
-        userOperation: userOp,
-        entryPoint: ENTRYPOINT_ADDRESS as Hex,
-      });
+    const sponsorUserOperationResult = await this.paymasterClient.sponsorUserOperation({
+      userOperation: userOp,
+      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+    });
 
     return {
       ...userOp,

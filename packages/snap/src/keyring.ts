@@ -18,7 +18,6 @@ import type {
 import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
 import {KeyringEvent} from '@metamask/keyring-api/dist/events';
 import {hexToBigInt, hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
-import type {SnapsGlobalObject} from '@metamask/snaps-types';
 import {v4 as uuid} from 'uuid';
 import type {Hex} from 'viem';
 
@@ -84,7 +83,7 @@ export class SimpleKeyring implements Keyring {
           EthMethod.SignTypedDataV3,
           EthMethod.SignTypedDataV4,
         ],
-        type: EthAccountType.Eip4337,
+        type: EthAccountType.Erc4337,
       };
       await this.#emitEvent(KeyringEvent.AccountCreated, {account});
       this.#state.wallets[account.id] = {account, privateKey};
@@ -360,6 +359,6 @@ export class SimpleKeyring implements Keyring {
   }
 
   async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
-    await emitSnapKeyringEvent(snap as SnapsGlobalObject, event, data);
+    await emitSnapKeyringEvent(snap, event, data);
   }
 }
