@@ -19,7 +19,7 @@ const Landing: React.FC = () => {
   const isSnapInstalled = isConnected && metamaskState.installedSnap;
 
   useEffect(() => {
-    if (isSnapInstalled) navigate(Paths.Landing.Setup);
+    // if (isSnapInstalled) navigate(Paths.Landing.Setup);
   }, [isSnapInstalled, navigate]);
 
   return (
