@@ -1,6 +1,6 @@
 import {useEffect} from 'react';
 import cx from 'classnames';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useAccount, useConnect} from '@incirlabs/react-ethooks';
 import {Button, Surface, PageContainer} from '../../components';
 import {useMetamask} from '../../hooks';
@@ -67,6 +67,10 @@ const Landing: React.FC = () => {
           </Button>
         </Surface>
       ) : null}
+
+      <Button theme="chip" as={Link} to="/setup">
+        Go To Setup
+      </Button>
     </PageContainer>
   );
 };

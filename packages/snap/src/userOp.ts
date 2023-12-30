@@ -1,3 +1,4 @@
+import type {EthBaseUserOperation} from '@metamask/keyring-api';
 import {zeroAddress, type Address, type Hex} from 'viem';
 
 export type UserOperation = {
@@ -31,10 +32,31 @@ export const DefaultsForUserOp: UserOperation = {
     '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
 };
 
+export const DefaultsForMMBaseUserOp: EthBaseUserOperation = {
+  nonce: '0x0',
+  initCode: '0x',
+  callData: '0x',
+  bundlerUrl: 'https://bundler.example.com/rpc',
+  gasLimits: undefined,
+
+  dummyPaymasterAndData: '0x',
+  dummySignature:
+    '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
+};
+
 export const fillUserOp = (
   op: Partial<UserOperation>,
   defaults = DefaultsForUserOp,
 ): UserOperation => {
+  const partial = Object.fromEntries(Object.entries(op).filter(([, value]) => value !== null));
+
+  return {...defaults, ...partial};
+};
+
+export const fillMMBaseUserOp = (
+  op: Partial<EthBaseUserOperation>,
+  defaults = DefaultsForMMBaseUserOp,
+): EthBaseUserOperation => {
   const partial = Object.fromEntries(Object.entries(op).filter(([, value]) => value !== null));
 
   return {...defaults, ...partial};

@@ -45,17 +45,15 @@ const Setup: React.FC = () => {
 
     const aaAddress = aaAddressRes.data;
 
-    try {
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+    const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
 
-      const account = await client.createAccount({
-        type: 'eip155:eip4337',
-        address: aaAddress,
-        privateKey: wallet.privateKey.replace('0x', ''),
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    const account = await client.createAccount({
+      type: 'eip155:eip4337',
+      address: aaAddress,
+      privateKey: wallet.privateKey.replace('0x', ''),
+    });
+
+    console.log('account', account);
   };
 
   return (

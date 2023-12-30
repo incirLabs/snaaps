@@ -1,5 +1,3 @@
-import {Common, Hardfork} from '@ethereumjs/common';
-import {TransactionFactory} from '@ethereumjs/tx';
 import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import type {TypedDataV1, TypedMessage} from '@metamask/eth-sig-util';
 import {
@@ -14,21 +12,27 @@ import type {
   KeyringAccount,
   KeyringRequest,
   SubmitRequestResponse,
+  EthBaseTransaction,
+  EthUserOperation,
+  EthBaseUserOperation,
+  EthUserOperationPatch,
 } from '@metamask/keyring-api';
 import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
 import {KeyringEvent} from '@metamask/keyring-api/dist/events';
-import {hexToBigInt, hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
+import {hexToBigInt, type Json, type JsonRpcRequest} from '@metamask/utils';
 import {v4 as uuid} from 'uuid';
 import type {Hex} from 'viem';
+import {signUserOperationHashWithECDSA} from 'permissionless';
+import {privateKeyToAccount} from 'viem/accounts';
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import {Buffer} from 'buffer';
 
 import {saveState} from './stateManagement';
-import {isEvmChain, serializeTransaction, isUniqueAddress, throwError} from './util';
-import {PimlicoClient, SupportedChains} from './pimlico';
-import {createGetNonceCall} from './callData';
-import {logger} from './logger';
+import {isEvmChain, isUniqueAddress, throwError} from './util';
+import {PimlicoClient} from './pimlico';
+import {createExecuteCall} from './callData';
+import {fillMMBaseUserOp} from './userOp';
 
 export type KeyringState = {
   wallets: Record<string, Wallet>;
@@ -56,12 +60,16 @@ export class SimpleKeyring implements Keyring {
   }
 
   async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
+    console.log('HERE !!!! 1');
+
     const address = options?.address as string;
     const privateKey = options?.privateKey as string;
 
     if (!isUniqueAddress(address, Object.values(this.#state.wallets))) {
       throw new Error(`Account address already in use: ${address}`);
     }
+    console.log('HERE !!!! 2');
+
     // The private key should not be stored in the account options since the
     // account object is exposed to external components, such as MetaMask and
     // the snap UI.
@@ -69,6 +77,8 @@ export class SimpleKeyring implements Keyring {
       // eslint-disable-next-line no-param-reassign
       delete options.privateKey;
     }
+
+    console.log('HERE !!!! 3');
 
     try {
       const account: KeyringAccount = {
@@ -78,18 +88,34 @@ export class SimpleKeyring implements Keyring {
         methods: [
           EthMethod.PersonalSign,
           EthMethod.Sign,
-          EthMethod.SignTransaction,
           EthMethod.SignTypedDataV1,
           EthMethod.SignTypedDataV3,
           EthMethod.SignTypedDataV4,
+
+          // ERC-4337
+          EthMethod.PrepareUserOperation,
+          EthMethod.PatchUserOperation,
+          EthMethod.SignUserOperation,
         ],
         type: EthAccountType.Erc4337,
       };
-      await this.#emitEvent(KeyringEvent.AccountCreated, {account});
+      console.log('HERE !!!! 4', account);
+
+      await this.#emitEvent(KeyringEvent.AccountCreated, {
+        account: JSON.parse(JSON.stringify(account)),
+      });
+      console.log('HERE !!!! 5');
+
       this.#state.wallets[account.id] = {account, privateKey};
+
+      console.log('HERE !!!! 6');
       await this.#saveState();
+      console.log('HERE !!!! 7');
+      console.log('HERE !!!! 8', account);
       return account;
     } catch (error) {
+      console.log('HERE !!!! 9');
+      console.log(error);
       throw new Error((error as Error).message);
     }
   }
@@ -190,14 +216,24 @@ export class SimpleKeyring implements Keyring {
 
   async #handleSigningRequest(method: string, params: Json): Promise<Json> {
     switch (method) {
+      case EthMethod.PrepareUserOperation: {
+        const [txs] = params as [EthBaseTransaction[]];
+        return this.#prepareUserOperation(txs);
+      }
+
+      case EthMethod.PatchUserOperation: {
+        const [userOp] = params as [EthUserOperation];
+        return this.#preparePaymasterAndData(userOp);
+      }
+
+      case EthMethod.SignUserOperation: {
+        const [userOp, entryPoint] = params as [EthUserOperation, string];
+        return this.#signUserOperation(userOp, entryPoint);
+      }
+
       case EthMethod.PersonalSign: {
         const [message, from] = params as [string, string];
         return this.#signPersonalMessage(from, message);
-      }
-
-      case EthMethod.SignTransaction: {
-        const [tx] = params as [any];
-        return this.#signTransaction(tx);
       }
 
       case EthMethod.SignTypedDataV1: {
@@ -229,80 +265,6 @@ export class SimpleKeyring implements Keyring {
       default: {
         throw new Error(`EVM method '${method}' not supported`);
       }
-    }
-  }
-
-  async #signTransaction(tx: any): Promise<Json> {
-    // Patch the transaction to make sure that the `chainId` is a hex string.
-    if (!tx.chainId.startsWith('0x')) {
-      // eslint-disable-next-line no-param-reassign
-      tx.chainId = `0x${parseInt(tx.chainId, 10).toString(16)}`;
-    }
-
-    const wallet = this.#getWalletByAddress(tx.from);
-    const privateKey = Buffer.from(wallet.privateKey, 'hex');
-    const common = Common.custom(
-      {chainId: tx.chainId},
-      {
-        hardfork: tx.maxPriorityFeePerGas || tx.maxFeePerGas ? Hardfork.London : Hardfork.Istanbul,
-      },
-    );
-
-    const signedTx = TransactionFactory.fromTxData(tx, {
-      common,
-    }).sign(privateKey);
-
-    const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
-
-    try {
-      const currentChain = (Object.keys(SupportedChains) as SupportedChains[]).find(
-        (chainName) => SupportedChains[chainName].id === hexToNumber(tx.chainId),
-      );
-
-      if (!currentChain) {
-        throw new Error('Unsupported chain');
-      }
-
-      const pimlico = new PimlicoClient(currentChain);
-
-      const nonce = await ethereum.request({
-        method: 'eth_call',
-        params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
-      });
-
-      const userOp = await pimlico.generateUserOp(
-        wallet.account.address as Hex,
-        serialized.to,
-        hexToBigInt(serialized.value),
-        serialized.data,
-        hexToBigInt(nonce as Hex),
-      );
-
-      const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
-
-      const signedUserOp = await pimlico.signUserOp(
-        (wallet.privateKey.startsWith('0x') ? wallet.privateKey : `0x${wallet.privateKey}`) as Hex,
-        sponsoredUserOp,
-      );
-
-      const userOpHash = await pimlico.sendUserOp(signedUserOp);
-
-      const {receipt, txHash} = await pimlico.getReceipt(userOpHash);
-
-      logger.debug(
-        'Receipt',
-        JSON.stringify(
-          receipt,
-          (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-          2,
-        ),
-      );
-      logger.debug('Transaction Hash', txHash);
-
-      return serialized;
-    } catch (err) {
-      logger.error('Error on bundler', err);
-      return {};
     }
   }
 
@@ -352,6 +314,63 @@ export class SimpleKeyring implements Keyring {
     const message = stripHexPrefix(data);
     const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
     return concatSig(toBuffer(signature.v), signature.r, signature.s);
+  }
+
+  #prepareUserOperation(txs: EthBaseTransaction[]): EthBaseUserOperation {
+    if (txs.length !== 1 || !txs[0]) {
+      throw new Error('Only one transaction per user operation is supported');
+    }
+
+    const [tx] = txs;
+
+    // nonce, user tx disinda
+
+    return fillMMBaseUserOp({
+      callData: createExecuteCall(tx.to as Hex, hexToBigInt(tx.value), tx.data as Hex),
+    });
+  }
+
+  async #preparePaymasterAndData(userOp: EthUserOperation): Promise<EthUserOperationPatch> {
+    const pimlico = new PimlicoClient('goerli');
+
+    const sponsoredUserOp = await pimlico.getSponsoredUserOp({
+      callData: userOp.callData as Hex,
+      callGasLimit: hexToBigInt(userOp.callGasLimit),
+      initCode: userOp.initCode as Hex,
+      nonce: hexToBigInt(userOp.nonce),
+      preVerificationGas: hexToBigInt(userOp.preVerificationGas),
+      sender: userOp.sender as Hex,
+      verificationGasLimit: hexToBigInt(userOp.verificationGasLimit),
+      maxFeePerGas: hexToBigInt(userOp.maxFeePerGas),
+      maxPriorityFeePerGas: hexToBigInt(userOp.maxPriorityFeePerGas),
+      paymasterAndData: userOp.paymasterAndData as Hex,
+      signature: userOp.signature as Hex,
+    });
+
+    return sponsoredUserOp;
+  }
+
+  async #signUserOperation(userOp: EthUserOperation, entryPoint: string): Promise<Hex> {
+    const signature = await signUserOperationHashWithECDSA({
+      account: privateKeyToAccount(this.#getWalletByAddress(userOp.sender).privateKey as Hex),
+      userOperation: {
+        callData: userOp.callData as Hex,
+        callGasLimit: hexToBigInt(userOp.callGasLimit),
+        initCode: userOp.initCode as Hex,
+        nonce: hexToBigInt(userOp.nonce),
+        preVerificationGas: hexToBigInt(userOp.preVerificationGas),
+        sender: userOp.sender as Hex,
+        verificationGasLimit: hexToBigInt(userOp.verificationGasLimit),
+        maxFeePerGas: hexToBigInt(userOp.maxFeePerGas),
+        maxPriorityFeePerGas: hexToBigInt(userOp.maxPriorityFeePerGas),
+        paymasterAndData: userOp.paymasterAndData as Hex,
+        signature: userOp.signature as Hex,
+      },
+      chainId: 5,
+      entryPoint: entryPoint as Hex,
+    });
+
+    return signature;
   }
 
   async #saveState(): Promise<void> {

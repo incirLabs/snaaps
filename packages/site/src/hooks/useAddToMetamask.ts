@@ -13,7 +13,7 @@ export const useAddToMetamask = () => {
       const client = new KeyringSnapRpcClient(snapId, window.ethereum);
 
       const account = await client.createAccount({
-        type: 'eip155:eip4337',
+        type: 'eip155:erc4337',
         address: addresses.snaap,
       });
     } catch (error) {
