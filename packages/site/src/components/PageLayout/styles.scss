@@ -7,7 +7,7 @@
     'left center right';
   grid-template-rows: auto 1fr;
   /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties, meowtec/no-px */
-  grid-template-columns: 1fr 800px 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: spacing(normal);
 
   &_left {

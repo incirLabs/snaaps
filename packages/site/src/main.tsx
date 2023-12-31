@@ -4,8 +4,7 @@ import {BrowserRouter} from 'react-router-dom';
 import {Web3Providers} from './Web3Providers';
 import App from './App';
 
-import 'bootstrap/scss/bootstrap-grid.scss';
-import 'bootstrap/scss/bootstrap-utilities.scss';
+import './bootstrap.scss';
 import '@csstools/normalize.css';
 import './styles/all.scss';
 import './index.scss';

@@ -17,7 +17,9 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <Router />
+      <div className="container">
+        <Router />
+      </div>
     </div>
   );
 };
