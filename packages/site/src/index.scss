@@ -8,6 +8,8 @@ body {
   overflow-x: hidden;
   padding: 0;
   margin: 0;
+  background: url('./assets/Background.png') no-repeat center center fixed;
+  background-size: cover;
 }
 
 .app {
