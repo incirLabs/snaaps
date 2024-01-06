@@ -1,6 +1,7 @@
 import {Outlet} from 'react-router-dom';
 import {PageContainer} from './PageContainer';
 import {Header} from '../Header/Header';
+import {Footer} from '../Footer/Footer';
 
 import './styles.scss';
 
@@ -16,7 +17,7 @@ export const PageLayout: React.FC<{children?: React.ReactNode}> = ({children}) =
       <Outlet />
 
       <PageContainer area="bottom">
-        <Header />
+        <Footer />
       </PageContainer>
     </div>
   );
