@@ -7,7 +7,7 @@
   border: 0.5px solid $g-colors-border;
   background-color: color.adjust($g-colors-white, $alpha: -0.5);
   box-shadow: $g-shadow-default;
-  color: $g-colors-text-light;
+  color: $g-colors-text-strong;
   cursor: pointer;
   font-size: rem(16px);
   font-weight: 600;
@@ -23,25 +23,26 @@
     transition: background-color $g-transition-default;
 
     &:hover {
-      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+      background-color: color.adjust($g-colors-white, $lightness: -5%);
     }
 
     &:active {
-      background-color: $g-colors-white;
+      background-color: color.adjust($g-colors-white, $lightness: -10%);
     }
   }
 
   &--chip {
-    padding: spacing(xsmall) spacing(3xlarge);
+    padding: spacing(normal) spacing(4xlarge);
     border-radius: 999px;
+    font-size: rem(14px);
     transition: background-color $g-transition-default;
 
     &:hover {
-      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+      background-color: color.adjust($g-colors-white, $lightness: -5%);
     }
 
     &:active {
-      background-color: $g-colors-white;
+      background-color: color.adjust($g-colors-white, $lightness: -10%);
     }
   }
 

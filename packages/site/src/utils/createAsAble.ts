@@ -18,5 +18,7 @@ export const createAsAble = <TAs extends AsType, TProps = object>(
   ) => JSX.Element,
 ) => {
   return <TPAs extends AsType>(props: AsAbleComponent<TProps, TPAs> & {as?: TAs | AsType}) =>
-    component(props, ({as, ...restProps}) => createElement(as || 'div', restProps, props.children));
+    component(props, ({as, ...restProps}) =>
+      createElement(as ?? defaultAs ?? 'div', restProps, props.children),
+    );
 };

@@ -1,24 +1,44 @@
+@use 'sass:color';
 @import '../../styles';
 
 .p-setup {
-  &_content {
+  &_page {
     display: flex;
     min-height: rem(420px);
     gap: spacing(3xlarge);
+    flex-direction: row;
+    background-color: color.adjust($g-colors-background, $alpha: -0.2);
+  }
+
+  &_wallets {
+    display: flex;
+    gap: spacing(normal);
+    flex: 0;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding: spacing(2xsmall);
+    border: 0.5px solid $g-colors-border;
+    background: color.adjust($g-colors-white, $alpha: -0.5);
+    white-space: nowrap;
+
+    .c-button {
+      padding: spacing(normal) spacing(4xlarge);
+      color: $g-colors-text-dark;
+      text-align: center;
+    }
   }
 
-  &_title {
-    color: $g-colors-text-light;
-    font-size: rem(24px);
-    font-weight: 600;
-  }
+  &_content {
+    flex: 1;
 
-  &_subtitle {
-    color: $g-colors-text-light;
-    font-size: rem(16px);
-    font-weight: 600;
+    &_title {
+      margin: spacing(normal) 0;
+      color: $g-colors-text-strong;
+      font-size: rem(20px);
+      font-weight: 900;
+    }
+
+    &_button {
+      margin: spacing(xlarge) 0;
+    }
   }
 }

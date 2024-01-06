@@ -6,3 +6,4 @@ export {Footer} from './Footer/Footer';
 export {Header} from './Header/Header';
 export {Divider} from './Divider/Divider';
 export {Marquee} from './Marquee/Marquee';
+export {Input} from './Input/Input';
