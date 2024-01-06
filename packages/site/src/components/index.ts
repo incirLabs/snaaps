@@ -5,3 +5,4 @@ export {Button} from './Button/Button';
 export {Header} from './Header/Header';
 export {Divider} from './Divider/Divider';
 export {MySnaapSidebar} from './MySnaapSidebar/MySnaapSidebar';
+export {Marquee} from './Marquee/Marquee';
