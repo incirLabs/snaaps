@@ -19,5 +19,13 @@
 
   &_card {
     min-height: rem(420px);
+    padding: spacing(xlarge);
+
+    &_title {
+      margin-bottom: spacing(normal);
+      color: $g-colors-text-strong;
+      font-size: rem(20px);
+      font-weight: 900;
+    }
   }
 }

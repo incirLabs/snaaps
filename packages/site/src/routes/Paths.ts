@@ -7,6 +7,7 @@ export const RawPaths = {
   MySnaap: {
     Root: '/my-snaap',
     MySnaap: '/',
+    Networks: '/networks',
     Plugins: '/plugins',
   },
 };

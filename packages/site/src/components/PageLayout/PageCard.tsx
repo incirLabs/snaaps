@@ -16,8 +16,8 @@ export const PageCard: React.FC<PageCardProps> = ({
   return (
     <Surface className={cx('c-page-layout_card', className)} {...props}>
       {title || titleRight ? (
-        <div className="mb-4 d-flex align-center justify-between">
-          {title ? <h2 className="mb-0">{title}</h2> : null}
+        <div className="d-flex align-center justify-between">
+          {title ? <h2 className="c-page-layout_card_title">{title}</h2> : null}
 
           {titleRight}
         </div>
