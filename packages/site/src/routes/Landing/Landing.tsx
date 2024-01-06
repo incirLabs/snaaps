@@ -57,6 +57,31 @@ const Landing: React.FC = () => {
           </Button>
         </Marquee>
       </Surface>
+
+      <div className="p-landing_features">
+        <Surface className="p-landing_features_card">
+          <Surface>
+            <h4 className="p-landing_features_title">Setup Your AA Wallet in Minutes</h4>
+          </Surface>
+
+          <Surface className="p-landing_features_content">
+            <span>Control Your AA Wallet Directly On Metamask</span>
+            <span>Same Address for All L2 Networks</span>
+            <span>Make Any TX with Any dApp with Your AA</span>
+          </Surface>
+        </Surface>
+
+        <Surface className="p-landing_features_card">
+          <Surface>
+            <h4 className="p-landing_features_title">Control Your AA Wallet</h4>
+          </Surface>
+
+          <Surface className="p-landing_features_content">
+            <span>Control Your AA Wallet Directly On Metamask</span>
+            <span>Only For Supported Wallets</span>
+          </Surface>
+        </Surface>
+      </div>
     </PageContainer>
   );
 };

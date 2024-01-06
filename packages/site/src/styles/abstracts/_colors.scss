@@ -12,7 +12,7 @@ $g-colors-secondary-background: #fafafa !default;
 $g-colors-text: #181818 !default;
 $g-colors-text-light: #4c5878 !default;
 $g-colors-text-strong: #303642 !default;
-$g-colors-text-dark: #0b0b0c !default;
+$g-colors-text-dark: #190602 !default;
 
 // Head
 $g-colors-head: #0b0b0c !default;
@@ -31,7 +31,7 @@ $g-colors-selection-background: #e6edfc !default;
 $g-colors-selection: #67759e !default;
 
 // Borders
-$g-colors-border: #d9d9d9 !default;
+$g-colors-border: rgba(255, 255, 255, 0.6) !default;
 $g-colors-hr: $g-colors-border !default;
 
 // Errors
