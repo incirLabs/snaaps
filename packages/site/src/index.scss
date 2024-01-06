@@ -21,19 +21,8 @@ body {
       gap: rem(20px);
       align-items: center;
       justify-content: center;
-      animation: scroll 30s linear infinite;
       font-weight: 600;
       white-space: nowrap;
     }
-  }
-}
-
-@keyframes scroll {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(-100%);
   }
 }
