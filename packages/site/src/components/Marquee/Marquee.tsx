@@ -41,7 +41,7 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
     }
 
     const anim = container.animate(
-      [{transform: 'translateX(0)'}, {transform: `translateX(-${container.scrollWidth / 2}px)`}],
+      [{transform: 'translateX(0)'}, {transform: `translateX(-${container.scrollWidth / 3}px)`}],
       {duration, iterations: Infinity},
     );
 
