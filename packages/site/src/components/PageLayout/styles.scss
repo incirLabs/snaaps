@@ -1,29 +1,20 @@
 @import '../../styles';
 
 .c-page-layout {
-  display: block;
-  gap: spacing(normal);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 
-  &_left {
-    grid-area: left;
+  &_top {
+    flex: 0;
   }
 
   &_center {
-    grid-area: center;
+    flex: 1;
   }
 
-  &_right {
-    grid-area: right;
-  }
-
-  &_top {
-    grid-area: top;
-  }
-
-  &_sidebar {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
+  &_bottom {
+    flex: 0;
   }
 
   &_card {

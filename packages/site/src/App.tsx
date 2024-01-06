@@ -13,7 +13,7 @@ const App: React.FC = () => {
         </Marquee>
       </div>
 
-      <div className="container">
+      <div className="container flex-1 d-flex f-dir-col">
         <Router />
       </div>
     </div>

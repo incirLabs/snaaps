@@ -14,7 +14,7 @@ const Router: React.FC = () => (
       <Route path={Paths.Landing.Setup} element={<Setup />} />
     </Route>
 
-    <Route path={Paths.MySnaap.Root} element={<PageLayout showSidebar />}>
+    <Route path={Paths.MySnaap.Root}>
       <Route path={Paths.MySnaap.MySnaap} element={<MySnaap />} />
       <Route path={Paths.MySnaap.Plugins} element={<Plugins />} />
     </Route>

@@ -11,6 +11,10 @@ body {
 }
 
 .app {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+
   &_warning-banner {
     padding: rem(10px);
     background-color: $g-colors-text-strong;
