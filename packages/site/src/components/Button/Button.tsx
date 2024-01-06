@@ -6,7 +6,7 @@ import './styles.scss';
 export type ButtonProps = JSX.IntrinsicElements['button'] & {
   children?: React.ReactNode;
   theme: 'primary' | 'chip' | 'text';
-  color?: 'default' | 'danger';
+  color?: 'default' | 'danger' | 'dark';
   block?: boolean;
 };
 
@@ -26,6 +26,7 @@ export const Button = createAsAble<'button', ButtonProps>('button', (props, AsAb
           'c-button--text': theme === 'text',
 
           'c-button_color--danger': color === 'danger',
+          'c-button_color--dark': color === 'dark',
         },
         className,
       )}

@@ -66,5 +66,18 @@
     &--danger {
       color: $g-colors-error-text;
     }
+
+    &--dark {
+      color: $g-colors-white;
+      background-color: #303642;
+
+      &:hover {
+        background-color: color.adjust(#303642, $lightness: -5%);
+      }
+
+      &:active {
+        background-color: color.adjust(#303642, $lightness: -10%);
+      }
+    }
   }
 }

@@ -1,13 +1,7 @@
 @import '../../styles';
 
 .c-page-layout {
-  display: grid;
-  grid-template-areas:
-    '. top .'
-    'left center right';
-  grid-template-rows: auto 1fr;
-  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties, meowtec/no-px */
-  grid-template-columns: auto 1fr auto;
+  display: block;
   gap: spacing(normal);
 
   &_left {

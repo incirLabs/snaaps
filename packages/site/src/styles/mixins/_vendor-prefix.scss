@@ -1,0 +1,5 @@
+@mixin vendor-prefix($name, $value, $prefix-value: false) {
+  @each $vendor in ('-webkit-') {
+    #{if($prefix-value, '', $vendor)}#{$name}: #{if($prefix-value, $vendor, '')}#{$value};
+  }
+}
