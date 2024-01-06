@@ -31,7 +31,7 @@ const Landing: React.FC = () => {
       <span className="p-landing_networks-title">Supported Networks</span>
 
       <Surface className="p-landing_networks">
-        <Marquee duration={15_000} className="p-landing_networks_content">
+        <Marquee duration={15_000} reversed className="p-landing_networks_content">
           <Button theme="chip" as="div">
             <LineaLogo height={18} />
           </Button>

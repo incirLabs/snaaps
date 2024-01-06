@@ -6,12 +6,17 @@ export type MarqueeProps = JSX.IntrinsicElements['div'] & {
    * The duration of the animation in milliseconds.
    */
   duration?: number;
+
+  /**
+   * Whether the animation should be reversed.
+   */
+  reversed?: boolean;
 };
 
 export type MarqueeRef = HTMLDivElement;
 
 const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
-  const {children, duration = 10_000, ...restProps} = props;
+  const {children, duration = 10_000, reversed = false, ...restProps} = props;
 
   const forwardedRef = useForwardedRef(ref);
 
@@ -40,8 +45,18 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
       });
     }
 
+    const rightBound = (container.scrollWidth - containerWidth) * -1;
+    const contentScrollWidth = container.scrollWidth / 3;
+
     const anim = container.animate(
-      [{transform: 'translateX(0)'}, {transform: `translateX(-${container.scrollWidth / 3}px)`}],
+      reversed
+        ? [
+            {transform: `translateX(${rightBound}px)`},
+            {
+              transform: `translateX(${rightBound + contentScrollWidth}px)`,
+            },
+          ]
+        : [{transform: 'translateX(0)'}, {transform: `translateX(-${contentScrollWidth}px)`}],
       {duration, iterations: Infinity},
     );
 
@@ -49,7 +64,7 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
     return () => {
       anim.cancel();
     };
-  }, [forwardedRef, children, duration]);
+  }, [forwardedRef, children, duration, reversed]);
 
   return (
     <div ref={forwardedRef} {...restProps}>
