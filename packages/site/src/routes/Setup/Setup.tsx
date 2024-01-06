@@ -5,7 +5,7 @@ import './styles.scss';
 
 const Setup: React.FC = () => {
   return (
-    <PageContainer area="center" className={cx('p-setup')}>
+    <PageContainer className={cx('p-setup')}>
       <Surface className="p-setup_content">
         <Button theme="chip">+ Create and deploy a new AA signer</Button>
       </Surface>

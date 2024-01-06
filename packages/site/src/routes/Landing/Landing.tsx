@@ -12,7 +12,7 @@ import './styles.scss';
 
 const Landing: React.FC = () => {
   return (
-    <PageContainer area="center" className={cx('p-landing')}>
+    <PageContainer className={cx('p-landing')}>
       <Surface className="p-landing_info">
         <div className="p-landing_info_image"></div>
 

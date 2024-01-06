@@ -11,7 +11,7 @@ const MySnaap: React.FC = () => {
   if (!addresses) return null;
 
   return (
-    <PageContainer area="center" className={cx('p-my-snaap')}>
+    <PageContainer className={cx('p-my-snaap')}>
       <PageContainer.Card title="🎭 MMy SnAAp">
         <div className="mb-4">
           <h4 className="mb-2">Your Signer</h4>
