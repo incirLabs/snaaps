@@ -7,6 +7,7 @@ import {ArbitrumLogo} from '../../assets/Networks/ArbitrumLogo';
 import {OptimismLogo} from '../../assets/Networks/OptimismLogo';
 import {PolygonLogo} from '../../assets/Networks/PolygonLogo';
 import {EthereumLogo} from '../../assets/Networks/EthereumLogo';
+import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 
 import './styles.scss';
 
@@ -14,7 +15,9 @@ const Landing: React.FC = () => {
   return (
     <PageContainer className={cx('p-landing')}>
       <Surface className="p-landing_info">
-        <div className="p-landing_info_image"></div>
+        <div className="p-landing_info_image">
+          <img src={LandingPlaceholder} alt="Placeholder" />
+        </div>
 
         <div className="p-landing_info_content">
           <h1 className="p-landing_info_content_title">Control Your AA Acount on Metamask Snaps</h1>
