@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @import '../../styles';
 
 .c-page-layout {
@@ -19,7 +21,8 @@
 
   &_card {
     min-height: rem(420px);
-    padding: spacing(xlarge);
+    padding: spacing(normal);
+    background-color: color.adjust($g-colors-white, $alpha: -0.25);
 
     &_title {
       margin-bottom: spacing(normal);

@@ -14,7 +14,7 @@ import './styles.scss';
 const Landing: React.FC = () => {
   return (
     <PageContainer className={cx('p-landing')}>
-      <Surface className="p-landing_info">
+      <PageContainer.Card className="p-landing_info">
         <div className="p-landing_info_image">
           <img src={LandingPlaceholder} alt="Placeholder" />
         </div>
@@ -29,7 +29,7 @@ const Landing: React.FC = () => {
             <Button theme="chip">Get an AA Wallet</Button>
           </div>
         </div>
-      </Surface>
+      </PageContainer.Card>
 
       <span className="p-landing_networks-title">Supported Networks</span>
 

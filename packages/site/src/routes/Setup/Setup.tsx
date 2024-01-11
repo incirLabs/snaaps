@@ -6,7 +6,7 @@ import './styles.scss';
 const Setup: React.FC = () => {
   return (
     <PageContainer className={cx('p-setup')}>
-      <Surface className="p-setup_page">
+      <PageContainer.Card className="p-setup_page">
         <Surface className="p-setup_wallets">
           <Button theme="primary">snAAps</Button>
           <Button theme="primary">CyberConnect</Button>
@@ -24,7 +24,7 @@ const Setup: React.FC = () => {
             Integrate Your AA Wallet 🦊
           </Button>
         </div>
-      </Surface>
+      </PageContainer.Card>
     </PageContainer>
   );
 };

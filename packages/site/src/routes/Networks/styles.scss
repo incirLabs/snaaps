@@ -1,10 +1,10 @@
-@use 'sass:color';
 @import '../../styles';
 
 .p-networks {
   &_content {
     display: flex;
     flex-direction: column;
+    padding: spacing(xlarge);
   }
 
   &_address {
