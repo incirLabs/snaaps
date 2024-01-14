@@ -8,3 +8,4 @@ export {Divider} from './Divider/Divider';
 export {Marquee} from './Marquee/Marquee';
 export {Input} from './Input/Input';
 export {ActivityIndicator} from './ActivityIndicator/ActivityIndicator';
+export {AccountCard} from './AccountCard/AccountCard';

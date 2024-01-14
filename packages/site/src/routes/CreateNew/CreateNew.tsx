@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
-import {ActivityIndicator, Button, PageContainer, Surface} from '../../components';
+import {AccountCard, ActivityIndicator, Button, PageContainer, Surface} from '../../components';
 import {GetAAStatusResponseSuccess, useGetAAStatus, useMount} from '../../hooks';
 import {NetworksConfig} from '../../utils/NetworksConfig';
 import {invokeSnap} from '../../utils/Snap';
@@ -85,32 +85,22 @@ const CreateNew: React.FC = () => {
       <PageContainer.Card className="p-create-new_content" title="Create a new AA Wallet">
         <div className="p-create-new_wallets">
           {wallets.map((wallet) => (
-            <Surface key={wallet.address} className="p-create-new_wallet">
-              <span>{wallet.status.address}</span>
-
-              <div className="p-create-new_wallet_chains">
-                {wallet.status.chains.map((chainKey) => {
-                  const chain = NetworksConfig[chainKey];
-
-                  return (
-                    <chain.logo.square.component
-                      width={chain.logo.square.preferredHeight * 1.5}
-                      height={chain.logo.square.preferredHeight * 1.5}
-                    />
-                  );
-                })}
-              </div>
-
-              {addedWallets.includes(wallet.status.address) ? (
-                <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.status.address).Networks}>
-                  Configure
-                </Button>
-              ) : (
-                <Button theme="chip" color="dark" onClick={() => onSetupClick(wallet)}>
-                  Setup
-                </Button>
-              )}
-            </Surface>
+            <AccountCard
+              key={wallet.address}
+              text={wallet.status.address}
+              chains={wallet.status.chains}
+              right={
+                addedWallets.includes(wallet.status.address) ? (
+                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.status.address).Networks}>
+                    Configure
+                  </Button>
+                ) : (
+                  <Button theme="chip" color="dark" onClick={() => onSetupClick(wallet)}>
+                    Setup
+                  </Button>
+                )
+              }
+            />
           ))}
         </div>
 

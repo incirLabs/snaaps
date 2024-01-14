@@ -5,6 +5,8 @@ import {Paths, PathsStatic} from './Paths';
 import Landing from './Landing/Landing';
 import Integrate from './Integrate/Integrate';
 import CreateNew from './CreateNew/CreateNew';
+
+import MySnaaps from './MySnaaps/MySnaaps';
 import MySnaap from './MySnaap/MySnaap';
 import Plugins from './Plugins/Plugins';
 import Networks from './Networks/Networks';
@@ -18,6 +20,8 @@ const Router: React.FC = () => (
     </Route>
 
     <Route path={PathsStatic.MySnaaps.Root} element={<PageLayout />}>
+      <Route path={PathsStatic.MySnaaps.MySnaaps} element={<MySnaaps />} />
+
       <Route path={PathsStatic.MySnaap.MySnaap} element={<MySnaap />} />
       <Route path={PathsStatic.MySnaap.Plugins} element={<Plugins />} />
       <Route path={PathsStatic.MySnaap.Networks} element={<Networks />} />
