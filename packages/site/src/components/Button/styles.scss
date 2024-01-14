@@ -13,6 +13,12 @@
   font-weight: 600;
   text-align: center;
 
+  // prettier-ignore
+  transition:
+    background-color $g-transition-default,
+    color $g-transition-default,
+    opacity $g-transition-default;
+
   &--block {
     display: block;
     width: 100%;
@@ -20,7 +26,6 @@
 
   &--primary {
     border-radius: 2px;
-    transition: background-color $g-transition-default;
 
     &:hover {
       background-color: color.adjust($g-colors-white, $lightness: -5%);
@@ -35,7 +40,6 @@
     padding: spacing(normal) spacing(4xlarge);
     border-radius: 999px;
     font-size: rem(14px);
-    transition: background-color $g-transition-default;
 
     &:hover {
       background-color: color.adjust($g-colors-white, $lightness: -5%);
@@ -52,7 +56,6 @@
     box-shadow: none;
     font-size: rem(14px);
     font-weight: 700;
-    transition: color $g-transition-default;
 
     &:hover {
       color: $g-colors-text-strong;
@@ -81,5 +84,10 @@
         background-color: color.adjust($g-colors-text-strong, $lightness: -10%);
       }
     }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }

@@ -27,6 +27,8 @@ export const Button = createAsAble<'button', ButtonProps>('button', (AsAble, pro
 
           'c-button_color--danger': color === 'danger',
           'c-button_color--dark': color === 'dark',
+
+          'c-button--disabled': restProps.disabled,
         },
         className,
       )}

@@ -16,20 +16,24 @@
   /* stylelint-disable-next-line declaration-property-value-disallowed-list */
   transition: all $g-transition-default;
 
+  &:hover {
+    background: color.adjust($g-colors-white, $lightness: -5%);
+  }
+
   &_left {
     display: flex;
     margin-right: spacing(medium);
   }
 
   &--disabled {
-    cursor: default;
     opacity: 0.4;
+    pointer-events: none;
   }
 
   &--active {
-    border: 0;
     backdrop-filter: blur(rem(24px));
     background: $g-colors-text-strong;
+    border-color: $g-colors-text-strong;
 
     // prettier-ignore
     box-shadow:
@@ -37,5 +41,9 @@
       2px 4px 9px rgba(255, 32, 32, 0.25),
       -7px 2px 16px -4px #ffeca7;
     color: $g-colors-white;
+
+    &:hover {
+      background: color.adjust($g-colors-text-strong, $alpha: -0.1);
+    }
   }
 }
