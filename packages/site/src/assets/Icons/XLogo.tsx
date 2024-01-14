@@ -1,7 +1,7 @@
 export const XLogo: React.FC<JSX.IntrinsicElements['svg']> = (props) => {
   return (
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g clip-path="url(#clip0_309_1478)">
+      <g clipPath="url(#clip0_309_1478)">
         <mask
           id="mask0_309_1478"
           style={{maskType: 'luminance'}}

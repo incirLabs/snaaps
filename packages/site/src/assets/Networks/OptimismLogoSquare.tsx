@@ -1,7 +1,7 @@
 export const OptimismLogoSquare: React.FC<JSX.IntrinsicElements['svg']> = (props) => {
   return (
     <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g clip-path="url(#clip0_363_1400)">
+      <g clipPath="url(#clip0_363_1400)">
         <path
           d="M12.9229 24C19.5503 24 24.9229 18.6274 24.9229 12C24.9229 5.37258 19.5503 0 12.9229 0C6.29543 0 0.922852 5.37258 0.922852 12C0.922852 18.6274 6.29543 24 12.9229 24Z"
           fill="#FF0420"
