@@ -45,8 +45,7 @@ export type KeyringState = {
 
 export type Wallet = {
   account: KeyringAccount;
-  signerAddress: string;
-  signerPrivateKey: string;
+  privateKey: string;
 };
 
 export class SimpleKeyring implements Keyring {
@@ -56,32 +55,29 @@ export class SimpleKeyring implements Keyring {
     this.#state = state;
   }
 
-  async listAccounts(): Promise<(KeyringAccount & {signer: string})[]> {
-    return Object.values(this.#state.wallets).map((wallet) => ({
-      ...wallet.account,
-      signer: wallet.signerAddress,
-    }));
+  async listAccounts(): Promise<KeyringAccount[]> {
+    return Object.values(this.#state.wallets).map((wallet) => wallet.account);
   }
 
-  async getAccount(id: string): Promise<KeyringAccount & {signer: string}> {
+  async getAccount(id: string): Promise<KeyringAccount> {
     const wallet = this.#state.wallets[id] ?? throwError(`Account '${id}' not found`);
 
-    return {
-      ...wallet.account,
-      signer: wallet?.signerAddress ?? '',
-    };
+    return wallet.account;
   }
 
   async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
     const address = options?.address as string;
     const signerIndex = options?.signerIndex as number;
 
-    if (signerIndex === undefined) {
-      throw new Error(`signerIndex is required`);
+    if (!address || signerIndex === undefined) {
+      throw new Error(`address and signerIndex is required`);
     }
 
     const signerPrivateKey = await getSignerPrivateKey(signerIndex);
     const signerAddress = await privateKeyToAddress(signerPrivateKey);
+
+    // eslint-disable-next-line no-param-reassign
+    options.signerAddress = signerAddress;
 
     if (!isUniqueAddress(address, Object.values(this.#state.wallets))) {
       throw new Error(`Account address already in use: ${address}`);
@@ -108,13 +104,12 @@ export class SimpleKeyring implements Keyring {
           EthMethod.SignTypedDataV3,
           EthMethod.SignTypedDataV4,
         ],
-        type: EthAccountType.Eip4337,
+        type: EthAccountType.Eoa,
       };
       await this.#emitEvent(KeyringEvent.AccountCreated, {account});
       this.#state.wallets[account.id] = {
         account,
-        signerAddress,
-        signerPrivateKey: stripHexPrefix(signerPrivateKey),
+        privateKey: stripHexPrefix(signerPrivateKey),
       };
       await this.#saveState();
       return account;
@@ -266,7 +261,7 @@ export class SimpleKeyring implements Keyring {
     tx.chainId = numberToHexString(tx.chainId);
 
     const wallet = this.#getWalletByAddress(tx.from);
-    const privateKey = Buffer.from(wallet.signerPrivateKey, 'hex');
+    const privateKey = Buffer.from(wallet.privateKey, 'hex');
     const common = Common.custom(
       {chainId: tx.chainId},
       {
@@ -307,7 +302,7 @@ export class SimpleKeyring implements Keyring {
       const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
 
       const signedUserOp = await pimlico.signUserOp(
-        addHexPrefix(wallet.signerPrivateKey),
+        addHexPrefix(wallet.privateKey),
         sponsoredUserOp,
       );
 
@@ -339,8 +334,8 @@ export class SimpleKeyring implements Keyring {
       version: SignTypedDataVersion.V1,
     },
   ): string {
-    const {signerPrivateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
+    const {privateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
     return signTypedData({
       privateKey: privateKeyBuffer,
@@ -350,8 +345,8 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signPersonalMessage(from: string, request: string): string {
-    const {signerPrivateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
+    const {privateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     const messageBuffer = Buffer.from(request.slice(2), 'hex');
 
     const signature = personalSign({
@@ -373,8 +368,8 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signMessage(from: string, data: string): string {
-    const {signerPrivateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
+    const {privateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     const message = stripHexPrefix(data);
     const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
     return concatSig(toBuffer(signature.v), signature.r, signature.s);
