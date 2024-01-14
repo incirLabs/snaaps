@@ -3,7 +3,7 @@ import {PageLayout} from '../components';
 import {Paths} from './Paths';
 
 import Landing from './Landing/Landing';
-import Setup from './Setup/Setup';
+import Integrate from './Integrate/Integrate';
 import MySnaap from './MySnaap/MySnaap';
 import Plugins from './Plugins/Plugins';
 import Networks from './Networks/Networks';
@@ -12,7 +12,7 @@ const Router: React.FC = () => (
   <Routes>
     <Route path={Paths.Landing.Root} element={<PageLayout />}>
       <Route path={Paths.Landing.Landing} element={<Landing />} />
-      <Route path={Paths.Landing.Setup} element={<Setup />} />
+      <Route path={Paths.Landing.Integrate} element={<Integrate />} />
     </Route>
 
     <Route path={Paths.MySnaap.Root} element={<PageLayout />}>

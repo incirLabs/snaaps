@@ -2,6 +2,7 @@ export const RawPaths = {
   Landing: {
     Root: '/',
     Landing: '/',
+    Integrate: '/Integrate',
     Setup: '/setup',
   },
   MySnaap: {

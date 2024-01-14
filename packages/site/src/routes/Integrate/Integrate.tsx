@@ -3,11 +3,11 @@ import {Button, Surface, PageContainer, Input} from '../../components';
 
 import './styles.scss';
 
-const Setup: React.FC = () => {
+const Integrate: React.FC = () => {
   return (
-    <PageContainer className={cx('p-setup')}>
-      <PageContainer.Card className="p-setup_page">
-        <Surface className="p-setup_wallets">
+    <PageContainer className={cx('p-integrate')}>
+      <PageContainer.Card className="p-integrate_page">
+        <Surface className="p-integrate_wallets">
           <Button theme="primary">snAAps</Button>
           <Button theme="primary">CyberConnect</Button>
           <Button theme="primary">Safe</Button>
@@ -15,12 +15,12 @@ const Setup: React.FC = () => {
           <Button theme="primary">Suggest an AA</Button>
         </Surface>
 
-        <div className="p-setup_content">
-          <h2 className="p-setup_content_title">Enter Your Smart Contract Wallet Address</h2>
+        <div className="p-integrate_content">
+          <h2 className="p-integrate_content_title">Enter Your Smart Contract Wallet Address</h2>
 
           <Input type="text" placeholder="0x0000000" />
 
-          <Button theme="chip" color="dark" className="p-setup_content_button">
+          <Button theme="chip" color="dark" className="p-integrate_content_button">
             Integrate Your AA Wallet 🦊
           </Button>
         </div>
@@ -29,4 +29,4 @@ const Setup: React.FC = () => {
   );
 };
 
-export default Setup;
+export default Integrate;
