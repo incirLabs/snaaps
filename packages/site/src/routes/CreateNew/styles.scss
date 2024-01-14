@@ -23,17 +23,21 @@
     justify-content: space-between;
 
     span {
-      flex: 1;
+      flex: 5;
       color: $g-colors-text-strong;
       font-size: rem(14px);
     }
 
     &_chains {
       display: flex;
-      flex: 1;
+      flex: 5;
       flex-direction: row;
       align-items: center;
       justify-content: center;
+    }
+
+    .c-button {
+      flex: 1;
     }
   }
 }

@@ -1,15 +1,18 @@
 import {useContractRead, useProvider} from '@incirlabs/react-ethooks';
 import {useSimpleAccountFactory} from './Contracts';
+import {NetworksConfig} from '../utils/NetworksConfig';
 
-export type GetAAStatusResponse =
-  | {
-      status: false;
-    }
-  | {
-      status: true;
-      address: string;
-      chains: string[];
-    };
+export type GetAAStatusResponseError = {
+  status: false;
+};
+
+export type GetAAStatusResponseSuccess = {
+  status: true;
+  address: string;
+  chains: (keyof typeof NetworksConfig)[];
+};
+
+export type GetAAStatusResponse = GetAAStatusResponseError | GetAAStatusResponseSuccess;
 
 export const useGetAAStatus = () => {
   const AccountFactory = useSimpleAccountFactory();

@@ -1,23 +1,26 @@
-import {useState} from 'react';
-import {InternalSnapMethod} from 'common';
+import {Env, InternalSnapMethod} from 'common';
+import {useEffect, useState} from 'react';
 import cx from 'classnames';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {ActivityIndicator, Button, PageContainer, Surface} from '../../components';
-import {GetAAStatusResponse, useGetAAStatus, useMount} from '../../hooks';
+import {GetAAStatusResponseSuccess, useGetAAStatus, useMount} from '../../hooks';
+import {NetworksConfig} from '../../utils/NetworksConfig';
 import {invokeSnap} from '../../utils/Snap';
 import {Paths} from '../Paths';
-
-import {EthereumLogoSquare} from '../../assets/Networks/EthereumLogoSquare';
 
 import './styles.scss';
 
 type Signer = {address: string; index: number};
+type Wallet = Signer & {status: GetAAStatusResponseSuccess};
 
 const CreateNew: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [wallets, setWallets] = useState<(Signer & {status: GetAAStatusResponse})[]>([]);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [addedWallets, setAddedWallets] = useState<string[]>([]);
   const [page, setPage] = useState(0);
 
+  const navigate = useNavigate();
   const getAAStatus = useGetAAStatus();
 
   const getWallets = async () => {
@@ -36,38 +39,77 @@ const CreateNew: React.FC = () => {
     const signersWithStatus = (
       await Promise.all(
         signers.map(async (signer: Signer) => {
+          const aaStatus = await getAAStatus(signer.address);
+          if (!aaStatus.status) return null;
+
           return {
             ...signer,
-            status: await getAAStatus(signer.address),
+            status: aaStatus,
           };
         }),
       )
-    ).filter((signer) => signer.status.status);
+    ).filter((signer): signer is Wallet => !!signer);
 
     setLoading(false);
     setWallets([...wallets, ...signersWithStatus]);
     setPage(page + 1);
   };
 
+  useEffect(() => {
+    (async () => {
+      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+
+      const accounts = await client.listAccounts();
+
+      setAddedWallets(accounts.map((account) => account.address));
+    })();
+  }, []);
+
   useMount(() => {
     getWallets();
   });
+
+  const onSetupClick = async (wallet: Wallet) => {
+    const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+
+    const account = await client.createAccount({
+      address: wallet.status.address,
+      signerIndex: wallet.index,
+    });
+
+    navigate(Paths.MySnaap.Networks);
+  };
 
   return (
     <PageContainer className={cx('p-create-new')}>
       <PageContainer.Card className="p-create-new_content" title="Create a new AA Wallet">
         <div className="p-create-new_wallets">
           {wallets.map((wallet) => (
-            <Surface className="p-create-new_wallet">
-              <span>{wallet.address}</span>
+            <Surface key={wallet.address} className="p-create-new_wallet">
+              <span>{wallet.status.address}</span>
 
               <div className="p-create-new_wallet_chains">
-                <EthereumLogoSquare width={30} height={30} />
+                {wallet.status.chains.map((chainKey) => {
+                  const chain = NetworksConfig[chainKey];
+
+                  return (
+                    <chain.logo.square.component
+                      width={chain.logo.square.preferredHeight * 1.5}
+                      height={chain.logo.square.preferredHeight * 1.5}
+                    />
+                  );
+                })}
               </div>
 
-              <Button theme="chip" color="dark" as={Link} to={Paths.MySnaap.Networks}>
-                Setup
-              </Button>
+              {addedWallets.includes(wallet.status.address) ? (
+                <Button theme="chip" as={Link} to={Paths.MySnaap.Networks}>
+                  Configure
+                </Button>
+              ) : (
+                <Button theme="chip" color="dark" onClick={() => onSetupClick(wallet)}>
+                  Setup
+                </Button>
+              )}
             </Surface>
           ))}
         </div>
