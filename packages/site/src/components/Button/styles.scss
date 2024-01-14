@@ -69,15 +69,16 @@
     }
 
     &--dark {
+      background-color: $g-colors-text-strong;
       color: $g-colors-white;
-      background-color: #303642;
 
       &:hover {
-        background-color: color.adjust(#303642, $lightness: -5%);
+        background-color: color.adjust($g-colors-text-strong, $lightness: -5%);
+        color: $g-colors-white;
       }
 
       &:active {
-        background-color: color.adjust(#303642, $lightness: -10%);
+        background-color: color.adjust($g-colors-text-strong, $lightness: -10%);
       }
     }
   }
