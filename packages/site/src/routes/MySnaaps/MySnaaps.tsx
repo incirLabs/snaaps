@@ -6,6 +6,7 @@ import {KeyringAccount, KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
 import {useMount} from '../../hooks';
 import {NetworkKeys} from '../../utils/NetworksConfig';
+import {getContractDeployedChains} from '../../utils/Networks';
 import {Paths} from '../Paths';
 
 import './styles.scss';
@@ -23,10 +24,12 @@ const MySnaaps: React.FC = () => {
 
       const wallets = await client.listAccounts();
 
-      const walletsWithChain = wallets.map((wallet) => ({
-        ...wallet,
-        chains: [],
-      }));
+      const walletsWithChain = await Promise.all(
+        wallets.map(async (wallet) => ({
+          ...wallet,
+          chains: await getContractDeployedChains(wallet.address),
+        })),
+      );
 
       setAccounts(walletsWithChain);
       setLoading(false);

@@ -1,17 +1,19 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import cx from 'classnames';
-import {useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import {NetworkButton} from './NetworkButton/NetworkButton';
 import {Button, PageContainer} from '../../components';
+import {getContractDeployedChains} from '../../utils/Networks';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 
 import './styles.scss';
+import {Paths} from '../Paths';
 
 const Networks: React.FC = () => {
   const {address} = useParams();
 
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkKeys[]>([]);
-  const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>(['linea', 'scroll']);
+  const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
 
   const toggleNetwork = (network: NetworkKeys) => {
     if (selectedNetworks.includes(network)) {
@@ -20,6 +22,12 @@ const Networks: React.FC = () => {
       setSelectedNetworks([...selectedNetworks, network]);
     }
   };
+
+  useEffect(() => {
+    if (!address) return;
+
+    getContractDeployedChains(address).then(setDeployedNetworks);
+  }, [address]);
 
   return (
     <PageContainer className={cx('p-networks')}>
@@ -81,7 +89,14 @@ const Networks: React.FC = () => {
             </Button>
           )}
 
-          <Button theme="chip">Continue</Button>
+          <Button
+            theme="chip"
+            disabled={deployedNetworks.length === 0}
+            as={Link}
+            to={Paths.MySnaap(address ?? '').MySnaap}
+          >
+            Continue
+          </Button>
         </div>
       </PageContainer.Card>
     </PageContainer>

@@ -16,9 +16,25 @@ import {
   EthereumLogoSquare,
 } from '../assets/Networks';
 
+export type NetworkConfig = {
+  name: string;
+  rpcUrl: string;
+  logo: {
+    square: {
+      preferredHeight: number;
+      component: React.FC<JSX.IntrinsicElements['svg']>;
+    };
+    wide: {
+      preferredHeight: number;
+      component: React.FC<JSX.IntrinsicElements['svg']>;
+    };
+  };
+};
+
 export const NetworksConfig = {
   linea: {
     name: 'Linea',
+    rpcUrl: 'https://rpc.linea.build',
     logo: {
       square: {
         preferredHeight: 20,
@@ -33,6 +49,7 @@ export const NetworksConfig = {
 
   scroll: {
     name: 'Scroll',
+    rpcUrl: 'https://rpc.scroll.io',
     logo: {
       square: {
         preferredHeight: 20,
@@ -47,6 +64,7 @@ export const NetworksConfig = {
 
   arbitrum: {
     name: 'Arbitrum',
+    rpcUrl: 'https://arb1.arbitrum.io/rpc',
     logo: {
       square: {
         preferredHeight: 20,
@@ -61,6 +79,7 @@ export const NetworksConfig = {
 
   optimism: {
     name: 'Optimism',
+    rpcUrl: 'https://mainnet.optimism.io',
     logo: {
       square: {
         preferredHeight: 20,
@@ -75,6 +94,7 @@ export const NetworksConfig = {
 
   polygon: {
     name: 'Polygon',
+    rpcUrl: 'https://polygon-rpc.com',
     logo: {
       square: {
         preferredHeight: 20,
@@ -89,6 +109,7 @@ export const NetworksConfig = {
 
   ethereum: {
     name: 'Ethereum',
+    rpcUrl: 'https://eth.llamarpc.com',
     logo: {
       square: {
         preferredHeight: 20,
@@ -100,7 +121,7 @@ export const NetworksConfig = {
       },
     },
   },
-};
+} satisfies Record<string, NetworkConfig>;
 
 export type NetworkKeys = keyof typeof NetworksConfig;
 export const NetworkKeys = Object.keys(NetworksConfig) as NetworkKeys[];
