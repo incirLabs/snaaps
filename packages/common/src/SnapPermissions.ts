@@ -1,10 +1,11 @@
 import {KeyringRpcMethod} from '@metamask/keyring-api';
 
-export enum InternalMethod {
-  NOOP = 'noop',
+export enum InternalSnapMethod {
+  NOOP = 'snap.internal.noop',
+  GetAvailableSigners = 'snap.internal.getAvailableSigners',
 }
 
-export const originPermissions = new Map<string, string[]>([
+export const OriginPermissions = new Map<string, string[]>([
   [
     'metamask',
     [
@@ -34,6 +35,21 @@ export const originPermissions = new Map<string, string[]>([
       KeyringRpcMethod.GetRequest,
       KeyringRpcMethod.ApproveRequest,
       KeyringRpcMethod.RejectRequest,
+
+      // Internal methods
+      InternalSnapMethod.NOOP,
+      InternalSnapMethod.GetAvailableSigners,
     ],
   ],
 ]);
+
+/**
+ * Verify if the caller can call the requested snap method.
+ *
+ * @param origin - Caller origin.
+ * @param method - Method being called.
+ * @returns True if the caller is allowed to call the method, false otherwise.
+ */
+export function hasPermission(origin: string, method: string): boolean {
+  return OriginPermissions.get(origin)?.includes(method) ?? false;
+}

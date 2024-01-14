@@ -74,3 +74,11 @@ export function runSensitive<Type>(callback: () => Type, message?: string): Type
     throw new Error(message ?? 'An unexpected error occurred');
   }
 }
+
+export function numberToHexString(value: number | string): `0x${string}` {
+  if (typeof value === 'string' && !value.startsWith('0x')) {
+    return `0x${parseInt(value, 10).toString(16)}`;
+  }
+
+  return `0x${value.toString(16)}`;
+}

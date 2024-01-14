@@ -1,6 +1,6 @@
 import {Common, Hardfork} from '@ethereumjs/common';
 import {TransactionFactory} from '@ethereumjs/tx';
-import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
+import {addHexPrefix, ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import type {TypedDataV1, TypedMessage} from '@metamask/eth-sig-util';
 import {
   SignTypedDataVersion,
@@ -26,10 +26,17 @@ import type {Hex} from 'viem';
 import {Buffer} from 'buffer';
 
 import {saveState} from './stateManagement';
-import {isEvmChain, serializeTransaction, isUniqueAddress, throwError} from './util';
+import {
+  isEvmChain,
+  serializeTransaction,
+  isUniqueAddress,
+  throwError,
+  numberToHexString,
+} from './util';
 import {PimlicoClient, SupportedChains} from './pimlico';
 import {createGetNonceCall} from './callData';
 import {logger} from './logger';
+import {privateKeyToAddress, getSignerPrivateKey} from './privateKeyUtil';
 
 export type KeyringState = {
   wallets: Record<string, Wallet>;
@@ -38,7 +45,8 @@ export type KeyringState = {
 
 export type Wallet = {
   account: KeyringAccount;
-  privateKey: string;
+  signerAddress: string;
+  signerPrivateKey: string;
 };
 
 export class SimpleKeyring implements Keyring {
@@ -58,11 +66,19 @@ export class SimpleKeyring implements Keyring {
 
   async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
     const address = options?.address as string;
-    const privateKey = options?.privateKey as string;
+    const signerIndex = options?.signerIndex as number;
+
+    if (signerIndex === undefined) {
+      throw new Error(`signerIndex is required`);
+    }
+
+    const signerPrivateKey = await getSignerPrivateKey(signerIndex);
+    const signerAddress = await privateKeyToAddress(signerPrivateKey);
 
     if (!isUniqueAddress(address, Object.values(this.#state.wallets))) {
       throw new Error(`Account address already in use: ${address}`);
     }
+
     // The private key should not be stored in the account options since the
     // account object is exposed to external components, such as MetaMask and
     // the snap UI.
@@ -87,7 +103,11 @@ export class SimpleKeyring implements Keyring {
         type: EthAccountType.Eip4337,
       };
       await this.#emitEvent(KeyringEvent.AccountCreated, {account});
-      this.#state.wallets[account.id] = {account, privateKey};
+      this.#state.wallets[account.id] = {
+        account,
+        signerAddress,
+        signerPrivateKey: stripHexPrefix(signerPrivateKey),
+      };
       await this.#saveState();
       return account;
     } catch (error) {
@@ -234,14 +254,11 @@ export class SimpleKeyring implements Keyring {
   }
 
   async #signTransaction(tx: any): Promise<Json> {
-    // Patch the transaction to make sure that the `chainId` is a hex string.
-    if (!tx.chainId.startsWith('0x')) {
-      // eslint-disable-next-line no-param-reassign
-      tx.chainId = `0x${parseInt(tx.chainId, 10).toString(16)}`;
-    }
+    // eslint-disable-next-line no-param-reassign
+    tx.chainId = numberToHexString(tx.chainId);
 
     const wallet = this.#getWalletByAddress(tx.from);
-    const privateKey = Buffer.from(wallet.privateKey, 'hex');
+    const privateKey = Buffer.from(wallet.signerPrivateKey, 'hex');
     const common = Common.custom(
       {chainId: tx.chainId},
       {
@@ -282,7 +299,7 @@ export class SimpleKeyring implements Keyring {
       const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
 
       const signedUserOp = await pimlico.signUserOp(
-        (wallet.privateKey.startsWith('0x') ? wallet.privateKey : `0x${wallet.privateKey}`) as Hex,
+        addHexPrefix(wallet.signerPrivateKey),
         sponsoredUserOp,
       );
 
@@ -314,8 +331,8 @@ export class SimpleKeyring implements Keyring {
       version: SignTypedDataVersion.V1,
     },
   ): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+    const {signerPrivateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
 
     return signTypedData({
       privateKey: privateKeyBuffer,
@@ -325,8 +342,8 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signPersonalMessage(from: string, request: string): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+    const {signerPrivateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
     const messageBuffer = Buffer.from(request.slice(2), 'hex');
 
     const signature = personalSign({
@@ -348,8 +365,8 @@ export class SimpleKeyring implements Keyring {
   }
 
   #signMessage(from: string, data: string): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+    const {signerPrivateKey} = this.#getWalletByAddress(from);
+    const privateKeyBuffer = Buffer.from(signerPrivateKey, 'hex');
     const message = stripHexPrefix(data);
     const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
     return concatSig(toBuffer(signature.v), signature.r, signature.s);
