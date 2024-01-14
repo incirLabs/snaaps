@@ -7,4 +7,33 @@
     flex-direction: column;
     padding: spacing(xlarge);
   }
+
+  &_wallets {
+    display: flex;
+    gap: spacing(xsmall);
+    flex-direction: column;
+    margin-bottom: spacing(large);
+  }
+
+  &_wallet {
+    display: flex;
+    gap: spacing(xsmall);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      flex: 1;
+      color: $g-colors-text-strong;
+      font-size: rem(14px);
+    }
+
+    &_chains {
+      display: flex;
+      flex: 1;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }

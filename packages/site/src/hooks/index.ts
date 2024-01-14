@@ -6,3 +6,4 @@ export {useAddToMetamask} from './useAddToMetamask';
 export {useSimpleAccount, useSimpleAccountFactory} from './Contracts';
 export {useForwardedRef} from './useForwardedRef';
 export {useProviderState} from './useProviderState';
+export {useGetAAStatus, type GetAAStatusResponse} from './useGetAAStatus';

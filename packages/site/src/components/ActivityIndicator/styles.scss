@@ -1,0 +1,74 @@
+@import '../../styles';
+
+.c-activity-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  div {
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    margin: rem(8px);
+    animation: activity-indicator 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: $g-colors-text-strong transparent transparent transparent;
+    border-radius: 50%;
+    border-style: solid;
+  }
+
+  &--small {
+    width: rem(16px);
+    height: rem(16px);
+
+    div {
+      width: rem(12px);
+      height: rem(12px);
+      border-width: rem(2.5px);
+    }
+  }
+
+  &--normal {
+    width: rem(40px);
+    height: rem(40px);
+
+    div {
+      width: rem(32px);
+      height: rem(32px);
+      border-width: rem(4px);
+    }
+  }
+
+  &--large {
+    width: rem(80px);
+    height: rem(80px);
+
+    div {
+      width: rem(64px);
+      height: rem(64px);
+      border-width: rem(8px);
+    }
+  }
+
+  div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+
+  div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+}
+
+@keyframes activity-indicator {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
