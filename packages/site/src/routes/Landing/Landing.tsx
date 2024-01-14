@@ -1,5 +1,9 @@
 import cx from 'classnames';
+import {useConnect} from '@incirlabs/react-ethooks';
+import {Link} from 'react-router-dom';
 import {Button, Surface, PageContainer, Marquee} from '../../components';
+import {useMetamask, useProviderState} from '../../hooks';
+import {Paths} from '../Paths';
 
 import {LineaLogo} from '../../assets/Networks/LineaLogo';
 import {ScrollLogo} from '../../assets/Networks/ScrollLogo';
@@ -12,6 +16,10 @@ import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 import './styles.scss';
 
 const Landing: React.FC = () => {
+  const [, , installSnap] = useMetamask();
+  const providerState = useProviderState();
+  const {connect} = useConnect();
+
   return (
     <PageContainer className={cx('p-landing')}>
       <PageContainer.Card className="p-landing_info">
@@ -22,12 +30,68 @@ const Landing: React.FC = () => {
         <div className="p-landing_info_content">
           <h1 className="p-landing_info_content_title">Control Your AA Acount on Metamask Snaps</h1>
 
-          <div className="p-landing_info_content_buttons">
-            <Button theme="chip" color="dark">
-              Integrate Your AA Wallet 🦊
-            </Button>
-            <Button theme="chip">Get an AA Wallet</Button>
-          </div>
+          {!providerState.flaskInstalled ? (
+            <div className="p-landing_info_content_buttons">
+              <Button
+                theme="chip"
+                color="dark"
+                as="a"
+                href="https://metamask.io/flask/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Install MetaMask🦊 Flask
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.flaskInstalled && !providerState.connected ? (
+            <div className="p-landing_info_content_buttons">
+              <Button theme="chip" color="dark" onClick={() => connect()}>
+                Connect Your MetaMask🦊 Wallet
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.connected && !providerState.snapInstalled ? (
+            <div className="p-landing_info_content_buttons">
+              <Button theme="chip" color="dark" onClick={() => installSnap()}>
+                Install SnAAp 😸
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.connected && providerState.snapInstalled ? (
+            <div className="p-landing_info_content_buttons-group">
+              <div className="p-landing_info_content_buttons">
+                <Button
+                  theme="chip"
+                  color="dark"
+                  className="w-100"
+                  as={Link}
+                  to={Paths.MySnaap.MySnaap}
+                >
+                  Open snAAps 😸
+                </Button>
+              </div>
+
+              <div className="p-landing_info_content_buttons">
+                <Button theme="chip" color="dark" as={Link} to={Paths.Landing.Integrate}>
+                  Integrate Your AA Wallet 🦊
+                </Button>
+
+                <Button theme="chip" as={Link} to={Paths.Landing.CreateNew}>
+                  Get an AA Wallet
+                </Button>
+              </div>
+
+              <div className="p-landing_info_content_buttons">
+                <Button theme="chip" onClick={() => installSnap()}>
+                  Reinstall SnAAp 😸
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </div>
       </PageContainer.Card>
 

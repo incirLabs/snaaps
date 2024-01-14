@@ -39,6 +39,12 @@
         -webkit-text-fill-color: transparent;
       }
 
+      &_buttons-group {
+        display: flex;
+        gap: spacing(xsmall);
+        flex-direction: column;
+      }
+
       &_buttons {
         display: flex;
         gap: spacing(normal);
