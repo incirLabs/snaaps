@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import cx from 'classnames';
+import {useParams} from 'react-router-dom';
 import {NetworkButton} from './NetworkButton/NetworkButton';
 import {Button, PageContainer} from '../../components';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
@@ -7,6 +8,8 @@ import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 import './styles.scss';
 
 const Networks: React.FC = () => {
+  const {address} = useParams();
+
   const [selectedNetworks, setSelectedNetworks] = useState<NetworkKeys[]>([]);
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>(['linea', 'scroll']);
 
@@ -20,9 +23,9 @@ const Networks: React.FC = () => {
 
   return (
     <PageContainer className={cx('p-networks')}>
-      <PageContainer.Card className="p-networks_content" title="You Are Connected To CyberConnect">
+      <PageContainer.Card className="p-networks_content" title="Select Networks to Deploy">
         <div className="p-networks_address">
-          <span>0x4C5920A65C90A1babc4C8bC66d2D3aBDD036b834</span>
+          <span>{address}</span>
 
           {deployedNetworks.map((key) => {
             const network = NetworksConfig[key];
