@@ -18,7 +18,7 @@ export type InputProps = JSX.IntrinsicElements['input'] & {
   containerProps?: JSX.IntrinsicElements['label'];
 };
 
-export const Input = createAsAble<'input', InputProps>('input', (props, AsAble) => {
+export const Input = createAsAble<'input', InputProps>('input', (AsAble, props) => {
   const {label, error, className, containerProps, ...restProps} = props;
 
   return (

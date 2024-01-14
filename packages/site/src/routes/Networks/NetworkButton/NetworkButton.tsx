@@ -21,7 +21,7 @@ export type NetworkButtonProps = {
 
 export const NetworkButton = createAsAble<'button', NetworkButtonProps>(
   'button',
-  (props, AsAble) => {
+  (AsAble, props) => {
     const {disabled, active, left, right, children, className, ...restProps} = props;
 
     return (

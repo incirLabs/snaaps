@@ -103,3 +103,4 @@ export const NetworksConfig = {
 };
 
 export type NetworkKeys = keyof typeof NetworksConfig;
+export const NetworkKeys = Object.keys(NetworksConfig) as NetworkKeys[];

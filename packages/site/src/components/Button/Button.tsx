@@ -10,7 +10,7 @@ export type ButtonProps = JSX.IntrinsicElements['button'] & {
   block?: boolean;
 };
 
-export const Button = createAsAble<'button', ButtonProps>('button', (props, AsAble) => {
+export const Button = createAsAble<'button', ButtonProps>('button', (AsAble, props) => {
   const {theme = 'chip', color, block, children, className, ...restProps} = props;
 
   return (
