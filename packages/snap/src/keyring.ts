@@ -56,12 +56,20 @@ export class SimpleKeyring implements Keyring {
     this.#state = state;
   }
 
-  async listAccounts(): Promise<KeyringAccount[]> {
-    return Object.values(this.#state.wallets).map((wallet) => wallet.account);
+  async listAccounts(): Promise<(KeyringAccount & {signer: string})[]> {
+    return Object.values(this.#state.wallets).map((wallet) => ({
+      ...wallet.account,
+      signer: wallet.signerAddress,
+    }));
   }
 
-  async getAccount(id: string): Promise<KeyringAccount> {
-    return this.#state.wallets[id]?.account ?? throwError(`Account '${id}' not found`);
+  async getAccount(id: string): Promise<KeyringAccount & {signer: string}> {
+    const wallet = this.#state.wallets[id] ?? throwError(`Account '${id}' not found`);
+
+    return {
+      ...wallet.account,
+      signer: wallet?.signerAddress ?? '',
+    };
   }
 
   async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
