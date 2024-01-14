@@ -37,11 +37,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({origin, request}) => {
     }
 
     case InternalSnapMethod.GetAvailableSigners: {
+      const page = Number((request.params as any)?.page) ?? 0;
+
+      const pageLength = 5;
+
       const addresses = await Promise.all(
-        Array.from({length: 10}, async (_, i) => {
+        Array.from({length: pageLength}, async (_, i) => {
+          const idx = page * pageLength + i;
+
           return {
-            address: await getSignerAddress(i),
-            index: i,
+            address: await getSignerAddress(idx),
+            index: idx,
           };
         }),
       );
