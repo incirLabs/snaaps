@@ -3,9 +3,8 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
-import {AccountCard, ActivityIndicator, Button, PageContainer, Surface} from '../../components';
+import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
 import {GetAAStatusResponseSuccess, useGetAAStatus, useMount} from '../../hooks';
-import {NetworksConfig} from '../../utils/NetworksConfig';
 import {invokeSnap} from '../../utils/Snap';
 import {Paths} from '../Paths';
 
