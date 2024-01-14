@@ -101,3 +101,5 @@ export const NetworksConfig = {
     },
   },
 };
+
+export type NetworkKeys = keyof typeof NetworksConfig;

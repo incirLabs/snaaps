@@ -77,7 +77,7 @@ const CreateNew: React.FC = () => {
       signerIndex: wallet.index,
     });
 
-    navigate(Paths.MySnaap.Networks);
+    navigate(Paths.MySnaap(account.address).Networks);
   };
 
   return (
@@ -102,7 +102,7 @@ const CreateNew: React.FC = () => {
               </div>
 
               {addedWallets.includes(wallet.status.address) ? (
-                <Button theme="chip" as={Link} to={Paths.MySnaap.Networks}>
+                <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.status.address).Networks}>
                   Configure
                 </Button>
               ) : (
