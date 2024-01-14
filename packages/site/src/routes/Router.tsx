@@ -4,6 +4,7 @@ import {Paths} from './Paths';
 
 import Landing from './Landing/Landing';
 import Integrate from './Integrate/Integrate';
+import CreateNew from './CreateNew/CreateNew';
 import MySnaap from './MySnaap/MySnaap';
 import Plugins from './Plugins/Plugins';
 import Networks from './Networks/Networks';
@@ -13,6 +14,7 @@ const Router: React.FC = () => (
     <Route path={Paths.Landing.Root} element={<PageLayout />}>
       <Route path={Paths.Landing.Landing} element={<Landing />} />
       <Route path={Paths.Landing.Integrate} element={<Integrate />} />
+      <Route path={Paths.Landing.CreateNew} element={<CreateNew />} />
     </Route>
 
     <Route path={Paths.MySnaap.Root} element={<PageLayout />}>

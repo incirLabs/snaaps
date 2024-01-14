@@ -1,0 +1,10 @@
+@use 'sass:color';
+@import '../../styles';
+
+.p-create-new {
+  &_content {
+    display: flex;
+    flex-direction: column;
+    padding: spacing(xlarge);
+  }
+}
