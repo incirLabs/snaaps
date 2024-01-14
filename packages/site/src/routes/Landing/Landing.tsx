@@ -3,14 +3,9 @@ import {useConnect} from '@incirlabs/react-ethooks';
 import {Link} from 'react-router-dom';
 import {Button, Surface, PageContainer, Marquee} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
+import {NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
 
-import {LineaLogo} from '../../assets/Networks/LineaLogo';
-import {ScrollLogo} from '../../assets/Networks/ScrollLogo';
-import {ArbitrumLogo} from '../../assets/Networks/ArbitrumLogo';
-import {OptimismLogo} from '../../assets/Networks/OptimismLogo';
-import {PolygonLogo} from '../../assets/Networks/PolygonLogo';
-import {EthereumLogo} from '../../assets/Networks/EthereumLogo';
 import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 
 import './styles.scss';
@@ -99,29 +94,11 @@ const Landing: React.FC = () => {
 
       <Surface className="p-landing_networks">
         <Marquee duration={15_000} reversed className="p-landing_networks_content">
-          <Button theme="chip" as="div">
-            <LineaLogo height={18} />
-          </Button>
-
-          <Button theme="chip" as="div">
-            <ScrollLogo height={20} />
-          </Button>
-
-          <Button theme="chip" as="div">
-            <ArbitrumLogo height={24} />
-          </Button>
-
-          <Button theme="chip" as="div">
-            <OptimismLogo height={14} />
-          </Button>
-
-          <Button theme="chip" as="div">
-            <PolygonLogo height={20} />
-          </Button>
-
-          <Button theme="chip" as="div">
-            <EthereumLogo height={22} />
-          </Button>
+          {Object.entries(NetworksConfig).map(([key, value]) => (
+            <Button key={key} theme="chip" as="div">
+              <value.logo.wide.component height={value.logo.wide.preferredHeight} />
+            </Button>
+          ))}
         </Marquee>
       </Surface>
 

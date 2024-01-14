@@ -1,15 +1,9 @@
 import cx from 'classnames';
+import {NetworkButton} from './NetworkButton/NetworkButton';
 import {Button, PageContainer} from '../../components';
-
-import {LineaLogoSquare} from '../../assets/Networks/LineaLogoSquare';
-import {ScrollLogoSquare} from '../../assets/Networks/ScrollLogoSquare';
-import {ArbitrumLogoSquare} from '../../assets/Networks/ArbitrumLogoSquare';
-import {PolygonLogoSquare} from '../../assets/Networks/PolygonLogoSquare';
-import {EthereumLogoSquare} from '../../assets/Networks/EthereumLogoSquare';
-import {OptimismLogoSquare} from '../../assets/Networks/OptimismLogoSquare';
+import {NetworksConfig} from '../../utils/NetworksConfig';
 
 import './styles.scss';
-import {NetworkButton} from './NetworkButton/NetworkButton';
 
 const Networks: React.FC = () => {
   return (
@@ -18,24 +12,23 @@ const Networks: React.FC = () => {
         <div className="p-networks_address">
           <span>0x4C5920A65C90A1babc4C8bC66d2D3aBDD036b834</span>
 
-          <LineaLogoSquare width={20} height={20} />
-          <ScrollLogoSquare width={20} height={20} />
+          {(['linea', 'scroll'] as const).map((network) => {
+            const logo = NetworksConfig[network].logo.square;
+
+            return <logo.component width={logo.preferredHeight} height={logo.preferredHeight} />;
+          })}
         </div>
 
         <div className="flex-1">
           <div className="p-networks_networks">
-            <NetworkButton disabled left={<LineaLogoSquare height={20} />}>
-              $4.12
-            </NetworkButton>
-            <NetworkButton active left={<ScrollLogoSquare height={20} />}>
-              $4.12
-            </NetworkButton>
-            <NetworkButton active left={<ArbitrumLogoSquare height={20} />}>
-              $4.12
-            </NetworkButton>
-            <NetworkButton left={<PolygonLogoSquare height={20} />}>$4.12</NetworkButton>
-            <NetworkButton left={<EthereumLogoSquare height={20} />}>$4.12</NetworkButton>
-            <NetworkButton left={<OptimismLogoSquare height={20} />}>$4.12</NetworkButton>
+            {Object.entries(NetworksConfig).map(([key, value]) => (
+              <NetworkButton
+                key={key}
+                left={<value.logo.square.component height={value.logo.square.preferredHeight} />}
+              >
+                $4.12
+              </NetworkButton>
+            ))}
           </div>
         </div>
 
