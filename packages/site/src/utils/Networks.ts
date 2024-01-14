@@ -1,18 +1,18 @@
-import {providers} from 'ethers';
-import {NetworksConfig, NetworkKeys} from './NetworksConfig';
-
-export const NetworksRPC = Object.fromEntries(
-  NetworkKeys.map((network) => [
-    network,
-    new providers.JsonRpcProvider(NetworksConfig[network].rpcUrl),
-  ]),
-) as Record<NetworkKeys, providers.JsonRpcProvider>;
+import {Env} from 'common';
+import {SimpleAccountFactory} from 'contracts';
+import {Hex} from 'viem';
+import {getBytecode, readContract} from 'wagmi/actions';
+import {wagmiConfig} from './WagmiConfig';
+import {NetworkKeys, NetworksConfig} from './NetworksConfig';
 
 export const checkContractExists = async (network: NetworkKeys, address: string) => {
   try {
-    const provider = NetworksRPC[network];
-    const code = await provider.getCode(address);
-    return code !== '0x';
+    const code = await getBytecode(wagmiConfig, {
+      address: address as Hex,
+      chainId: NetworksConfig[network].chain.id,
+    });
+
+    return !!code;
   } catch (e) {
     return false;
   }
@@ -38,4 +38,19 @@ export const getContractDeployedChains = async (address: string) => {
   return Object.entries(results)
     .filter(([, exists]) => exists)
     .map(([network]) => network) as NetworkKeys[];
+};
+
+export const getWalletAddress = async (
+  signer: string,
+  network: NetworkKeys = 'ethereum',
+): Promise<string> => {
+  const address = await readContract(wagmiConfig, {
+    abi: SimpleAccountFactory,
+    address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
+    functionName: 'getAddress',
+    args: [signer, 0],
+    chainId: NetworksConfig[network].chain.id,
+  });
+
+  return address as string;
 };

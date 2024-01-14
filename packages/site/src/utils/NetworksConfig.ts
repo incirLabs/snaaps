@@ -1,4 +1,4 @@
-import {ChainObject, type Chain} from '@incirlabs/react-ethooks';
+import {type Chain, linea, scroll, arbitrum, optimism, polygon, mainnet} from 'wagmi/chains';
 
 import {
   // Wide
@@ -21,7 +21,7 @@ import {
 export type NetworkConfig = {
   name: string;
   rpcUrl: string;
-  chain: ChainObject;
+  chain: Chain;
   logo: {
     square: {
       preferredHeight: number;
@@ -38,17 +38,7 @@ export const NetworksConfig = {
   linea: {
     name: 'Linea',
     rpcUrl: 'https://rpc.linea.build',
-    chain: {
-      blockExplorerUrls: ['https://explorer.linea.build'],
-      chainId: 59144,
-      chainName: 'Linea',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-      },
-      rpcUrls: ['https://rpc.linea.build'],
-    },
+    chain: linea,
     logo: {
       square: {
         preferredHeight: 20,
@@ -64,17 +54,7 @@ export const NetworksConfig = {
   scroll: {
     name: 'Scroll',
     rpcUrl: 'https://rpc.scroll.io',
-    chain: {
-      blockExplorerUrls: ['https://scrollscan.com'],
-      chainId: 534352,
-      chainName: 'Scroll',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-      },
-      rpcUrls: ['https://rpc.scroll.io'],
-    },
+    chain: scroll,
     logo: {
       square: {
         preferredHeight: 20,
@@ -90,17 +70,7 @@ export const NetworksConfig = {
   arbitrum: {
     name: 'Arbitrum',
     rpcUrl: 'https://arb1.arbitrum.io/rpc',
-    chain: {
-      blockExplorerUrls: ['https://arbiscan.io'],
-      chainId: 42161,
-      chainName: 'Arbitrum One',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-      },
-      rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-    },
+    chain: arbitrum,
     logo: {
       square: {
         preferredHeight: 20,
@@ -116,17 +86,7 @@ export const NetworksConfig = {
   optimism: {
     name: 'Optimism',
     rpcUrl: 'https://mainnet.optimism.io',
-    chain: {
-      blockExplorerUrls: ['https://optimistic.etherscan.io'],
-      chainId: 10,
-      chainName: 'OP Mainnet',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-      },
-      rpcUrls: ['https://mainnet.optimism.io'],
-    },
+    chain: optimism,
     logo: {
       square: {
         preferredHeight: 20,
@@ -142,17 +102,7 @@ export const NetworksConfig = {
   polygon: {
     name: 'Polygon',
     rpcUrl: 'https://polygon-rpc.com',
-    chain: {
-      blockExplorerUrls: ['https://polygonscan.com'],
-      chainId: 137,
-      chainName: 'Polygon',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Matic',
-        symbol: 'MATIC',
-      },
-      rpcUrls: ['https://polygon-rpc.com'],
-    },
+    chain: polygon,
     logo: {
       square: {
         preferredHeight: 20,
@@ -168,17 +118,7 @@ export const NetworksConfig = {
   ethereum: {
     name: 'Ethereum',
     rpcUrl: 'https://eth.llamarpc.com',
-    chain: {
-      blockExplorerUrls: ['https://etherscan.io'],
-      chainId: 1,
-      chainName: 'Ethereum',
-      nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-      },
-      rpcUrls: ['https://eth.llamarpc.com'],
-    },
+    chain: mainnet,
     logo: {
       square: {
         preferredHeight: 20,

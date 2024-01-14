@@ -1,10 +1,12 @@
+import {Env} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
+import {Hex} from 'viem';
+import {useChainId, useSwitchChain, useWriteContract} from 'wagmi';
 import {Link, useParams} from 'react-router-dom';
-import {AutoChangeChain, useContractWrite, useProvider} from '@incirlabs/react-ethooks';
+import {SimpleAccountFactory} from 'contracts';
 import {NetworkButton} from './NetworkButton/NetworkButton';
 import {Button, PageContainer} from '../../components';
-import {useSimpleAccountFactory} from '../../hooks';
 import {getContractDeployedChains} from '../../utils/Networks';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
@@ -17,9 +19,9 @@ const Networks: React.FC = () => {
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys>();
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
 
-  const provider = useProvider();
-  const AccountFactory = useSimpleAccountFactory();
-  const createAccount = useContractWrite(AccountFactory, 'createAccount');
+  const chainId = useChainId();
+  const {switchChainAsync} = useSwitchChain();
+  const writeContract = useWriteContract();
 
   useEffect(() => {
     if (!address) return;
@@ -31,24 +33,20 @@ const Networks: React.FC = () => {
     if (!selectedNetwork || !address) return;
     const selected = NetworksConfig[selectedNetwork];
 
-    await AutoChangeChain(provider, [selected.chain]);
-
-    const currentNetwork = await provider.getNetwork();
-    if (currentNetwork.chainId !== selected.chain.chainId) {
-      // TODO: show error message
-      alert('Please switch to the correct network');
-      return;
+    if (chainId !== selected.chain.id) {
+      await switchChainAsync({chainId: selected.chain.id});
     }
 
-    // TODO: get signer address
-    const tx = await createAccount(['0xSignerAddress', 0]);
-    if (!tx.status) {
-      alert(JSON.stringify(tx.error));
-      return;
-    }
+    // TODO: test implementation
+    const txHash = await writeContract.writeContractAsync({
+      abi: SimpleAccountFactory,
+      address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
+      functionName: 'createAccount',
+      args: ['0x4C5920A65C90A1babc4C8bC66d2D3aBDD036b834', 0],
+      chainId: selected.chain.id,
+    });
 
-    const receipt = await tx.data.wait();
-    console.log(receipt);
+    console.log(txHash);
   };
 
   return (

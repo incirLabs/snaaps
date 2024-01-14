@@ -1,9 +1,9 @@
-import {useAccount} from '@incirlabs/react-ethooks';
+import {useAccount} from 'wagmi';
 import {useMetamask} from './MetamaskContext';
 
 export const useProviderState = () => {
   const [metamaskState] = useMetamask();
-  const address = useAccount();
+  const {address} = useAccount();
 
   const flaskInstalled = metamaskState.snapsDetected && metamaskState.isFlask;
   const connected = flaskInstalled && address;

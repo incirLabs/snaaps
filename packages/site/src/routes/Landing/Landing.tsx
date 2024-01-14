@@ -1,5 +1,6 @@
 import cx from 'classnames';
-import {useConnect} from '@incirlabs/react-ethooks';
+import {useConnect} from 'wagmi';
+import {injected} from 'wagmi/connectors';
 import {Link} from 'react-router-dom';
 import {Button, Surface, PageContainer, Marquee} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
@@ -42,7 +43,7 @@ const Landing: React.FC = () => {
 
           {providerState.flaskInstalled && !providerState.connected ? (
             <div className="p-landing_info_content_buttons">
-              <Button theme="chip" color="dark" onClick={() => connect()}>
+              <Button theme="chip" color="dark" onClick={() => connect({connector: injected()})}>
                 Connect Your MetaMask🦊 Wallet
               </Button>
             </div>
@@ -64,7 +65,7 @@ const Landing: React.FC = () => {
                   color="dark"
                   className="w-100"
                   as={Link}
-                  to={Paths.MySnaap.MySnaap}
+                  to={Paths.MySnaaps.Root}
                 >
                   Open snAAps 😸
                 </Button>

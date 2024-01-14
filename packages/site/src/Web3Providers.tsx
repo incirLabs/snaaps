@@ -1,23 +1,16 @@
-import {useRef} from 'react';
-import {providers} from 'ethers';
-import {EthooksProvider} from '@incirlabs/react-ethooks';
+import {WagmiProvider} from 'wagmi';
 import {MetaMaskProvider} from './hooks';
+import {wagmiConfig} from './utils/WagmiConfig';
 
 export const DefaultProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-  const provider = useRef(providers.getDefaultProvider() as providers.Web3Provider);
-
-  return <EthooksProvider provider={provider.current}>{children}</EthooksProvider>;
+  return <WagmiProvider config={wagmiConfig}>{children}</WagmiProvider>;
 };
 
 export const InpageProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-  const provider = useRef(
-    new providers.Web3Provider(window.ethereum as unknown as providers.ExternalProvider),
-  );
-
   return (
-    <EthooksProvider provider={provider.current} autoConnect>
+    <WagmiProvider config={wagmiConfig}>
       <MetaMaskProvider>{children}</MetaMaskProvider>
-    </EthooksProvider>
+    </WagmiProvider>
   );
 };
 

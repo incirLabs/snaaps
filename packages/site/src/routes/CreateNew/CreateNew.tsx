@@ -4,14 +4,19 @@ import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
-import {GetAAStatusResponseSuccess, useGetAAStatus, useMount} from '../../hooks';
+import {useMount} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
+import {getContractDeployedChains, getWalletAddress} from '../../utils/Networks';
+import {NetworkKeys} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
 
 import './styles.scss';
 
 type Signer = {address: string; index: number};
-type Wallet = Signer & {status: GetAAStatusResponseSuccess};
+type Wallet = Signer & {
+  walletAddress: string;
+  networks: NetworkKeys[];
+};
 
 const CreateNew: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +25,6 @@ const CreateNew: React.FC = () => {
   const [page, setPage] = useState(0);
 
   const navigate = useNavigate();
-  const getAAStatus = useGetAAStatus();
 
   const getWallets = async () => {
     if (loading) return;
@@ -35,22 +39,23 @@ const CreateNew: React.FC = () => {
 
     if (!signers || !Array.isArray(signers)) return;
 
-    const signersWithStatus = (
+    const newWallets = (
       await Promise.all(
         signers.map(async (signer: Signer) => {
-          const aaStatus = await getAAStatus(signer.address);
-          if (!aaStatus.status) return null;
+          const walletAddress = await getWalletAddress(signer.address);
+          const networks = await getContractDeployedChains(walletAddress);
 
           return {
             ...signer,
-            status: aaStatus,
+            walletAddress,
+            networks,
           };
         }),
       )
-    ).filter((signer): signer is Wallet => !!signer);
+    ).filter((wallet) => !!wallet);
 
     setLoading(false);
-    setWallets([...wallets, ...signersWithStatus]);
+    setWallets([...wallets, ...newWallets]);
     setPage(page + 1);
   };
 
@@ -72,7 +77,7 @@ const CreateNew: React.FC = () => {
     const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
 
     const account = await client.createAccount({
-      address: wallet.status.address,
+      address: wallet.walletAddress,
       signerIndex: wallet.index,
     });
 
@@ -86,11 +91,11 @@ const CreateNew: React.FC = () => {
           {wallets.map((wallet) => (
             <AccountCard
               key={wallet.address}
-              text={wallet.status.address}
-              chains={wallet.status.chains}
+              text={wallet.walletAddress}
+              chains={wallet.networks}
               right={
-                addedWallets.includes(wallet.status.address) ? (
-                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.status.address).Networks}>
+                addedWallets.includes(wallet.walletAddress) ? (
+                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.walletAddress).Networks}>
                     Configure
                   </Button>
                 ) : (
