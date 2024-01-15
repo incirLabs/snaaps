@@ -2,7 +2,7 @@ import {Env} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Hex} from 'viem';
-import {useChainId, useSwitchChain, useWriteContract} from 'wagmi';
+import {useChainId, useSwitchChain, useWriteContract, useWaitForTransactionReceipt} from 'wagmi';
 import {Link, useParams} from 'react-router-dom';
 import {SimpleAccountFactory} from 'contracts';
 import {NetworkButton} from './NetworkButton/NetworkButton';
@@ -24,7 +24,8 @@ const Networks: React.FC = () => {
 
   const chainId = useChainId();
   const {switchChainAsync} = useSwitchChain();
-  const writeContract = useWriteContract();
+  const {writeContractAsync, data: lastTxHash} = useWriteContract();
+  const {status} = useWaitForTransactionReceipt({hash: lastTxHash});
 
   useEffect(() => {
     if (!address) return;
@@ -35,9 +36,10 @@ const Networks: React.FC = () => {
       const chains = await getContractDeployedChains(address);
 
       setDeployedNetworks(chains);
+      setSelectedNetwork(undefined);
       setLoading(false);
     })();
-  }, [address]);
+  }, [address, status]);
 
   const deployContract = async () => {
     if (!selectedNetwork || !address) return;
@@ -47,16 +49,13 @@ const Networks: React.FC = () => {
       await switchChainAsync({chainId: selected.chain.id});
     }
 
-    // TODO: test implementation
-    const txHash = await writeContract.writeContractAsync({
+    await writeContractAsync({
       abi: SimpleAccountFactory,
       address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
       functionName: 'createAccount',
       args: [signerAddress, 0],
       chainId: selected.chain.id,
     });
-
-    console.log(txHash);
   };
 
   return (
