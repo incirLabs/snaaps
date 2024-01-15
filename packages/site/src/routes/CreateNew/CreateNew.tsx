@@ -6,8 +6,7 @@ import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
 import {useMount} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
-import {getContractDeployedChains, getWalletAddress} from '../../utils/Networks';
-import {NetworkKeys} from '../../utils/NetworksConfig';
+import {getWalletAddress} from '../../utils/Networks';
 import {Paths} from '../Paths';
 
 import './styles.scss';
@@ -15,7 +14,6 @@ import './styles.scss';
 type Signer = {address: string; index: number};
 type Wallet = Signer & {
   walletAddress: string;
-  networks: NetworkKeys[];
 };
 
 const CreateNew: React.FC = () => {
@@ -43,12 +41,10 @@ const CreateNew: React.FC = () => {
       await Promise.all(
         signers.map(async (signer: Signer) => {
           const walletAddress = await getWalletAddress(signer.address);
-          const networks = await getContractDeployedChains(walletAddress);
 
           return {
             ...signer,
             walletAddress,
-            networks,
           };
         }),
       )
@@ -92,7 +88,7 @@ const CreateNew: React.FC = () => {
             <AccountCard
               key={wallet.address}
               text={wallet.walletAddress}
-              chains={wallet.networks}
+              walletAddress={wallet.walletAddress}
               right={
                 addedWallets.includes(wallet.walletAddress) ? (
                   <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.walletAddress).Networks}>
