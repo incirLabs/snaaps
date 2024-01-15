@@ -3,22 +3,27 @@ import {Outlet, useParams} from 'react-router-dom';
 import {PageContainer} from '../PageLayout/PageContainer';
 import {Header} from '../Header/Header';
 import {Footer} from '../Footer/Footer';
-import {useDeployedNetworks} from '../../hooks';
+import {useDeployedNetworks, useSignerAddress} from '../../hooks';
 
 import './styles.scss';
 
 export const MySnaapPageLayout: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const {address} = useParams();
 
-  const {deployedNetworks, loading} = useDeployedNetworks(address);
+  const {deployedNetworks, loading: networksLoading} = useDeployedNetworks(address);
+  const {signerAddress, loading: signerLoading} = useSignerAddress();
 
   useEffect(() => {
-    if (loading) return;
+    if (signerLoading || networksLoading) return;
 
     if (deployedNetworks.length === 0) {
       // TODO: Redirect to Networks
     }
-  }, [deployedNetworks.length, loading]);
+
+    if (!signerAddress) {
+      // TODO: Redirect to My Snaaps
+    }
+  }, [signerLoading, networksLoading, deployedNetworks.length, signerAddress]);
 
   return (
     <div className="c-my-snaap-page-layout">

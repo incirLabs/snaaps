@@ -16,7 +16,7 @@ import './styles.scss';
 
 const Networks: React.FC = () => {
   const {address} = useParams();
-  const signerAddress = useSignerAddress(address);
+  const {signerAddress} = useSignerAddress(address);
 
   const [loading, setLoading] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys>();

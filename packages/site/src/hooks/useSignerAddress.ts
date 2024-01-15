@@ -1,13 +1,16 @@
 import {Env} from 'common';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 
 export const useSignerAddress = (contractAddress?: string) => {
+  const [loading, setLoading] = useState(false);
   const [signerAddress, setSignerAddress] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
       if (!contractAddress) return;
+
+      setLoading(true);
 
       const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
 
@@ -19,8 +22,9 @@ export const useSignerAddress = (contractAddress?: string) => {
       const signer = found.options?.signerAddress;
 
       setSignerAddress(typeof signer === 'string' ? signer : undefined);
+      setLoading(false);
     })();
   }, [contractAddress]);
 
-  return signerAddress;
+  return useMemo(() => ({loading, signerAddress}), [loading, signerAddress]);
 };

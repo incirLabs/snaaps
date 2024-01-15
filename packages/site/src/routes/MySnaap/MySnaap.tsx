@@ -8,7 +8,7 @@ import './styles.scss';
 const MySnaap: React.FC = () => {
   const {address} = useParams();
 
-  const signerAddress = useSignerAddress(address);
+  const {signerAddress} = useSignerAddress(address);
 
   return (
     <PageContainer className={cx('p-my-snaap')}>
