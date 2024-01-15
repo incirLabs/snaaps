@@ -91,7 +91,7 @@ const CreateNew: React.FC = () => {
               walletAddress={wallet.walletAddress}
               right={
                 addedWallets.includes(wallet.walletAddress) ? (
-                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.walletAddress).Networks}>
+                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.walletAddress).MySnaap}>
                     Configure
                   </Button>
                 ) : (

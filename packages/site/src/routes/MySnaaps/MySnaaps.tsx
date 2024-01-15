@@ -37,7 +37,7 @@ const MySnaaps: React.FC = () => {
               text={account.address}
               walletAddress={account.address}
               right={
-                <Button theme="chip" as={Link} to={Paths.MySnaap(account.address).Networks}>
+                <Button theme="chip" as={Link} to={Paths.MySnaap(account.address).MySnaap}>
                   Configure
                 </Button>
               }

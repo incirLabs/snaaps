@@ -1,5 +1,6 @@
 export {Row, Col} from './Layout';
 export * from './PageLayout';
+export {MySnaapPageLayout} from './MySnaapPageLayout/MySnaapPageLayout';
 export {Surface} from './Surface/Surface';
 export {Button} from './Button/Button';
 export {Footer} from './Footer/Footer';

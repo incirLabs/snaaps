@@ -13,4 +13,25 @@
     font-size: rem(24px);
     font-weight: 700;
   }
+
+  &_networks {
+    display: flex;
+    gap: spacing(xsmall);
+    align-items: center;
+
+    &_add-button {
+      @extend %button-clean;
+
+      display: flex;
+      width: rem(28px);
+      height: rem(28px);
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $g-colors-border;
+      background: $g-colors-white;
+      border-radius: 999px;
+      color: $g-colors-black;
+      font-size: rem(16px);
+    }
+  }
 }

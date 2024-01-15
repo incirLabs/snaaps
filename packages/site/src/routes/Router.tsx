@@ -1,5 +1,5 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
-import {PageLayout} from '../components';
+import {PageLayout, MySnaapPageLayout} from '../components';
 import {Paths, PathsStatic} from './Paths';
 
 import Landing from './Landing/Landing';
@@ -21,10 +21,12 @@ const Router: React.FC = () => (
 
     <Route path={PathsStatic.MySnaaps.Root} element={<PageLayout />}>
       <Route path={PathsStatic.MySnaaps.MySnaaps} element={<MySnaaps />} />
+      <Route path={PathsStatic.MySnaap.Networks} element={<Networks />} />
+    </Route>
 
+    <Route path={PathsStatic.MySnaap.Root} element={<MySnaapPageLayout />}>
       <Route path={PathsStatic.MySnaap.MySnaap} element={<MySnaap />} />
       <Route path={PathsStatic.MySnaap.Plugins} element={<Plugins />} />
-      <Route path={PathsStatic.MySnaap.Networks} element={<Networks />} />
     </Route>
 
     <Route path="*" element={<Navigate to={Paths.Landing.Root} />} />
