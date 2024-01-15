@@ -3,6 +3,7 @@ import {Paths} from '../../routes/Paths';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 
 import {LogoSquare} from '../../assets/LogoSquare';
+import {PlusIcon} from '../../assets/Icons/PlusIcon';
 
 import './styles.scss';
 
@@ -28,7 +29,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
               to={Paths.MySnaap(walletAddress).Networks}
               className="c-header_networks_add-button"
             >
-              +
+              <PlusIcon width={14} height={14} />
             </Link>
           ) : null}
 
