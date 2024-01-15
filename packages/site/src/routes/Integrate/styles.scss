@@ -1,0 +1,40 @@
+@use 'sass:color';
+@import '../../styles';
+
+.p-integrate {
+  &_page {
+    display: flex;
+    min-height: rem(420px);
+    gap: spacing(3xlarge);
+    flex-direction: row;
+  }
+
+  &_content {
+    flex: 1;
+
+    &_title {
+      margin-bottom: spacing(large);
+      color: $g-colors-text-strong;
+      font-size: rem(20px);
+      font-weight: 900;
+    }
+
+    &_button {
+      display: flex;
+      gap: spacing(normal);
+      align-items: center;
+      margin: spacing(xlarge) 0;
+    }
+  }
+
+  &_networks {
+    display: flex;
+    gap: spacing(xsmall);
+    flex-direction: row;
+    margin: spacing(large) 0;
+
+    &_network {
+      pointer-events: none;
+    }
+  }
+}

@@ -1,72 +1,132 @@
-import {useEffect} from 'react';
 import cx from 'classnames';
-import {useNavigate} from 'react-router-dom';
-import {useAccount, useConnect} from '@incirlabs/react-ethooks';
-import {Button, Surface, PageContainer} from '../../components';
-import {useMetamask} from '../../hooks';
+import {useConnect} from 'wagmi';
+import {injected} from 'wagmi/connectors';
+import {Link} from 'react-router-dom';
+import {Button, Surface, PageContainer, Marquee} from '../../components';
+import {useMetamask, useProviderState} from '../../hooks';
+import {NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
+
+import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 
 import './styles.scss';
 
 const Landing: React.FC = () => {
-  const [metamaskState, , installSnap] = useMetamask();
+  const [, , installSnap] = useMetamask();
+  const providerState = useProviderState();
   const {connect} = useConnect();
-  const {address} = useAccount();
-  const navigate = useNavigate();
-
-  const isFlaskInstalled = metamaskState.snapsDetected && metamaskState.isFlask;
-  const isConnected = isFlaskInstalled && address;
-  const isSnapInstalled = isConnected && metamaskState.installedSnap;
-
-  useEffect(() => {
-    if (isSnapInstalled) navigate(Paths.Landing.Setup);
-  }, [isSnapInstalled, navigate]);
 
   return (
-    <PageContainer area="center" className={cx('p-landing')}>
-      {!isFlaskInstalled ? (
-        <Surface className="p-landing_content">
-          <span className="p-landing_title">Turn Your EOA to AA</span>
+    <PageContainer className={cx('p-landing')}>
+      <PageContainer.Card className="p-landing_info">
+        <div className="p-landing_info_image">
+          <img src={LandingPlaceholder} alt="Placeholder" />
+        </div>
 
-          <span className="p-landing_subtitle">
-            You need to install <b>MetaMask Flask</b> to use this DAPP
-          </span>
+        <div className="p-landing_info_content">
+          <h1 className="p-landing_info_content_title">Control Your AA Acount on Metamask Snaps</h1>
 
-          <Button
-            theme="chip"
-            as="a"
-            href="https://metamask.io/flask/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Install 🦊 Flask
-          </Button>
+          {!providerState.flaskInstalled ? (
+            <div className="p-landing_info_content_buttons">
+              <Button
+                theme="chip"
+                color="dark"
+                as="a"
+                href="https://metamask.io/flask/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Install MetaMask🦊 Flask
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.flaskInstalled && !providerState.connected ? (
+            <div className="p-landing_info_content_buttons">
+              <Button theme="chip" color="dark" onClick={() => connect({connector: injected()})}>
+                Connect Your MetaMask🦊 Wallet
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.connected && !providerState.snapInstalled ? (
+            <div className="p-landing_info_content_buttons">
+              <Button theme="chip" color="dark" onClick={() => installSnap()}>
+                Install SnAAp 😸
+              </Button>
+            </div>
+          ) : null}
+
+          {providerState.connected && providerState.snapInstalled ? (
+            <div className="p-landing_info_content_buttons-group">
+              <div className="p-landing_info_content_buttons">
+                <Button
+                  theme="chip"
+                  color="dark"
+                  className="w-100"
+                  as={Link}
+                  to={Paths.MySnaaps.Root}
+                >
+                  Open snAAps 😸
+                </Button>
+              </div>
+
+              <div className="p-landing_info_content_buttons">
+                <Button theme="chip" color="dark" as={Link} to={Paths.Landing.Integrate}>
+                  Integrate Your AA Wallet 🦊
+                </Button>
+
+                <Button theme="chip" as={Link} to={Paths.Landing.CreateNew}>
+                  Get an AA Wallet
+                </Button>
+              </div>
+
+              <div className="p-landing_info_content_buttons">
+                <Button theme="chip" onClick={() => installSnap()}>
+                  Reinstall SnAAp 😸
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </PageContainer.Card>
+
+      <span className="p-landing_networks-title">Supported Networks</span>
+
+      <Surface className="p-landing_networks">
+        <Marquee duration={15_000} reversed className="p-landing_networks_content">
+          {Object.entries(NetworksConfig).map(([key, value]) => (
+            <Button key={key} theme="chip" as="div">
+              <value.logo.wide.component height={value.logo.wide.preferredHeight} />
+            </Button>
+          ))}
+        </Marquee>
+      </Surface>
+
+      <div className="p-landing_features">
+        <Surface className="p-landing_features_card">
+          <Surface>
+            <h4 className="p-landing_features_title">Setup Your AA Wallet in Minutes</h4>
+          </Surface>
+
+          <Surface className="p-landing_features_content">
+            <span>Control Your AA Wallet Directly On Metamask</span>
+            <span>Same Address for All L2 Networks</span>
+            <span>Make Any TX with Any dApp with Your AA</span>
+          </Surface>
         </Surface>
-      ) : null}
 
-      {isFlaskInstalled && !isConnected ? (
-        <Surface className="p-landing_content">
-          <span className="p-landing_subtitle">Connect Your Wallet To Start</span>
+        <Surface className="p-landing_features_card">
+          <Surface>
+            <h4 className="p-landing_features_title">Control Your AA Wallet</h4>
+          </Surface>
 
-          <span className="p-landing_title">Turn Your EOA to AA</span>
-
-          <Button theme="chip" onClick={() => connect()}>
-            Connect Your 🦊 Flask
-          </Button>
+          <Surface className="p-landing_features_content">
+            <span>Control Your AA Wallet Directly On Metamask</span>
+            <span>Only For Supported Wallets</span>
+          </Surface>
         </Surface>
-      ) : null}
-
-      {isConnected ? (
-        <Surface className="p-landing_content">
-          <span className="p-landing_subtitle">Install SnAAp To Continue</span>
-
-          <span className="p-landing_title">Turn Your EOA to AA</span>
-
-          <Button theme="chip" onClick={() => installSnap()}>
-            Install SnAAp 😸
-          </Button>
-        </Surface>
-      ) : null}
+      </div>
     </PageContainer>
   );
 };

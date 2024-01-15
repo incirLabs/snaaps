@@ -1,22 +1,32 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
-import {PageLayout} from '../components';
-import {Paths} from './Paths';
+import {PageLayout, MySnaapPageLayout} from '../components';
+import {Paths, PathsStatic} from './Paths';
 
 import Landing from './Landing/Landing';
-import Setup from './Setup/Setup';
+import Integrate from './Integrate/Integrate';
+import CreateNew from './CreateNew/CreateNew';
+
+import MySnaaps from './MySnaaps/MySnaaps';
 import MySnaap from './MySnaap/MySnaap';
 import Plugins from './Plugins/Plugins';
+import Networks from './Networks/Networks';
 
 const Router: React.FC = () => (
   <Routes>
-    <Route path={Paths.Landing.Root} element={<PageLayout />}>
-      <Route path={Paths.Landing.Landing} element={<Landing />} />
-      <Route path={Paths.Landing.Setup} element={<Setup />} />
+    <Route path={PathsStatic.Landing.Root} element={<PageLayout />}>
+      <Route path={PathsStatic.Landing.Landing} element={<Landing />} />
+      <Route path={PathsStatic.Landing.Integrate} element={<Integrate />} />
+      <Route path={PathsStatic.Landing.CreateNew} element={<CreateNew />} />
     </Route>
 
-    <Route path={Paths.MySnaap.Root} element={<PageLayout showSidebar />}>
-      <Route path={Paths.MySnaap.MySnaap} element={<MySnaap />} />
-      <Route path={Paths.MySnaap.Plugins} element={<Plugins />} />
+    <Route path={PathsStatic.MySnaaps.Root} element={<PageLayout />}>
+      <Route path={PathsStatic.MySnaaps.MySnaaps} element={<MySnaaps />} />
+      <Route path={PathsStatic.MySnaap.Networks} element={<Networks />} />
+    </Route>
+
+    <Route path={PathsStatic.MySnaap.Root} element={<MySnaapPageLayout />}>
+      <Route path={PathsStatic.MySnaap.MySnaap} element={<MySnaap />} />
+      <Route path={PathsStatic.MySnaap.Plugins} element={<Plugins />} />
     </Route>
 
     <Route path="*" element={<Navigate to={Paths.Landing.Root} />} />

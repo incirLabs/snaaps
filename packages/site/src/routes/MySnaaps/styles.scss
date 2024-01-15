@@ -1,0 +1,16 @@
+@use 'sass:color';
+@import '../../styles';
+
+.p-my-snaaps {
+  &_content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &_wallets {
+    display: flex;
+    gap: spacing(xsmall);
+    flex-direction: column;
+    margin-bottom: spacing(large);
+  }
+}

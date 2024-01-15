@@ -3,7 +3,7 @@
 $l-divider-size: rem(1px) !default;
 
 .c-divider {
-  background-color: $g-colors-border;
+  background-color: $g-colors-hr;
 
   &--vertical {
     width: $l-divider-size;

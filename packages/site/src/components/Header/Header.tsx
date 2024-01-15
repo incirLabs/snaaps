@@ -1,18 +1,50 @@
-import {Button} from '../Button/Button';
+import {Link} from 'react-router-dom';
+import {Paths} from '../../routes/Paths';
+import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
+
+import {LogoSquare} from '../../assets/LogoSquare';
+import {PlusIcon} from '../../assets/Icons/PlusIcon';
 
 import './styles.scss';
 
-export const Header: React.FC = () => {
-  const connected = false;
+export type HeaderProps = {
+  networks?: NetworkKeys[];
+  walletAddress?: string;
+};
+
+export const Header: React.FC<HeaderProps> = (props) => {
+  const {networks, walletAddress} = props;
 
   return (
     <div className="c-header">
-      <h1 className="c-header_logo">SnAAps 😸</h1>
+      <Link className="c-header_logo" to="/">
+        <LogoSquare width={32} height={32} className="me-3" />
+        snAAps
+      </Link>
 
-      {connected ? (
-        <Button theme="chip" className="c-header_connected-button">
-          Connected 🦊
-        </Button>
+      {networks ? (
+        <div className="c-header_networks">
+          {walletAddress ? (
+            <Link
+              to={Paths.MySnaap(walletAddress).Networks}
+              className="c-header_networks_add-button"
+            >
+              <PlusIcon width={14} height={14} />
+            </Link>
+          ) : null}
+
+          {networks.map((networkKey) => {
+            const network = NetworksConfig[networkKey];
+
+            return (
+              <network.logo.square.component
+                key={networkKey}
+                width={network.logo.square.preferredHeight * 1.2}
+                height={network.logo.square.preferredHeight * 1.2}
+              />
+            );
+          })}
+        </div>
       ) : null}
     </div>
   );

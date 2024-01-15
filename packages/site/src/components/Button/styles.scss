@@ -7,11 +7,17 @@
   border: 0.5px solid $g-colors-border;
   background-color: color.adjust($g-colors-white, $alpha: -0.5);
   box-shadow: $g-shadow-default;
-  color: $g-colors-text-light;
+  color: $g-colors-text-strong;
   cursor: pointer;
   font-size: rem(16px);
   font-weight: 600;
-  text-align: left;
+  text-align: center;
+
+  // prettier-ignore
+  transition:
+    background-color $g-transition-default,
+    color $g-transition-default,
+    opacity $g-transition-default;
 
   &--block {
     display: block;
@@ -20,28 +26,27 @@
 
   &--primary {
     border-radius: 2px;
-    transition: background-color $g-transition-default;
 
     &:hover {
-      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+      background-color: color.adjust($g-colors-white, $lightness: -5%);
     }
 
     &:active {
-      background-color: $g-colors-white;
+      background-color: color.adjust($g-colors-white, $lightness: -10%);
     }
   }
 
   &--chip {
-    padding: spacing(xsmall) spacing(3xlarge);
+    padding: spacing(normal) spacing(4xlarge);
     border-radius: 999px;
-    transition: background-color $g-transition-default;
+    font-size: rem(14px);
 
     &:hover {
-      background-color: color.adjust($g-colors-white, $alpha: -0.25);
+      background-color: color.adjust($g-colors-white, $lightness: -5%);
     }
 
     &:active {
-      background-color: $g-colors-white;
+      background-color: color.adjust($g-colors-white, $lightness: -10%);
     }
   }
 
@@ -51,7 +56,6 @@
     box-shadow: none;
     font-size: rem(14px);
     font-weight: 700;
-    transition: color $g-transition-default;
 
     &:hover {
       color: $g-colors-text-strong;
@@ -66,5 +70,24 @@
     &--danger {
       color: $g-colors-error-text;
     }
+
+    &--dark {
+      background-color: $g-colors-text-strong;
+      color: $g-colors-white;
+
+      &:hover {
+        background-color: color.adjust($g-colors-text-strong, $lightness: -5%);
+        color: $g-colors-white;
+      }
+
+      &:active {
+        background-color: color.adjust($g-colors-text-strong, $lightness: -10%);
+      }
+    }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }

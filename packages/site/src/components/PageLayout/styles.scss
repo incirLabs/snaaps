@@ -1,38 +1,34 @@
+@use 'sass:color';
+
 @import '../../styles';
 
 .c-page-layout {
-  display: grid;
-  grid-template-areas:
-    '. top .'
-    'left center right';
-  grid-template-rows: auto 1fr;
-  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties, meowtec/no-px */
-  grid-template-columns: 1fr 800px 1fr;
-  gap: spacing(normal);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 
-  &_left {
-    grid-area: left;
+  &_top {
+    flex: 0;
   }
 
   &_center {
-    grid-area: center;
+    flex: 1;
   }
 
-  &_right {
-    grid-area: right;
-  }
-
-  &_top {
-    grid-area: top;
-  }
-
-  &_sidebar {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
+  &_bottom {
+    flex: 0;
   }
 
   &_card {
     min-height: rem(420px);
+    padding: spacing(xlarge);
+    background-color: color.adjust($g-colors-white, $alpha: -0.25);
+
+    &_title {
+      margin-bottom: spacing(normal);
+      color: $g-colors-text-strong;
+      font-size: rem(20px);
+      font-weight: 900;
+    }
   }
 }

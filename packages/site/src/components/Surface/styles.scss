@@ -4,7 +4,7 @@
 
 .c-surface {
   padding: spacing(normal) spacing(medium);
-  border: 0.5px solid $g-colors-border;
+  border: 0.5px solid $g-colors-hr;
   background-color: color.adjust($g-colors-white, $alpha: -0.5);
   border-radius: 2px;
   box-shadow: $g-shadow-default;

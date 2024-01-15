@@ -1,0 +1,27 @@
+@import '../../styles';
+
+.c-account-card {
+  display: flex;
+  gap: spacing(xsmall);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  &_text {
+    flex: auto;
+    color: $g-colors-text-strong;
+    font-size: rem(14px);
+  }
+
+  &_chains {
+    display: flex;
+    flex: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &_right {
+    flex: 1;
+  }
+}

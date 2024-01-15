@@ -1,0 +1,45 @@
+@import '../../styles';
+
+$selector: '.c-bubble';
+
+#{$selector} {
+  position: relative;
+
+  &_content {
+    position: absolute;
+    top: -#{spacing(3xlarge)};
+    left: 50%;
+    padding: spacing(2xsmall) spacing(xsmall);
+    background: $g-colors-text-strong;
+    border-radius: 3px;
+    color: $g-colors-white;
+    font-size: rem(14px);
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: opacity $g-transition-default, top $g-transition-default;
+    visibility: hidden;
+    white-space: nowrap;
+
+    &::before {
+      position: absolute;
+      /* stylelint-disable-next-line meowtec/no-px */
+      bottom: -8px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-top: 8px solid $g-colors-text-strong;
+      border-right: 8px solid transparent;
+      border-left: 8px solid transparent;
+      content: ' ';
+      transform: translateX(-50%);
+    }
+  }
+
+  &:hover {
+    #{$selector}_content {
+      top: -#{spacing(xlarge)};
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}

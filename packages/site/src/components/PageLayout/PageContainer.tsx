@@ -2,7 +2,7 @@ import cx from 'classnames';
 import {PageCard} from './PageCard';
 
 export type PageContainerProps = JSX.IntrinsicElements['div'] & {
-  area: 'top' | 'left' | 'center' | 'right';
+  area?: 'top' | 'center' | 'bottom';
 };
 
 export type PageContainerSubComponents = {
@@ -10,7 +10,7 @@ export type PageContainerSubComponents = {
 };
 
 export const PageContainer: React.FC<PageContainerProps> & PageContainerSubComponents = ({
-  area,
+  area = 'center',
   children,
   className,
   ...props

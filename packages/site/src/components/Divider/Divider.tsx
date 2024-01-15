@@ -7,7 +7,7 @@ export type DividerProps = {
   vertical?: boolean;
 };
 
-export const Divider = createAsAble<'div', DividerProps>('div', (props, AsAble) => {
+export const Divider = createAsAble<'div', DividerProps>('div', (AsAble, props) => {
   const {vertical, className, children, ...restProps} = props;
 
   return (

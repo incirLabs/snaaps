@@ -6,7 +6,7 @@ import './styles.scss';
 
 const Plugins: React.FC = () => {
   return (
-    <PageContainer area="center" className={cx('p-plugins')}>
+    <PageContainer className={cx('p-plugins')}>
       <PageContainer.Card
         title="🔌  Plugins"
         titleRight={<Button theme="text">➕ Submit Your AA Plugin</Button>}

@@ -1,0 +1,35 @@
+@import '../../styles';
+
+.p-networks {
+  &_content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &_address {
+    display: flex;
+    gap: spacing(2xsmall);
+    flex-direction: row;
+    align-items: center;
+
+    span {
+      margin-right: spacing(xsmall);
+      color: $g-colors-text-strong;
+      font-size: rem(14px);
+    }
+  }
+
+  &_networks {
+    display: flex;
+    gap: spacing(normal);
+    flex-direction: row;
+    padding-top: spacing(2xlarge);
+  }
+
+  &_buttons {
+    display: flex;
+    gap: spacing(normal);
+    flex-direction: row;
+    padding-top: spacing(normal);
+  }
+}

@@ -2,21 +2,28 @@ import {createElement} from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AsType = keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>;
-
-export type AsAbleProps<P = object, As extends AsType = 'div'> = P &
-  React.ComponentPropsWithoutRef<As>;
-
-export type AsAbleComponent<P = object, As extends AsType = 'div'> = AsAbleProps<P, As> & {
+export type AsAbleComponent<P = object, As extends AsType = 'div'> = P & {
   as?: As;
+} & React.ComponentPropsWithoutRef<As>;
+
+const AsAbleComponent = <TDefaultAs extends AsType = 'div'>(
+  defaultAs: TDefaultAs,
+  props: AsAbleComponent<object, TDefaultAs>,
+) => {
+  const {as, children, ...restProps} = props;
+
+  // eslint-disable-next-line react/destructuring-assignment
+  return createElement(as ?? defaultAs, restProps, children);
 };
 
-export const createAsAble = <TAs extends AsType, TProps = object>(
-  defaultAs: TAs,
-  component: (
-    props: AsAbleComponent<TProps, AsType>,
-    AsAble: (props: AsAbleProps<object, TAs> & {as?: AsType}) => JSX.Element,
-  ) => JSX.Element,
-) => {
-  return <TPAs extends AsType>(props: AsAbleComponent<TProps, TPAs> & {as?: TAs | AsType}) =>
-    component(props, ({as, ...restProps}) => createElement(as || 'div', restProps, props.children));
+export const createAsAble = <TDefaultAs extends AsType = 'div', TProps = object>(
+  defaultAs: TDefaultAs,
+  component: <TAs extends AsType>(
+    AsAble: React.FC<AsAbleComponent<object, TDefaultAs>>,
+    props: AsAbleComponent<TProps, TAs>,
+  ) => React.ReactNode,
+): (<TAs extends AsType = TDefaultAs>(props: AsAbleComponent<TProps, TAs>) => React.ReactNode) => {
+  const asAbleWithDefault = AsAbleComponent.bind(null, defaultAs);
+
+  return component.bind(null, asAbleWithDefault);
 };

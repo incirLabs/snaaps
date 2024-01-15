@@ -1,5 +1,6 @@
 import type {JsonTx} from '@ethereumjs/tx';
 import type {Json} from '@metamask/utils';
+import type {Hex} from 'viem';
 
 import type {Wallet} from './keyring';
 
@@ -73,4 +74,14 @@ export function runSensitive<Type>(callback: () => Type, message?: string): Type
   } catch (error) {
     throw new Error(message ?? 'An unexpected error occurred');
   }
+}
+
+export function numberToHexString(value: number | string): Hex {
+  if (typeof value === 'string') {
+    if (value.startsWith('0x')) return value as Hex;
+
+    return `0x${parseInt(value, 10).toString(16)}`;
+  }
+
+  return `0x${value.toString(16)}`;
 }
