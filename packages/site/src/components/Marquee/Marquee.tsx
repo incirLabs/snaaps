@@ -48,7 +48,7 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
     }
 
     const rightBound = (container.scrollWidth - containerWidth) * -1;
-    const contentScrollWidth = container.scrollWidth / 3;
+    const contentScrollWidth = container.scrollWidth / 2;
 
     const anim = container.animate(
       reversed
@@ -58,7 +58,7 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
               transform: `translateX(${rightBound + contentScrollWidth}px)`,
             },
           ]
-        : [{transform: 'translateX(0)'}, {transform: `translateX(-${contentScrollWidth}px)`}],
+        : [{transform: 'translateX(0)'}, {transform: `translateX(${contentScrollWidth * -1}px)`}],
       {duration, iterations: Infinity},
     );
 
