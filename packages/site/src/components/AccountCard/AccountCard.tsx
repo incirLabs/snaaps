@@ -57,8 +57,8 @@ export const AccountCard: React.FC<AccountCardProps> = (props) => {
             return (
               <chain.logo.square.component
                 key={chainKey}
-                width={chain.logo.square.preferredHeight * 1.5}
-                height={chain.logo.square.preferredHeight * 1.5}
+                width={chain.logo.square.preferredHeight * 1.2}
+                height={chain.logo.square.preferredHeight * 1.2}
               />
             );
           })
