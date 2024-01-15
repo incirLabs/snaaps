@@ -10,3 +10,4 @@ export {Marquee} from './Marquee/Marquee';
 export {Input} from './Input/Input';
 export {ActivityIndicator} from './ActivityIndicator/ActivityIndicator';
 export {AccountCard} from './AccountCard/AccountCard';
+export {Bubble} from './Bubble/Bubble';

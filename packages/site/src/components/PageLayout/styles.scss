@@ -21,7 +21,7 @@
 
   &_card {
     min-height: rem(420px);
-    padding: spacing(normal);
+    padding: spacing(xlarge);
     background-color: color.adjust($g-colors-white, $alpha: -0.25);
 
     &_title {
