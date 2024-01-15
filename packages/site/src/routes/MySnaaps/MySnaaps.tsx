@@ -30,7 +30,7 @@ const MySnaaps: React.FC = () => {
   return (
     <PageContainer className={cx('p-my-snaaps')}>
       <PageContainer.Card className="p-my-snaaps_content" title="Select an Account">
-        {accounts.length > 0 ? (
+        {accounts.length > 0 || loading ? (
           <div className="p-my-snaaps_wallets">
             {accounts.map((account) => (
               <AccountCard
