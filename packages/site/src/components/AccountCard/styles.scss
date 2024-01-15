@@ -8,14 +8,14 @@
   justify-content: space-between;
 
   &_text {
-    flex: 5;
+    flex: auto;
     color: $g-colors-text-strong;
     font-size: rem(14px);
   }
 
   &_chains {
     display: flex;
-    flex: 5;
+    flex: auto;
     flex-direction: row;
     align-items: center;
     justify-content: center;

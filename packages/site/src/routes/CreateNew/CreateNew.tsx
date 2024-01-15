@@ -6,7 +6,8 @@ import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
 import {useMount} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
-import {getWalletAddress} from '../../utils/Networks';
+import {getContractDeployedChains, getWalletAddress} from '../../utils/Networks';
+import {NetworkKeys} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
 
 import './styles.scss';
@@ -14,6 +15,7 @@ import './styles.scss';
 type Signer = {address: string; index: number};
 type Wallet = Signer & {
   walletAddress: string;
+  networks: NetworkKeys[];
 };
 
 const CreateNew: React.FC = () => {
@@ -45,6 +47,7 @@ const CreateNew: React.FC = () => {
           return {
             ...signer,
             walletAddress,
+            networks: await getContractDeployedChains(walletAddress),
           };
         }),
       )
@@ -88,15 +91,25 @@ const CreateNew: React.FC = () => {
             <AccountCard
               key={wallet.address}
               text={`${wallet.index + 1} - ${wallet.walletAddress}`}
-              walletAddress={wallet.walletAddress}
+              chains={wallet.networks}
               right={
                 addedWallets.includes(wallet.walletAddress) ? (
-                  <Button theme="chip" as={Link} to={Paths.MySnaap(wallet.walletAddress).MySnaap}>
+                  <Button
+                    className="d-block w-100"
+                    theme="chip"
+                    as={Link}
+                    to={Paths.MySnaap(wallet.walletAddress).MySnaap}
+                  >
                     Configure
                   </Button>
                 ) : (
-                  <Button theme="chip" color="dark" onClick={() => onSetupClick(wallet)}>
-                    Setup
+                  <Button
+                    theme="chip"
+                    color="dark"
+                    className="d-block w-100"
+                    onClick={() => onSetupClick(wallet)}
+                  >
+                    {wallet.networks.length > 0 ? 'Add to MetaMask' : 'Setup'}
                   </Button>
                 )
               }
