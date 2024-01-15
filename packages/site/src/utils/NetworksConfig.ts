@@ -1,4 +1,13 @@
-import {type Chain, linea, scroll, arbitrum, optimism, polygon, mainnet} from 'wagmi/chains';
+import {
+  type Chain,
+  linea,
+  scroll,
+  arbitrum,
+  optimism,
+  polygon,
+  mainnet,
+  goerli,
+} from 'wagmi/chains';
 
 import {
   // Wide
@@ -8,6 +17,7 @@ import {
   OptimismLogo,
   PolygonLogo,
   EthereumLogo,
+  EthereumGoerliLogo,
 
   // Square
   LineaLogoSquare,
@@ -16,6 +26,7 @@ import {
   OptimismLogoSquare,
   PolygonLogoSquare,
   EthereumLogoSquare,
+  EthereumGoerliLogoSquare,
 } from '../assets/Networks';
 
 export type NetworkConfig = {
@@ -120,6 +131,21 @@ export const NetworksConfig = {
       wide: {
         preferredHeight: 22,
         component: EthereumLogo,
+      },
+    },
+  },
+
+  ethereumGoerli: {
+    name: 'Ethereum Goerli',
+    chain: goerli,
+    logo: {
+      square: {
+        preferredHeight: 20,
+        component: EthereumGoerliLogoSquare,
+      },
+      wide: {
+        preferredHeight: 22,
+        component: EthereumGoerliLogo,
       },
     },
   },
