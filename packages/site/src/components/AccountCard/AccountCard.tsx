@@ -1,8 +1,7 @@
-import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Surface, SurfaceProps} from '../Surface/Surface';
 import {ActivityIndicator} from '../ActivityIndicator/ActivityIndicator';
-import {getContractDeployedChains} from '../../utils/Networks';
+import {useDeployedNetworks} from '../../hooks';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 
 import './styles.scss';
@@ -27,21 +26,7 @@ export type AccountCardProps = SurfaceProps & {
 export const AccountCard: React.FC<AccountCardProps> = (props) => {
   const {text, chains: chainsProp, walletAddress, right, className, ...restProps} = props;
 
-  const [loading, setLoading] = useState(false);
-  const [chainsState, setChainsState] = useState<NetworkKeys[]>([]);
-
-  useEffect(() => {
-    if (chainsProp || !walletAddress) return;
-
-    (async () => {
-      setLoading(true);
-
-      const chains = await getContractDeployedChains(walletAddress);
-
-      setChainsState(chains);
-      setLoading(false);
-    })();
-  }, [walletAddress, chainsProp]);
+  const {deployedNetworks, loading} = useDeployedNetworks(walletAddress, !!chainsProp);
 
   return (
     <Surface className={cx('c-account-card', className)} {...restProps}>
@@ -51,7 +36,7 @@ export const AccountCard: React.FC<AccountCardProps> = (props) => {
         {loading ? (
           <ActivityIndicator size="small" />
         ) : (
-          (chainsProp ?? chainsState ?? []).map((chainKey) => {
+          (chainsProp ?? deployedNetworks ?? []).map((chainKey) => {
             const chain = NetworksConfig[chainKey];
 
             return (
