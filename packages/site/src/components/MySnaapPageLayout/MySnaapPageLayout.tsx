@@ -1,29 +1,29 @@
 import {useEffect} from 'react';
-import {Outlet, useParams} from 'react-router-dom';
+import {Outlet, useNavigate, useParams} from 'react-router-dom';
 import {PageContainer} from '../PageLayout/PageContainer';
 import {Header} from '../Header/Header';
 import {Footer} from '../Footer/Footer';
 import {useDeployedNetworks, useSignerAddress} from '../../hooks';
+import {Paths} from '../../routes/Paths';
 
 import './styles.scss';
 
 export const MySnaapPageLayout: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const {address} = useParams();
+  const navigate = useNavigate();
 
   const {deployedNetworks, loading: networksLoading} = useDeployedNetworks(address);
-  const {signerAddress, loading: signerLoading} = useSignerAddress();
+  const {signerAddress, loading: signerLoading} = useSignerAddress(address);
 
   useEffect(() => {
     if (signerLoading || networksLoading) return;
 
-    if (deployedNetworks.length === 0) {
-      // TODO: Redirect to Networks
-    }
-
     if (!signerAddress) {
-      // TODO: Redirect to My Snaaps
+      navigate(Paths.MySnaaps.Root, {replace: true});
+    } else if (deployedNetworks.length === 0) {
+      navigate(Paths.MySnaap(address ?? '').Networks, {replace: true});
     }
-  }, [signerLoading, networksLoading, deployedNetworks.length, signerAddress]);
+  }, [signerLoading, networksLoading, deployedNetworks.length, signerAddress, navigate, address]);
 
   return (
     <div className="c-my-snaap-page-layout">

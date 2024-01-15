@@ -3,7 +3,7 @@ import {getWalletAddress} from '../utils/Networks';
 import {NetworkKeys} from '../utils/NetworksConfig';
 
 export const useContractAddress = (signerAddress?: string, network?: NetworkKeys) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [contractAddress, setContractAddress] = useState<string | undefined>(undefined);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 
 export const useSignerAddress = (contractAddress?: string) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [signerAddress, setSignerAddress] = useState<string | undefined>(undefined);
 
   useEffect(() => {

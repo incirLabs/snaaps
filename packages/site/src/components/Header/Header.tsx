@@ -17,10 +17,10 @@ export const Header: React.FC<HeaderProps> = (props) => {
 
   return (
     <div className="c-header">
-      <h1 className="c-header_logo">
+      <Link className="c-header_logo" to="/">
         <LogoSquare width={32} height={32} className="me-3" />
         snAAps
-      </h1>
+      </Link>
 
       {networks ? (
         <div className="c-header_networks">

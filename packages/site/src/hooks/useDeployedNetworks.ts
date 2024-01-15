@@ -3,7 +3,7 @@ import {NetworkKeys} from '../utils/NetworksConfig';
 import {getContractDeployedChains} from '../utils/Networks';
 
 export const useDeployedNetworks = (walletAddress?: string, pause?: boolean) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
 
   useEffect(() => {
