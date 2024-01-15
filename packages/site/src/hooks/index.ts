@@ -6,3 +6,4 @@ export {useProviderState} from './useProviderState';
 export {useSignerAddress} from './useSignerAddress';
 export {useContractAddress} from './useContractAddress';
 export {useDeployedNetworks} from './useDeployedNetworks';
+export {useWindowDimensions} from './useWindowDimensions';

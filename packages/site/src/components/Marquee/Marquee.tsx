@@ -1,5 +1,5 @@
 import {forwardRef, useLayoutEffect} from 'react';
-import {useForwardedRef} from '../../hooks';
+import {useForwardedRef, useWindowDimensions} from '../../hooks';
 
 export type MarqueeProps = JSX.IntrinsicElements['div'] & {
   /**
@@ -19,6 +19,8 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
   const {children, duration = 10_000, reversed = false, ...restProps} = props;
 
   const forwardedRef = useForwardedRef(ref);
+
+  const {width, height} = useWindowDimensions();
 
   useLayoutEffect(() => {
     const container = forwardedRef.current;
@@ -64,7 +66,7 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
     return () => {
       anim.cancel();
     };
-  }, [forwardedRef, children, duration, reversed]);
+  }, [forwardedRef, children, duration, reversed, width, height]);
 
   return (
     <div ref={forwardedRef} {...restProps}>
