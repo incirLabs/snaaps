@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import {createAsAble} from '../../../utils/createAsAble';
+import {createAsAble} from '../../utils/createAsAble';
 
 import './styles.scss';
 

@@ -9,35 +9,32 @@
     flex-direction: row;
   }
 
-  &_wallets {
-    display: flex;
-    gap: spacing(normal);
-    flex: 0;
-    flex-direction: column;
-    padding: spacing(2xsmall);
-    border: 0.5px solid $g-colors-border;
-    background: color.adjust($g-colors-white, $alpha: -0.5);
-    white-space: nowrap;
-
-    .c-button {
-      padding: spacing(normal) spacing(4xlarge);
-      color: $g-colors-text-dark;
-      text-align: center;
-    }
-  }
-
   &_content {
     flex: 1;
 
     &_title {
-      margin: spacing(normal) 0;
+      margin-bottom: spacing(large);
       color: $g-colors-text-strong;
       font-size: rem(20px);
       font-weight: 900;
     }
 
     &_button {
+      display: flex;
+      gap: spacing(normal);
+      align-items: center;
       margin: spacing(xlarge) 0;
+    }
+  }
+
+  &_networks {
+    display: flex;
+    gap: spacing(xsmall);
+    flex-direction: row;
+    margin: spacing(large) 0;
+
+    &_network {
+      pointer-events: none;
     }
   }
 }

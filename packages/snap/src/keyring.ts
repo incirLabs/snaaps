@@ -69,11 +69,16 @@ export class SimpleKeyring implements Keyring {
     const address = options?.address as string;
     const signerIndex = options?.signerIndex as number;
 
-    if (!address || signerIndex === undefined) {
-      throw new Error(`address and signerIndex is required`);
+    if (!address) {
+      throw new Error(`Address is required`);
     }
 
-    const signerPrivateKey = await getSignerPrivateKey(signerIndex);
+    if (!signerIndex && (!options?.privateKey || typeof options.privateKey !== 'string')) {
+      throw new Error(`Signer index or private key is required`);
+    }
+
+    const signerPrivateKey =
+      (options.privateKey as string) ?? (await getSignerPrivateKey(signerIndex));
     const signerAddress = await privateKeyToAddress(signerPrivateKey);
 
     // eslint-disable-next-line no-param-reassign

@@ -7,7 +7,10 @@ export const useDeployedNetworks = (walletAddress?: string, pause?: boolean) => 
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
 
   useEffect(() => {
-    if (pause || !walletAddress) return;
+    if (pause || !walletAddress) {
+      setLoading(false);
+      return;
+    }
 
     (async () => {
       setLoading(true);
