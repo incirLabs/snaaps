@@ -20,7 +20,6 @@ import {
 
 export type NetworkConfig = {
   name: string;
-  rpcUrl: string;
   chain: Chain;
   logo: {
     square: {
@@ -37,7 +36,6 @@ export type NetworkConfig = {
 export const NetworksConfig = {
   linea: {
     name: 'Linea',
-    rpcUrl: 'https://rpc.linea.build',
     chain: linea,
     logo: {
       square: {
@@ -53,7 +51,6 @@ export const NetworksConfig = {
 
   scroll: {
     name: 'Scroll',
-    rpcUrl: 'https://rpc.scroll.io',
     chain: scroll,
     logo: {
       square: {
@@ -69,7 +66,6 @@ export const NetworksConfig = {
 
   arbitrum: {
     name: 'Arbitrum',
-    rpcUrl: 'https://arb1.arbitrum.io/rpc',
     chain: arbitrum,
     logo: {
       square: {
@@ -85,7 +81,6 @@ export const NetworksConfig = {
 
   optimism: {
     name: 'Optimism',
-    rpcUrl: 'https://mainnet.optimism.io',
     chain: optimism,
     logo: {
       square: {
@@ -101,7 +96,6 @@ export const NetworksConfig = {
 
   polygon: {
     name: 'Polygon',
-    rpcUrl: 'https://polygon-rpc.com',
     chain: polygon,
     logo: {
       square: {
@@ -117,7 +111,6 @@ export const NetworksConfig = {
 
   ethereum: {
     name: 'Ethereum',
-    rpcUrl: 'https://eth.llamarpc.com',
     chain: mainnet,
     logo: {
       square: {
