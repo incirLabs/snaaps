@@ -3,3 +3,4 @@ export {default as useResponsive} from './useResponsive';
 export {MetaMaskProvider, useMetamask} from './MetamaskContext';
 export {useForwardedRef} from './useForwardedRef';
 export {useProviderState} from './useProviderState';
+export {useSignerAddress} from './useSignerAddress';

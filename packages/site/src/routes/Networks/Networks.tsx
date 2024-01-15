@@ -7,6 +7,7 @@ import {Link, useParams} from 'react-router-dom';
 import {SimpleAccountFactory} from 'contracts';
 import {NetworkButton} from './NetworkButton/NetworkButton';
 import {Button, PageContainer} from '../../components';
+import {useSignerAddress} from '../../hooks';
 import {getContractDeployedChains} from '../../utils/Networks';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
@@ -15,6 +16,7 @@ import './styles.scss';
 
 const Networks: React.FC = () => {
   const {address} = useParams();
+  const signerAddress = useSignerAddress(address);
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys>();
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
@@ -42,7 +44,7 @@ const Networks: React.FC = () => {
       abi: SimpleAccountFactory,
       address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
       functionName: 'createAccount',
-      args: ['0x4C5920A65C90A1babc4C8bC66d2D3aBDD036b834', 0],
+      args: [signerAddress, 0],
       chainId: selected.chain.id,
     });
 
