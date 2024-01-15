@@ -1,5 +1,6 @@
 import type {JsonTx} from '@ethereumjs/tx';
 import type {Json} from '@metamask/utils';
+import type {Hex} from 'viem';
 
 import type {Wallet} from './keyring';
 
@@ -75,8 +76,10 @@ export function runSensitive<Type>(callback: () => Type, message?: string): Type
   }
 }
 
-export function numberToHexString(value: number | string): `0x${string}` {
-  if (typeof value === 'string' && !value.startsWith('0x')) {
+export function numberToHexString(value: number | string): Hex {
+  if (typeof value === 'string') {
+    if (value.startsWith('0x')) return value as Hex;
+
     return `0x${parseInt(value, 10).toString(16)}`;
   }
 
