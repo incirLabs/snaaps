@@ -33,7 +33,7 @@ export const AccountCard: React.FC<AccountCardProps> = (props) => {
       <span className="c-account-card_text">{text}</span>
 
       <div className="c-account-card_chains">
-        {loading ? (
+        {(chainsProp ? false : loading) ? (
           <ActivityIndicator size="small" />
         ) : (
           (chainsProp ?? deployedNetworks ?? []).map((chainKey) => {

@@ -37,7 +37,10 @@ const CreateNew: React.FC = () => {
       },
     });
 
-    if (!signers || !Array.isArray(signers)) return;
+    if (!signers || !Array.isArray(signers)) {
+      setLoading(false);
+      return;
+    }
 
     const newWallets = (
       await Promise.all(
