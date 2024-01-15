@@ -51,7 +51,7 @@ const CreateNew: React.FC = () => {
     ).filter((wallet) => !!wallet);
 
     setLoading(false);
-    setWallets([...wallets, ...newWallets]);
+    setWallets([...wallets, ...newWallets].sort((a, b) => a.index - b.index));
     setPage(page + 1);
   };
 
@@ -87,7 +87,7 @@ const CreateNew: React.FC = () => {
           {wallets.map((wallet) => (
             <AccountCard
               key={wallet.address}
-              text={wallet.walletAddress}
+              text={`${wallet.index + 1} - ${wallet.walletAddress}`}
               walletAddress={wallet.walletAddress}
               right={
                 addedWallets.includes(wallet.walletAddress) ? (
