@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
 
             return (
               <network.logo.square.component
+                key={networkKey}
                 width={network.logo.square.preferredHeight * 1.2}
                 height={network.logo.square.preferredHeight * 1.2}
               />

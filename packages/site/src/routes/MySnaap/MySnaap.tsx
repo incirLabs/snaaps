@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import {useParams} from 'react-router-dom';
-import {Button, Surface, PageContainer, Bubble} from '../../components';
+import {Button, Surface, PageContainer, Bubble, ActivityIndicator} from '../../components';
 import {useSignerAddress} from '../../hooks';
 
 import './styles.scss';
@@ -8,7 +8,7 @@ import './styles.scss';
 const MySnaap: React.FC = () => {
   const {address} = useParams();
 
-  const {signerAddress} = useSignerAddress(address);
+  const {signerAddress, loading: signerLoading} = useSignerAddress(address);
 
   return (
     <PageContainer className={cx('p-my-snaap')}>
@@ -21,7 +21,7 @@ const MySnaap: React.FC = () => {
         <div className="mb-4">
           <h4 className="mb-2">Your Signer</h4>
           <Surface.Content
-            left={<span>{signerAddress}</span>}
+            left={signerLoading ? <ActivityIndicator size="small" /> : <span>{signerAddress}</span>}
             right={
               <Bubble content="Coming Soon!">
                 <Button theme="text">Change</Button>
