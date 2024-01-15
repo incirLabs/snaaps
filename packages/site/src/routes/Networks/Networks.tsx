@@ -6,7 +6,7 @@ import {useChainId, useSwitchChain, useWriteContract} from 'wagmi';
 import {Link, useParams} from 'react-router-dom';
 import {SimpleAccountFactory} from 'contracts';
 import {NetworkButton} from './NetworkButton/NetworkButton';
-import {Button, PageContainer} from '../../components';
+import {ActivityIndicator, Button, PageContainer} from '../../components';
 import {useSignerAddress} from '../../hooks';
 import {getContractDeployedChains} from '../../utils/Networks';
 import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
@@ -18,6 +18,7 @@ const Networks: React.FC = () => {
   const {address} = useParams();
   const signerAddress = useSignerAddress(address);
 
+  const [loading, setLoading] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys>();
   const [deployedNetworks, setDeployedNetworks] = useState<NetworkKeys[]>([]);
 
@@ -28,7 +29,14 @@ const Networks: React.FC = () => {
   useEffect(() => {
     if (!address) return;
 
-    getContractDeployedChains(address).then(setDeployedNetworks);
+    (async () => {
+      setLoading(true);
+
+      const chains = await getContractDeployedChains(address);
+
+      setDeployedNetworks(chains);
+      setLoading(false);
+    })();
   }, [address]);
 
   const deployContract = async () => {
@@ -71,25 +79,29 @@ const Networks: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          <div className="p-networks_networks">
-            {NetworkKeys.map((key) => {
-              const network = NetworksConfig[key];
+          {loading ? (
+            <ActivityIndicator className="w-100 py-5" />
+          ) : (
+            <div className="p-networks_networks">
+              {NetworkKeys.map((key) => {
+                const network = NetworksConfig[key];
 
-              return (
-                <NetworkButton
-                  key={key}
-                  left={
-                    <network.logo.square.component height={network.logo.square.preferredHeight} />
-                  }
-                  active={selectedNetwork === key}
-                  disabled={deployedNetworks.includes(key)}
-                  onClick={() => setSelectedNetwork(key as NetworkKeys)}
-                >
-                  $4.12
-                </NetworkButton>
-              );
-            })}
-          </div>
+                return (
+                  <NetworkButton
+                    key={key}
+                    left={
+                      <network.logo.square.component height={network.logo.square.preferredHeight} />
+                    }
+                    active={selectedNetwork === key}
+                    disabled={deployedNetworks.includes(key)}
+                    onClick={() => setSelectedNetwork(key as NetworkKeys)}
+                  >
+                    $4.12
+                  </NetworkButton>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="p-networks_buttons">
