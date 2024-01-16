@@ -13,7 +13,7 @@ const config: SnapConfig = {
     crypto: true,
   },
   environment: {
-    DAPP_ORIGIN_PRODUCTION: 'http://localhost:3000',
+    DAPP_ORIGIN_PRODUCTION: 'https://usesnaaps.com',
     DAPP_ORIGIN_DEVELOPMENT: 'http://localhost:3000',
     SNAP_ORIGIN: 'local:http://localhost:8080',
     SNAP_PIMLICO_API_KEY: '0',

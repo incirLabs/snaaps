@@ -21,7 +21,7 @@ export const OriginPermissions = new Map<string, string[]>([
     ],
   ],
   [
-    'http://localhost:3000',
+    process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://usesnaaps.com',
     [
       // Keyring methods
       KeyringRpcMethod.ListAccounts,

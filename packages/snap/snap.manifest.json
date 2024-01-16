@@ -1,13 +1,13 @@
 {
-  "version": "1.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "AA Snap Test",
+  "version": "0.0.1",
+  "description": "snAAps Account Abstraction keyring snap",
+  "proposedName": "snAAps",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MetaMask/snap-simple-keyring.git"
+    "url": "https://github.com/incirLabs/snaaps.git"
   },
   "source": {
-    "shasum": "2SoO9h5WkIVK4nYESL36LkR77vJHL2BlC6D3eYowwkE=",
+    "shasum": "iQOuMi+ZtzIp4FM6WHlgVpkNdMxB250f5U4mPqY8Lpw=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -21,6 +21,7 @@
     "endowment:network-access": {},
     "endowment:keyring": {
       "allowedOrigins": [
+        "https://usesnaaps.com",
         "http://localhost:3000"
       ]
     },

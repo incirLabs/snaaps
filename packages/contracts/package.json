@@ -2,6 +2,7 @@
   "name": "contracts",
   "version": "0.6.0",
   "description": "ERC-4337 Account Abstraction Implementation",
+  "private": true,
   "main": "./exports.ts",
   "types": "./exports.ts",
   "scripts": {

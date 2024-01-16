@@ -1,22 +1,25 @@
 {
   "name": "snap",
-  "version": "1.1.0",
-  "description": "A simple keyring snap that integrates with MetaMask accounts.",
+  "version": "0.0.1",
+  "description": "snAAps Account Abstraction snap for MetaMask",
   "keywords": [
     "metamask",
     "snap",
     "keyring",
-    "account"
+    "account",
+    "account abstraction",
+    "ethereum",
+    "4337"
   ],
-  "homepage": "https://github.com/MetaMask/snap-simple-keyring#readme",
+  "homepage": "https://github.com/incirLabs/snaaps#readme",
   "bugs": {
-    "url": "https://github.com/MetaMask/snap-simple-keyring/issues"
+    "url": "https://github.com/incirLabs/snaaps/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MetaMask/snap-simple-keyring.git"
+    "url": "https://github.com/incirLabs/snaaps.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
+  "license": "CC BY-NC-ND 4.0 Deed (see in LICENSE.md)",
   "main": "dist/bundle.js",
   "files": [
     "dist/",
@@ -25,17 +28,19 @@
   ],
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
-    "build": "dotenv -e ../../.env mm-snap build",
+    "start": "NODE_ENV='development' dotenv -e ../../.env mm-snap watch",
+    "build": "NODE_ENV='production' dotenv -e ../../.env mm-snap build",
     "build:clean": "yarn clean && yarn build",
     "clean": "rimraf dist",
-    "lint": "yarn lint:eslint && yarn lint:misc && yarn lint:deps && yarn lint:types",
+    "test": "dotenv -e ../../.env vite test",
+    "format:check": "prettier -c \"src/**/*.{js,ts}\"",
+    "format": "prettier --write \"src/**/*.{js,ts}\"",
     "lint:deps": "depcheck",
-    "lint:eslint": "eslint . --cache --ext js,jsx,ts,tsx",
-    "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
-    "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' '!snap.manifest.json' --check",
+    "lint:eslint": "eslint \"src/**/*.{js,ts}\"",
     "lint:types": "tsc --noEmit",
-    "serve": "dotenv -e ../../.env mm-snap serve",
-    "start": "NODE_ENV='development' dotenv -e ../../.env mm-snap watch"
+    "lint:fix": "yarn lint:eslint --fix && yarn format",
+    "lint": "yarn lint:eslint && yarn format:check && yarn lint:deps && yarn lint:types",
+    "serve": "dotenv -e ../../.env mm-snap serve"
   },
   "dependencies": {
     "@ethereumjs/common": "^3.1.2",
@@ -53,25 +58,13 @@
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",
     "@metamask/auto-changelog": "^3.3.0",
-    "@metamask/eslint-config": "^12.2.0",
-    "@metamask/eslint-config-jest": "^12.1.0",
-    "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
     "@metamask/snaps-cli": "^3.0.0",
     "@types/node": "^20.6.2",
-    "@typescript-eslint/eslint-plugin": "^5.33.0",
-    "@typescript-eslint/parser": "^5.33.0",
     "depcheck": "^1.4.6",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
-    "eslint": "^8.21.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jest": "^26.8.2",
-    "eslint-plugin-jsdoc": "^39.2.9",
-    "eslint-plugin-n": "^16.1.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-promise": "^6.1.1",
+    "eslint": "^8.7.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "typescript": "^4.7.4"
