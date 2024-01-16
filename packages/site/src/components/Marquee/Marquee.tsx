@@ -27,6 +27,10 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
 
     if (!container || !children) return;
 
+    Array.from(container.children).forEach((elem) => {
+      if (elem.classList.contains('marquee__clone')) elem.remove();
+    });
+
     const containerWidth = container.getBoundingClientRect().width;
 
     const contentWidth = Array.from(container.children).reduce(
@@ -41,7 +45,8 @@ const Marquee = forwardRef<MarqueeRef, MarqueeProps>((props, ref) => {
 
       Array.from({length: diff}).forEach(() => {
         childrenArr.forEach((elem) => {
-          const clone = elem.cloneNode(true);
+          const clone = elem.cloneNode(true) as Element;
+          clone.classList.add('marquee__clone');
           container.append(clone);
         });
       });
