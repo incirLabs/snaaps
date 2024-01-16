@@ -1,5 +1,4 @@
 import {NetworkKeys, NetworksConfig} from 'common';
-import {Env} from 'common';
 import {SimpleAccountFactory} from 'contracts';
 import {Hex} from 'viem';
 import {getBytecode, readContract} from 'wagmi/actions';
@@ -44,12 +43,14 @@ export const getWalletAddress = async (
   signer: string,
   network: NetworkKeys = 'ethereum',
 ): Promise<string> => {
+  const config = NetworksConfig[network];
+
   const address = await readContract(wagmiConfig, {
     abi: SimpleAccountFactory,
-    address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
+    address: config.accountFactory,
     functionName: 'getAddress',
     args: [signer, 0],
-    chainId: NetworksConfig[network].viem.id,
+    chainId: config.viem.id,
   });
 
   return address as string;

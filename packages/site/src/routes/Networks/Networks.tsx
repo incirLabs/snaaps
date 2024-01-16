@@ -1,7 +1,6 @@
-import {Env, NetworkKeys, NetworksConfig} from 'common';
+import {NetworkKeys, NetworksConfig} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
-import {Hex} from 'viem';
 import {useChainId, useSwitchChain, useWriteContract, useWaitForTransactionReceipt} from 'wagmi';
 import {Link, useParams} from 'react-router-dom';
 import {SimpleAccountFactory} from 'contracts';
@@ -51,7 +50,7 @@ const Networks: React.FC = () => {
 
     await writeContractAsync({
       abi: SimpleAccountFactory,
-      address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
+      address: selected.accountFactory,
       functionName: 'createAccount',
       args: [signerAddress, 0],
       chainId: selected.viem.id,

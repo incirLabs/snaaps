@@ -17,7 +17,6 @@ const config: SnapConfig = {
     DAPP_ORIGIN_DEVELOPMENT: 'http://localhost:3000',
     SNAP_ORIGIN: 'local:http://localhost:8080',
     SNAP_PIMLICO_API_KEY: '0',
-    SNAP_ENTRYPOINT_ADDRESS: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
   },
   stats: {
     builtIns: {

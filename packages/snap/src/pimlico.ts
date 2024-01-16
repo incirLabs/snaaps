@@ -11,7 +11,6 @@ import {createExecuteCall} from './callData';
 import {fillUserOp} from './userOp';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
-const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS ?? '';
 
 const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: string) =>
   `https://api.pimlico.io/v${type === 'bundler' ? 1 : 2}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
@@ -67,7 +66,7 @@ export class PimlicoClient {
     const sponsorUserOperationResult: SponsorUserOperationReturnType =
       await this.paymasterClient.sponsorUserOperation({
         userOperation: userOp,
-        entryPoint: ENTRYPOINT_ADDRESS as Hex,
+        entryPoint: this.chain.entryPoint,
       });
 
     return {
@@ -86,7 +85,7 @@ export class PimlicoClient {
       account: owner,
       userOperation: sponsoredUserOperation,
       chainId: this.chain.viem.id,
-      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+      entryPoint: this.chain.entryPoint,
     });
 
     return {
@@ -98,7 +97,7 @@ export class PimlicoClient {
   public async sendUserOp(signedSponsoredUserOperation: UserOperation) {
     const userOpHash = await this.bundlerClient.sendUserOperation({
       userOperation: signedSponsoredUserOperation,
-      entryPoint: ENTRYPOINT_ADDRESS as Hex,
+      entryPoint: this.chain.entryPoint,
     });
 
     return userOpHash;
