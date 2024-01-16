@@ -1,6 +1,6 @@
 {
   "name": "@snaaps/snap",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "snAAps Account Abstraction snap for MetaMask",
   "keywords": [
     "metamask",
@@ -40,7 +40,8 @@
     "lint:types": "tsc --noEmit",
     "lint:fix": "yarn lint:eslint --fix && yarn format",
     "lint": "yarn lint:eslint && yarn format:check && yarn lint:deps && yarn lint:types",
-    "serve": "dotenv -e ../../.env mm-snap serve"
+    "serve": "dotenv -e ../../.env mm-snap serve",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@ethereumjs/common": "^3.1.2",

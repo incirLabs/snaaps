@@ -75,7 +75,10 @@ export class SimpleKeyring implements Keyring {
       throw new Error(`Address is required`);
     }
 
-    if (!signerIndex && (!options?.privateKey || typeof options.privateKey !== 'string')) {
+    if (
+      typeof signerIndex !== 'number' &&
+      (!options?.privateKey || typeof options.privateKey !== 'string')
+    ) {
       throw new Error(`Signer index or private key is required`);
     }
 
