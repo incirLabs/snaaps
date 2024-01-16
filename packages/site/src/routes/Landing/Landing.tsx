@@ -4,9 +4,9 @@ import {injected} from 'wagmi/connectors';
 import {Link} from 'react-router-dom';
 import {Button, Surface, PageContainer, Marquee} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
-import {NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
 
+import {NetworksLogos} from '../../assets/NetworksLogos';
 import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 
 import './styles.scss';
@@ -95,9 +95,9 @@ const Landing: React.FC = () => {
 
       <Surface className="p-landing_networks">
         <Marquee duration={15_000} reversed className="p-landing_networks_content">
-          {Object.entries(NetworksConfig).map(([key, value]) => (
+          {Object.entries(NetworksLogos).map(([key, logo]) => (
             <Button key={key} theme="chip" as="div">
-              <value.logo.wide.component height={value.logo.wide.preferredHeight} />
+              <logo.wide.component height={logo.wide.preferredHeight} />
             </Button>
           ))}
         </Marquee>

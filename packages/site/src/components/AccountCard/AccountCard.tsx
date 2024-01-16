@@ -1,8 +1,10 @@
+import {NetworkKeys} from 'common';
 import cx from 'classnames';
 import {Surface, SurfaceProps} from '../Surface/Surface';
 import {ActivityIndicator} from '../ActivityIndicator/ActivityIndicator';
 import {useDeployedNetworks} from '../../hooks';
-import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
+
+import {NetworksLogos} from '../../assets/NetworksLogos';
 
 import './styles.scss';
 
@@ -36,14 +38,14 @@ export const AccountCard: React.FC<AccountCardProps> = (props) => {
         {(chainsProp ? false : loading) ? (
           <ActivityIndicator size="small" />
         ) : (
-          (chainsProp ?? deployedNetworks ?? []).map((chainKey) => {
-            const chain = NetworksConfig[chainKey];
+          (chainsProp ?? deployedNetworks ?? []).map((chainKey: NetworkKeys) => {
+            const logo = NetworksLogos[chainKey];
 
             return (
-              <chain.logo.square.component
+              <logo.square.component
                 key={chainKey}
-                width={chain.logo.square.preferredHeight * 1.2}
-                height={chain.logo.square.preferredHeight * 1.2}
+                width={logo.square.preferredHeight * 1.2}
+                height={logo.square.preferredHeight * 1.2}
               />
             );
           })

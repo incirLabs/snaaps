@@ -1,4 +1,4 @@
-import {Env} from 'common';
+import {Env, NetworkKeys, NetworksConfig} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Hex} from 'viem';
@@ -8,8 +8,9 @@ import {SimpleAccountFactory} from 'contracts';
 import {ActivityIndicator, Button, NetworkButton, PageContainer} from '../../components';
 import {useSignerAddress} from '../../hooks';
 import {getContractDeployedChains} from '../../utils/Networks';
-import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
+
+import {NetworksLogos} from '../../assets/NetworksLogos';
 
 import './styles.scss';
 
@@ -44,8 +45,8 @@ const Networks: React.FC = () => {
     if (!selectedNetwork || !address) return;
     const selected = NetworksConfig[selectedNetwork];
 
-    if (chainId !== selected.chain.id) {
-      await switchChainAsync({chainId: selected.chain.id});
+    if (chainId !== selected.viem.id) {
+      await switchChainAsync({chainId: selected.viem.id});
     }
 
     await writeContractAsync({
@@ -53,7 +54,7 @@ const Networks: React.FC = () => {
       address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
       functionName: 'createAccount',
       args: [signerAddress, 0],
-      chainId: selected.chain.id,
+      chainId: selected.viem.id,
     });
   };
 
@@ -64,13 +65,13 @@ const Networks: React.FC = () => {
           <span>{address}</span>
 
           {deployedNetworks.map((key) => {
-            const network = NetworksConfig[key];
+            const logo = NetworksLogos[key];
 
             return (
-              <network.logo.square.component
+              <logo.square.component
                 key={key}
-                width={network.logo.square.preferredHeight}
-                height={network.logo.square.preferredHeight}
+                width={logo.square.preferredHeight}
+                height={logo.square.preferredHeight}
               />
             );
           })}
@@ -83,18 +84,17 @@ const Networks: React.FC = () => {
             <div className="p-networks_networks">
               {NetworkKeys.map((key) => {
                 const network = NetworksConfig[key];
+                const logo = NetworksLogos[key];
 
                 return (
                   <NetworkButton
                     key={key}
-                    left={
-                      <network.logo.square.component height={network.logo.square.preferredHeight} />
-                    }
+                    left={<logo.square.component height={logo.square.preferredHeight} />}
                     active={selectedNetwork === key}
                     disabled={deployedNetworks.includes(key)}
                     onClick={() => setSelectedNetwork(key as NetworkKeys)}
                   >
-                    $4.12
+                    {network.name}
                   </NetworkButton>
                 );
               })}

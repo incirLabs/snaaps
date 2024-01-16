@@ -1,15 +1,15 @@
+import {NetworkKeys, NetworksConfig} from 'common';
 import {Env} from 'common';
 import {SimpleAccountFactory} from 'contracts';
 import {Hex} from 'viem';
 import {getBytecode, readContract} from 'wagmi/actions';
 import {wagmiConfig} from './WagmiConfig';
-import {NetworkKeys, NetworksConfig} from './NetworksConfig';
 
 export const checkContractExists = async (network: NetworkKeys, address: string) => {
   try {
     const code = await getBytecode(wagmiConfig, {
       address: address as Hex,
-      chainId: NetworksConfig[network].chain.id,
+      chainId: NetworksConfig[network].viem.id,
     });
 
     return !!code;
@@ -49,7 +49,7 @@ export const getWalletAddress = async (
     address: Env.ACCOUNT_FACTORY_ADDRESS as Hex,
     functionName: 'getAddress',
     args: [signer, 0],
-    chainId: NetworksConfig[network].chain.id,
+    chainId: NetworksConfig[network].viem.id,
   });
 
   return address as string;

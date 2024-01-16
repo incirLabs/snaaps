@@ -1,5 +1,5 @@
+import {NetworkKeys} from 'common';
 import {useEffect, useState} from 'react';
-import {NetworkKeys} from '../utils/NetworksConfig';
 import {getContractDeployedChains} from '../utils/Networks';
 
 export const useDeployedNetworks = (walletAddress?: string, pause?: boolean) => {

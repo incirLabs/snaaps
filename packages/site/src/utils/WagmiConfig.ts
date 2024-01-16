@@ -1,9 +1,9 @@
+import {NetworksConfig} from 'common';
 import {createConfig, http} from 'wagmi';
-import {Chain} from 'wagmi/chains';
 import {injected} from 'wagmi/connectors';
-import {NetworksConfig} from './NetworksConfig';
+import {Chain} from 'viem/chains';
 
-const chains = Object.values(NetworksConfig).map((network) => network.chain) as unknown as [
+const chains = Object.values(NetworksConfig).map((network) => network.viem) as unknown as [
   Chain,
   ...Chain[],
 ];

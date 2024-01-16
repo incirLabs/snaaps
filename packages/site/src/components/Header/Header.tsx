@@ -1,7 +1,8 @@
+import {NetworkKeys} from 'common';
 import {Link} from 'react-router-dom';
 import {Paths} from '../../routes/Paths';
-import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 
+import {NetworksLogos} from '../../assets/NetworksLogos';
 import {LogoSquare} from '../../assets/LogoSquare';
 import {PlusIcon} from '../../assets/Icons/PlusIcon';
 
@@ -34,13 +35,13 @@ export const Header: React.FC<HeaderProps> = (props) => {
           ) : null}
 
           {networks.map((networkKey) => {
-            const network = NetworksConfig[networkKey];
+            const logo = NetworksLogos[networkKey];
 
             return (
-              <network.logo.square.component
+              <logo.square.component
                 key={networkKey}
-                width={network.logo.square.preferredHeight * 1.2}
-                height={network.logo.square.preferredHeight * 1.2}
+                width={logo.square.preferredHeight * 1.2}
+                height={logo.square.preferredHeight * 1.2}
               />
             );
           })}

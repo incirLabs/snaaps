@@ -1,4 +1,4 @@
-import {Env, InternalSnapMethod} from 'common';
+import {Env, InternalSnapMethod, NetworkKeys} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
@@ -7,7 +7,6 @@ import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../compo
 import {useMount} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
 import {getContractDeployedChains, getWalletAddress} from '../../utils/Networks';
-import {NetworkKeys} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
 
 import './styles.scss';

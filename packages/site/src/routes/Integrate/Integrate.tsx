@@ -1,4 +1,4 @@
-import {Env} from 'common';
+import {Env, NetworkKeys, NetworksConfig} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
 import {isAddress, isHash} from 'viem';
@@ -6,8 +6,9 @@ import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {useNavigate} from 'react-router-dom';
 import {Button, PageContainer, Input, NetworkButton, ActivityIndicator} from '../../components';
 import {useDeployedNetworks} from '../../hooks';
-import {NetworkKeys, NetworksConfig} from '../../utils/NetworksConfig';
 import {Paths} from '../Paths';
+
+import {NetworksLogos} from '../../assets/NetworksLogos';
 
 import './styles.scss';
 
@@ -95,15 +96,12 @@ const Integrate: React.FC = () => {
               <div className="p-integrate_networks">
                 {NetworkKeys.map((key) => {
                   const network = NetworksConfig[key];
+                  const logo = NetworksLogos[key];
 
                   return (
                     <NetworkButton
                       key={key}
-                      left={
-                        <network.logo.square.component
-                          height={network.logo.square.preferredHeight}
-                        />
-                      }
+                      left={<logo.square.component height={logo.square.preferredHeight} />}
                       active={deployedNetworks.includes(key)}
                       className="p-integrate_networks_network"
                     >
