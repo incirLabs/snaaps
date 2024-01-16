@@ -1,4 +1,4 @@
-import {Env, InternalSnapMethod, NetworkKeys} from 'common';
+import {Env, InternalSnapMethod} from 'common';
 import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
@@ -6,7 +6,7 @@ import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
 import {useMount} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
-import {getContractDeployedChains, getWalletAddress} from '../../utils/Networks';
+import {getWalletAddress} from '../../utils/Networks';
 import {Paths} from '../Paths';
 
 import './styles.scss';
@@ -14,7 +14,6 @@ import './styles.scss';
 type Signer = {address: string; index: number};
 type Wallet = Signer & {
   walletAddress: string;
-  networks: NetworkKeys[];
 };
 
 const CreateNew: React.FC = () => {
@@ -49,7 +48,6 @@ const CreateNew: React.FC = () => {
           return {
             ...signer,
             walletAddress,
-            networks: await getContractDeployedChains(walletAddress),
           };
         }),
       )
@@ -93,7 +91,7 @@ const CreateNew: React.FC = () => {
             <AccountCard
               key={wallet.address}
               text={`${wallet.index + 1} - ${wallet.walletAddress}`}
-              chains={wallet.networks}
+              walletAddress={wallet.walletAddress}
               right={
                 addedWallets.includes(wallet.walletAddress) ? (
                   <Button
@@ -111,7 +109,7 @@ const CreateNew: React.FC = () => {
                     className="d-block w-100"
                     onClick={() => onSetupClick(wallet)}
                   >
-                    {wallet.networks.length > 0 ? 'Add to MetaMask' : 'Setup'}
+                    Setup
                   </Button>
                 )
               }
