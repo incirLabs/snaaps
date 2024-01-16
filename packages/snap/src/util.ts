@@ -1,3 +1,4 @@
+import {NetworksConfig} from 'common';
 import type {JsonTx} from '@ethereumjs/tx';
 import type {Json} from '@metamask/utils';
 import type {Hex} from 'viem';
@@ -46,6 +47,20 @@ export function isUniqueAddress(address: string, wallets: Wallet[]): boolean {
  */
 export function isEvmChain(chain: string): boolean {
   return chain.startsWith('eip155:');
+}
+
+/**
+ * Determines whether the given CAIP-2 chain ID is a supported chain.
+ *
+ * @param chain - The CAIP-2 chain ID to check.
+ * @returns Returns true if the chain is supported, otherwise false.
+ */
+export function isSupportedChain(chain: string): boolean {
+  const chainId = parseInt(chain.split(':')[2] ?? '', 10) ?? 0;
+
+  if (chainId === 0) return false;
+
+  return Object.values(NetworksConfig).some((network) => network.id === chainId);
 }
 
 /**

@@ -33,6 +33,7 @@ import {
   isUniqueAddress,
   throwError,
   numberToHexString,
+  isSupportedChain,
 } from './util';
 import {PimlicoClient} from './pimlico';
 import {createGetNonceCall} from './callData';
@@ -125,9 +126,8 @@ export class SimpleKeyring implements Keyring {
   }
 
   async filterAccountChains(_id: string, chains: string[]): Promise<string[]> {
-    // The `id` argument is not used because all accounts created by this snap
-    // are expected to be compatible with any EVM chain.
-    return chains.filter((chain) => isEvmChain(chain));
+    // The `id` argument is not used because all accounts uses the same bundler.
+    return chains.filter((chain) => isEvmChain(chain) && isSupportedChain(chain));
   }
 
   async updateAccount(account: KeyringAccount): Promise<void> {
