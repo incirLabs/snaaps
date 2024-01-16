@@ -1,3 +1,4 @@
+import {NetworksConfig, type NetworkKeys} from 'common';
 import {Common, Hardfork} from '@ethereumjs/common';
 import {TransactionFactory} from '@ethereumjs/tx';
 import {addHexPrefix, ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
@@ -33,7 +34,7 @@ import {
   throwError,
   numberToHexString,
 } from './util';
-import {PimlicoClient, SupportedChains} from './pimlico';
+import {PimlicoClient} from './pimlico';
 import {createGetNonceCall} from './callData';
 import {logger} from './logger';
 import {privateKeyToAddress, getSignerPrivateKey} from './privateKeyUtil';
@@ -281,9 +282,9 @@ export class SimpleKeyring implements Keyring {
     const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
 
     try {
-      const currentChain = (Object.keys(SupportedChains) as SupportedChains[]).find(
-        (chainName) => SupportedChains[chainName].id === hexToNumber(tx.chainId),
-      );
+      const [currentChain] = Object.entries(NetworksConfig).find(
+        ([, chain]) => chain.id === hexToNumber(tx.chainId),
+      ) as [NetworkKeys, any];
 
       if (!currentChain) {
         throw new Error('Unsupported chain');

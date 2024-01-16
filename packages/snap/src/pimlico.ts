@@ -1,3 +1,4 @@
+import {NetworksConfig, type NetworkConfig, type NetworkKeys} from 'common';
 import {bundlerActions, signUserOperationHashWithECDSA, type UserOperation} from 'permissionless';
 import {
   pimlicoBundlerActions,
@@ -6,42 +7,33 @@ import {
 } from 'permissionless/actions/pimlico';
 import {createClient, http, type Hex} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
-import {goerli, baseGoerli, lineaTestnet} from 'viem/chains';
 import {createExecuteCall} from './callData';
 import {fillUserOp} from './userOp';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
 const ENTRYPOINT_ADDRESS = process.env.SNAP_ENTRYPOINT_ADDRESS ?? '';
 
-export const SupportedChains = {
-  goerli,
-  'base-goerli': baseGoerli,
-  'linea-testnet': lineaTestnet,
-} as const;
-
-export type SupportedChains = keyof typeof SupportedChains;
-
-const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: SupportedChains) =>
+const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: string) =>
   `https://api.pimlico.io/v${type === 'bundler' ? 1 : 2}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
 
 export class PimlicoClient {
-  chain: SupportedChains;
+  chain: NetworkConfig;
 
   bundlerUrl: string;
   paymasterUrl: string;
 
-  constructor(chain: SupportedChains) {
-    this.chain = chain;
+  constructor(chain: NetworkKeys) {
+    this.chain = NetworksConfig[chain];
 
-    this.bundlerUrl = getPimlicoUrl('bundler', this.chain);
+    this.bundlerUrl = getPimlicoUrl('bundler', this.chain.pimlico);
 
-    this.paymasterUrl = getPimlicoUrl('paymaster', this.chain);
+    this.paymasterUrl = getPimlicoUrl('paymaster', this.chain.pimlico);
   }
 
   public get bundlerClient() {
     return createClient({
       transport: http(this.bundlerUrl),
-      chain: SupportedChains[this.chain],
+      chain: this.chain.viem as any,
     })
       .extend(bundlerActions)
       .extend(pimlicoBundlerActions);
@@ -50,7 +42,7 @@ export class PimlicoClient {
   public get paymasterClient() {
     return createClient({
       transport: http(this.paymasterUrl),
-      chain: SupportedChains[this.chain],
+      chain: this.chain.viem as any,
     }).extend(pimlicoPaymasterActions);
   }
 
@@ -93,7 +85,7 @@ export class PimlicoClient {
     const signature = await signUserOperationHashWithECDSA({
       account: owner,
       userOperation: sponsoredUserOperation,
-      chainId: SupportedChains[this.chain].id,
+      chainId: this.chain.viem.id,
       entryPoint: ENTRYPOINT_ADDRESS as Hex,
     });
 
