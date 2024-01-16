@@ -7,6 +7,9 @@ import {
   polygon,
   mainnet,
   goerli,
+  gnosis,
+  base,
+  bsc,
 } from 'viem/chains';
 
 export type NetworkConfig = {
@@ -64,6 +67,27 @@ export const NetworksConfig = {
     name: 'Ethereum Goerli',
     viem: goerli,
     pimlico: 'goerli',
+  },
+
+  gnosis: {
+    id: gnosis.id,
+    name: 'Gnosis',
+    viem: gnosis,
+    pimlico: 'gnosis',
+  },
+
+  base: {
+    id: base.id,
+    name: 'Base',
+    viem: base,
+    pimlico: 'base',
+  },
+
+  bsc: {
+    id: bsc.id,
+    name: 'BNB Chain',
+    viem: bsc,
+    pimlico: 'binance',
   },
 } satisfies Record<string, NetworkConfig>;
 

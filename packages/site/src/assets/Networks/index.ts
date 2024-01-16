@@ -5,6 +5,9 @@ export {OptimismLogo} from './OptimismLogo';
 export {PolygonLogo} from './PolygonLogo';
 export {EthereumLogo} from './EthereumLogo';
 export {EthereumGoerliLogo} from './EthereumGoerliLogo';
+export {GnosisLogo} from './GnosisLogo';
+export {BaseLogo} from './BaseLogo';
+export {BNBChainLogo} from './BNBChainLogo';
 
 export {LineaLogoSquare} from './LineaLogoSquare';
 export {ScrollLogoSquare} from './ScrollLogoSquare';
@@ -13,3 +16,6 @@ export {OptimismLogoSquare} from './OptimismLogoSquare';
 export {PolygonLogoSquare} from './PolygonLogoSquare';
 export {EthereumLogoSquare} from './EthereumLogoSquare';
 export {EthereumGoerliLogoSquare} from './EthereumGoerliLogoSquare';
+export {GnosisLogoSquare} from './GnosisLogoSquare';
+export {BaseLogoSquare} from './BaseLogoSquare';
+export {BNBChainLogoSquare} from './BNBChainLogoSquare';

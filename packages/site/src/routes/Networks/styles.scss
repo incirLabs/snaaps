@@ -22,7 +22,7 @@
   &_networks {
     display: flex;
     gap: spacing(normal);
-    flex-direction: row;
+    flex-flow: row wrap;
     padding-top: spacing(2xlarge);
   }
 

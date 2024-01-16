@@ -30,7 +30,7 @@
   &_networks {
     display: flex;
     gap: spacing(xsmall);
-    flex-direction: row;
+    flex-flow: row wrap;
     margin: spacing(large) 0;
 
     &_network {

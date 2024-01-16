@@ -9,6 +9,9 @@ import {
   PolygonLogo,
   EthereumLogo,
   EthereumGoerliLogo,
+  GnosisLogo,
+  BaseLogo,
+  BNBChainLogo,
 
   // Square
   LineaLogoSquare,
@@ -18,6 +21,9 @@ import {
   PolygonLogoSquare,
   EthereumLogoSquare,
   EthereumGoerliLogoSquare,
+  GnosisLogoSquare,
+  BaseLogoSquare,
+  BNBChainLogoSquare,
 } from './Networks';
 
 export type NetworkLogos = {
@@ -106,6 +112,39 @@ export const NetworksLogos: Record<NetworkKeys, NetworkLogos> = {
     wide: {
       preferredHeight: 22,
       component: EthereumGoerliLogo,
+    },
+  },
+
+  gnosis: {
+    square: {
+      preferredHeight: 20,
+      component: GnosisLogoSquare,
+    },
+    wide: {
+      preferredHeight: 16,
+      component: GnosisLogo,
+    },
+  },
+
+  base: {
+    square: {
+      preferredHeight: 18,
+      component: BaseLogoSquare,
+    },
+    wide: {
+      preferredHeight: 20,
+      component: BaseLogo,
+    },
+  },
+
+  bsc: {
+    square: {
+      preferredHeight: 20,
+      component: BNBChainLogoSquare,
+    },
+    wide: {
+      preferredHeight: 22,
+      component: BNBChainLogo,
     },
   },
 };
