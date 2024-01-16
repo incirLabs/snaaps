@@ -1,5 +1,5 @@
 {
-  "name": "snap",
+  "name": "@snaaps/snap",
   "version": "0.0.1",
   "description": "snAAps Account Abstraction snap for MetaMask",
   "keywords": [

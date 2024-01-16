@@ -7,12 +7,12 @@
     "url": "https://github.com/incirLabs/snaaps.git"
   },
   "source": {
-    "shasum": "eqziJwwexpjaCMljpuM4oIVAcxXwubhxbzJq+k3jd8k=",
+    "shasum": "9z07vngRGoEl1A0M3m3DHnIoaXYh/GHwM0tBHh6x3vE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "@snaaps/snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
