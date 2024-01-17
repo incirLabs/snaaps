@@ -1,17 +1,22 @@
-import type {KeyringState} from '../keyring';
+import type {KeyringAccount} from '@metamask/keyring-api';
 
-export type State = {
-  keyring: KeyringState;
+export type Wallet = {
+  account: KeyringAccount;
+  privateKey: string;
+  signerAddress: string;
 };
+
+export type KeyringState = {
+  wallets: Record<string, Wallet>;
+};
+
+export type State = KeyringState;
 
 /**
  * Default state.
  */
 const defaultState: State = {
-  keyring: {
-    wallets: {},
-    pendingRequests: {},
-  },
+  wallets: {},
 };
 
 /**
@@ -19,7 +24,7 @@ const defaultState: State = {
  *
  * @returns The current state of the keyring.
  */
-export async function getState(): Promise<KeyringState> {
+export async function getState(): Promise<State> {
   const state = (await snap.request({
     method: 'snap_manageState',
     params: {operation: 'get'},
@@ -36,7 +41,7 @@ export async function getState(): Promise<KeyringState> {
  *
  * @param state - New snap state.
  */
-export async function saveState(state: KeyringState) {
+export async function saveState(state: State) {
   await snap.request({
     method: 'snap_manageState',
     params: {operation: 'update', newState: state},

@@ -1,5 +1,7 @@
-import type {SnapConfig} from '@metamask/snaps-cli';
+// eslint-disable-next-line import/no-nodejs-modules
 import {resolve} from 'path';
+
+import type {SnapConfig} from '@metamask/snaps-cli';
 
 const config: SnapConfig = {
   bundler: 'webpack',

@@ -1,145 +1,167 @@
 import {NetworksConfig, type NetworkKeys} from 'common';
-import {Common, Hardfork} from '@ethereumjs/common';
+import {v4 as uuid} from 'uuid';
+import {hexToBigInt, type Hex} from 'viem';
 import {TransactionFactory} from '@ethereumjs/tx';
 import {addHexPrefix, ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
-import type {TypedDataV1, TypedMessage} from '@metamask/eth-sig-util';
 import {
-  SignTypedDataVersion,
   concatSig,
   personalSign,
   recoverPersonalSignature,
   signTypedData,
+  SignTypedDataVersion,
+  type TypedDataV1,
+  type TypedMessage,
 } from '@metamask/eth-sig-util';
-import type {
-  Keyring,
-  KeyringAccount,
-  KeyringRequest,
-  SubmitRequestResponse,
-} from '@metamask/keyring-api';
-import {EthAccountType, EthMethod, emitSnapKeyringEvent} from '@metamask/keyring-api';
-import {KeyringEvent} from '@metamask/keyring-api/dist/events';
-import {hexToBigInt, hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
-import type {SnapsGlobalObject} from '@metamask/snaps-types';
-import {v4 as uuid} from 'uuid';
-import type {Hex} from 'viem';
-
-// eslint-disable-next-line @typescript-eslint/no-shadow
-import {Buffer} from 'buffer';
-
-import {saveState} from './state';
 import {
-  isEvmChain,
-  serializeTransaction,
-  isUniqueAddress,
-  throwError,
-  numberToHexString,
-  isSupportedChain,
-} from './utils/helpers';
+  emitSnapKeyringEvent,
+  EthAccountType,
+  EthMethod,
+  KeyringEvent,
+  type Keyring,
+  type KeyringAccount,
+  type KeyringRequest,
+  type SubmitRequestResponse,
+} from '@metamask/keyring-api';
+import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
+import type {SnapsGlobalObject} from '@metamask/snaps-types';
+
+import {saveState, type State} from './state';
+import {getCommonForTx, numberToHexString, throwError} from './utils/helpers';
+import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
+import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient} from './utils/pimlico';
 import {createGetNonceCall} from './utils/callData';
-import {logger} from './utils/logger';
-import {privateKeyToAddress, getSignerPrivateKey} from './utils/privateKey';
-
-export type KeyringState = {
-  wallets: Record<string, Wallet>;
-  pendingRequests: Record<string, KeyringRequest>;
-};
-
-export type Wallet = {
-  account: KeyringAccount;
-  privateKey: string;
-};
 
 export class SimpleKeyring implements Keyring {
-  #state: KeyringState;
+  #state: State;
 
-  constructor(state: KeyringState) {
+  constructor(state: State) {
     this.#state = state;
   }
 
+  get #wallets() {
+    return Object.values(this.#state.wallets);
+  }
+
+  get #idToWallets() {
+    return this.#state.wallets;
+  }
+
+  #getWalletByIDSafe(id: string) {
+    return this.#idToWallets[id] ?? throwError(`Account with id '${id}' not found`);
+  }
+
+  get #addressToWallets() {
+    return Object.fromEntries(this.#wallets.map((wallet) => [wallet.account.address, wallet]));
+  }
+
+  #getWalletByAddressSafe(address: string) {
+    return (
+      this.#addressToWallets[address] ?? throwError(`Account with address '${address}' not found`)
+    );
+  }
+
+  async #saveState() {
+    await saveState(this.#state);
+  }
+
+  async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
+    await emitSnapKeyringEvent(snap as SnapsGlobalObject, event, data);
+  }
+
   async listAccounts(): Promise<KeyringAccount[]> {
-    return Object.values(this.#state.wallets).map((wallet) => wallet.account);
+    return this.#wallets.map((wallet) => wallet.account);
   }
 
   async getAccount(id: string): Promise<KeyringAccount> {
-    const wallet = this.#state.wallets[id] ?? throwError(`Account '${id}' not found`);
-
-    return wallet.account;
+    return this.#getWalletByIDSafe(id).account;
   }
 
-  async createAccount(options: Record<string, Json> = {}): Promise<KeyringAccount> {
-    const address = options?.address as string;
-    const signerIndex = options?.signerIndex as number;
+  async createAccount(unsafeOptions: Record<string, Json> = {}): Promise<KeyringAccount> {
+    const result = CreateAccountOptionsSchema.safeParse(unsafeOptions);
+    if (!result.success) throwError(result.error.message);
 
-    if (!address) {
-      throw new Error(`Address is required`);
-    }
-
-    if (
-      typeof signerIndex !== 'number' &&
-      (!options?.privateKey || typeof options.privateKey !== 'string')
-    ) {
-      throw new Error(`Signer index or private key is required`);
-    }
+    const {address} = result.data;
 
     const signerPrivateKey =
-      (options.privateKey as string) ?? (await getSignerPrivateKey(signerIndex));
-    const signerAddress = await privateKeyToAddress(signerPrivateKey);
+      'privateKey' in result.data
+        ? result.data.privateKey
+        : await getSignerPrivateKey(result.data.signerIndex);
 
-    // eslint-disable-next-line no-param-reassign
-    options.signerAddress = signerAddress;
-
-    if (!isUniqueAddress(address, Object.values(this.#state.wallets))) {
+    if (this.#addressToWallets[address]) {
       throw new Error(`Account address already in use: ${address}`);
     }
 
-    // The private key should not be stored in the account options since the
-    // account object is exposed to external components, such as MetaMask and
-    // the snap UI.
-    if (options?.privateKey) {
-      // eslint-disable-next-line no-param-reassign
-      delete options.privateKey;
-    }
-
     try {
-      const account: KeyringAccount = {
-        id: uuid(),
-        options,
-        address,
-        methods: [
-          EthMethod.PersonalSign,
-          EthMethod.Sign,
-          EthMethod.SignTransaction,
-          EthMethod.SignTypedDataV1,
-          EthMethod.SignTypedDataV3,
-          EthMethod.SignTypedDataV4,
-        ],
-        type: EthAccountType.Eoa,
-      };
-      await this.#emitEvent(KeyringEvent.AccountCreated, {account});
-      this.#state.wallets[account.id] = {
-        account,
-        privateKey: stripHexPrefix(signerPrivateKey),
-      };
-      await this.#saveState();
+      const account = await this.#createAccount({address, signerPrivateKey});
+
       return account;
     } catch (error) {
       throw new Error((error as Error).message);
     }
   }
 
+  #createAccount = async (data: {
+    address: string;
+    signerPrivateKey: string;
+  }): Promise<KeyringAccount> => {
+    const signerAddress = await privateKeyToAddress(data.signerPrivateKey);
+
+    const account: KeyringAccount = {
+      id: uuid(),
+      options: {
+        signerAddress,
+      },
+      address: data.address,
+      methods: [
+        EthMethod.PersonalSign,
+        EthMethod.Sign,
+        EthMethod.SignTransaction,
+        EthMethod.SignTypedDataV1,
+        EthMethod.SignTypedDataV3,
+        EthMethod.SignTypedDataV4,
+      ],
+      type: EthAccountType.Eoa,
+    };
+
+    await this.#emitEvent(KeyringEvent.AccountCreated, {account});
+
+    this.#state.wallets[account.id] = {
+      account,
+      privateKey: stripHexPrefix(data.signerPrivateKey),
+      signerAddress,
+    };
+
+    await this.#saveState();
+
+    return account;
+  };
+
   async filterAccountChains(_id: string, chains: string[]): Promise<string[]> {
     // The `id` argument is not used because all accounts uses the same bundler.
-    return chains.filter((chain) => isEvmChain(chain) && isSupportedChain(chain));
+    // This may change in the future if we support multiple bundlers.
+
+    return chains.filter((chain) => {
+      if (!chain.startsWith('eip155:')) return false;
+
+      const chainId = parseInt(chain.split(':')[1] ?? '0', 10) ?? 0;
+
+      if (chainId === 0) return false;
+
+      return Object.values(NetworksConfig).some((network) => network.id === chainId);
+    });
   }
 
   async updateAccount(account: KeyringAccount): Promise<void> {
-    const wallet =
-      this.#state.wallets[account.id] ?? throwError(`Account '${account.id}' not found`);
+    const wallet = this.#getWalletByIDSafe(account.id);
+
+    const options = AccountOptionsSchema.safeParse(account.options);
+    if (!options.success) throwError(options.error.message);
 
     const newAccount: KeyringAccount = {
       ...wallet.account,
       ...account,
+
       // Restore read-only properties.
       address: wallet.account.address,
     };
@@ -148,7 +170,9 @@ export class SimpleKeyring implements Keyring {
       await this.#emitEvent(KeyringEvent.AccountUpdated, {
         account: newAccount,
       });
+
       wallet.account = newAccount;
+
       await this.#saveState();
     } catch (error) {
       throwError((error as Error).message);
@@ -156,56 +180,23 @@ export class SimpleKeyring implements Keyring {
   }
 
   async deleteAccount(id: string): Promise<void> {
+    this.#getWalletByIDSafe(id);
+
     try {
       await this.#emitEvent(KeyringEvent.AccountDeleted, {id});
+
       delete this.#state.wallets[id];
+
       await this.#saveState();
     } catch (error) {
       throwError((error as Error).message);
     }
   }
 
-  async listRequests(): Promise<KeyringRequest[]> {
-    return Object.values(this.#state.pendingRequests);
-  }
-
-  async getRequest(id: string): Promise<KeyringRequest> {
-    return this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`);
-  }
-
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
-    const res = this.#syncSubmitRequest(request);
-
-    return res;
-  }
-
-  async approveRequest(id: string): Promise<void> {
-    const {request} = this.#state.pendingRequests[id] ?? throwError(`Request '${id}' not found`);
-
-    const result = await this.#handleSigningRequest(request.method, request.params ?? []);
-
-    await this.#removePendingRequest(id);
-    await this.#emitEvent(KeyringEvent.RequestApproved, {id, result});
-  }
-
-  async rejectRequest(id: string): Promise<void> {
-    if (this.#state.pendingRequests[id] === undefined) {
-      throw new Error(`Request '${id}' not found`);
-    }
-
-    await this.#removePendingRequest(id);
-    await this.#emitEvent(KeyringEvent.RequestRejected, {id});
-  }
-
-  async #removePendingRequest(id: string): Promise<void> {
-    delete this.#state.pendingRequests[id];
-    await this.#saveState();
-  }
-
-  async #syncSubmitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     const {method, params = []} = request.request as JsonRpcRequest;
 
-    const signature = await this.#handleSigningRequest(method, params);
+    const signature = await this.#handleSignRequest(method as EthMethod, params);
 
     return {
       pending: false,
@@ -213,15 +204,7 @@ export class SimpleKeyring implements Keyring {
     };
   }
 
-  #getWalletByAddress(address: string): Wallet {
-    const match = Object.values(this.#state.wallets).find(
-      (wallet) => wallet.account.address.toLowerCase() === address.toLowerCase(),
-    );
-
-    return match ?? throwError(`Account '${address}' not found`);
-  }
-
-  async #handleSigningRequest(method: string, params: Json): Promise<Json> {
+  async #handleSignRequest(method: EthMethod, params: Json): Promise<string> {
     switch (method) {
       case EthMethod.PersonalSign: {
         const [message, from] = params as [string, string];
@@ -233,24 +216,15 @@ export class SimpleKeyring implements Keyring {
         return this.#signTransaction(tx);
       }
 
-      case EthMethod.SignTypedDataV1: {
-        const [from, data] = params as [string, Json];
-        return this.#signTypedData(from, data, {
-          version: SignTypedDataVersion.V1,
-        });
-      }
-
-      case EthMethod.SignTypedDataV3: {
-        const [from, data] = params as [string, Json];
-        return this.#signTypedData(from, data, {
-          version: SignTypedDataVersion.V3,
-        });
-      }
-
+      case EthMethod.SignTypedDataV1:
+      case EthMethod.SignTypedDataV3:
       case EthMethod.SignTypedDataV4: {
         const [from, data] = params as [string, Json];
+
+        const version = method.replace('eth_signTypedData_v', 'V') as SignTypedDataVersion;
+
         return this.#signTypedData(from, data, {
-          version: SignTypedDataVersion.V4,
+          version,
         });
       }
 
@@ -260,40 +234,82 @@ export class SimpleKeyring implements Keyring {
       }
 
       default: {
-        throw new Error(`EVM method '${method}' not supported`);
+        throw new Error(`EVM method '${method as string}' not supported`);
       }
     }
   }
 
-  async #signTransaction(tx: any): Promise<Json> {
+  #signMessage(from: string, data: string): string {
+    const {privateKey} = this.#getWalletByAddressSafe(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+
+    const message = stripHexPrefix(data);
+
+    const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
+
+    return concatSig(toBuffer(signature.v), signature.r, signature.s);
+  }
+
+  #signPersonalMessage(from: string, request: string): string {
+    const {privateKey, signerAddress} = this.#getWalletByAddressSafe(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+
+    const messageBuffer = Buffer.from(request.slice(2), 'hex');
+
+    const signature = personalSign({
+      privateKey: privateKeyBuffer,
+      data: messageBuffer,
+    });
+
+    const recoveredAddress = recoverPersonalSignature({
+      data: messageBuffer,
+      signature,
+    });
+
+    if (recoveredAddress !== signerAddress) {
+      throw new Error(
+        `Signature verification failed for account signer '${signerAddress}' (got '${recoveredAddress}')`,
+      );
+    }
+
+    return signature;
+  }
+
+  #signTypedData(
+    from: string,
+    data: Json,
+    opts: {version: SignTypedDataVersion} = {
+      version: SignTypedDataVersion.V1,
+    },
+  ): string {
+    const {privateKey} = this.#getWalletByAddressSafe(from);
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+
+    return signTypedData({
+      privateKey: privateKeyBuffer,
+      data: data as unknown as TypedDataV1 | TypedMessage<any>,
+      version: opts.version,
+    });
+  }
+
+  async #signTransaction(tx: any): Promise<string> {
     // eslint-disable-next-line no-param-reassign
     tx.chainId = numberToHexString(tx.chainId);
 
-    const wallet = this.#getWalletByAddress(tx.from);
-    const privateKey = Buffer.from(wallet.privateKey, 'hex');
-    const common = Common.custom(
-      {chainId: tx.chainId},
-      {
-        hardfork: tx.maxPriorityFeePerGas || tx.maxFeePerGas ? Hardfork.London : Hardfork.Istanbul,
-      },
-    );
+    const wallet = this.#getWalletByAddressSafe(tx.from);
 
-    const signedTx = TransactionFactory.fromTxData(tx, {
-      common,
-    }).sign(privateKey);
+    const common = getCommonForTx(tx);
 
-    const serialized: any = serializeTransaction(signedTx.toJSON(), signedTx.type);
+    const typedTx = TransactionFactory.fromTxData(tx, {common});
 
     try {
-      const [currentChain] = Object.entries(NetworksConfig).find(
-        ([, chain]) => chain.id === hexToNumber(tx.chainId),
+      const [chain] = Object.entries(NetworksConfig).find(
+        ([, c]) => c.id === hexToNumber(tx.chainId),
       ) as [NetworkKeys, any];
 
-      if (!currentChain) {
-        throw new Error('Unsupported chain');
-      }
+      if (!chain) throwError('Chain is not supported');
 
-      const pimlico = new PimlicoClient(currentChain);
+      const pimlico = new PimlicoClient(chain);
 
       const nonce = await ethereum.request({
         method: 'eth_call',
@@ -302,9 +318,9 @@ export class SimpleKeyring implements Keyring {
 
       const userOp = await pimlico.generateUserOp(
         wallet.account.address as Hex,
-        serialized.to,
-        hexToBigInt(serialized.value),
-        serialized.data,
+        typedTx.to?.toString() as Hex,
+        typedTx.value,
+        `0x${typedTx.data.toString('hex')}`,
         hexToBigInt(nonce as Hex),
       );
 
@@ -317,78 +333,29 @@ export class SimpleKeyring implements Keyring {
 
       const userOpHash = await pimlico.sendUserOp(signedUserOp);
 
-      const {receipt, txHash} = await pimlico.getReceipt(userOpHash);
+      await pimlico.getReceipt(userOpHash);
 
-      logger.debug(
-        'Receipt',
-        JSON.stringify(
-          receipt,
-          (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-          2,
-        ),
-      );
-      logger.debug('Transaction Hash', txHash);
-
-      return serialized;
+      return '';
     } catch (err) {
-      logger.error('Error on bundler', err);
-      return {};
+      return throwError('Error on bundler');
     }
   }
 
-  #signTypedData(
-    from: string,
-    data: Json,
-    opts: {version: SignTypedDataVersion} = {
-      version: SignTypedDataVersion.V1,
-    },
-  ): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-
-    return signTypedData({
-      privateKey: privateKeyBuffer,
-      data: data as unknown as TypedDataV1 | TypedMessage<any>,
-      version: opts.version,
-    });
+  // Async requests are not used in the current implementation.
+  // The following methods are just stubs to satisfy the interface.
+  async listRequests(): Promise<KeyringRequest[]> {
+    return [];
   }
 
-  #signPersonalMessage(from: string, request: string): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-    const messageBuffer = Buffer.from(request.slice(2), 'hex');
-
-    const signature = personalSign({
-      privateKey: privateKeyBuffer,
-      data: messageBuffer,
-    });
-
-    const recoveredAddress = recoverPersonalSignature({
-      data: messageBuffer,
-      signature,
-    });
-    if (recoveredAddress !== from) {
-      throw new Error(
-        `Signature verification failed for account '${from}' (got '${recoveredAddress}')`,
-      );
-    }
-
-    return signature;
+  async getRequest(id: string): Promise<KeyringRequest> {
+    throwError(`Request with id '${id}' not found`);
   }
 
-  #signMessage(from: string, data: string): string {
-    const {privateKey} = this.#getWalletByAddress(from);
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-    const message = stripHexPrefix(data);
-    const signature = ecsign(Buffer.from(message, 'hex'), privateKeyBuffer);
-    return concatSig(toBuffer(signature.v), signature.r, signature.s);
+  async approveRequest(id: string): Promise<void> {
+    throwError(`Request with id '${id}' not found`);
   }
 
-  async #saveState(): Promise<void> {
-    await saveState(this.#state);
-  }
-
-  async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
-    await emitSnapKeyringEvent(snap as SnapsGlobalObject, event, data);
+  async rejectRequest(id: string): Promise<void> {
+    throwError(`Request with id '${id}' not found`);
   }
 }

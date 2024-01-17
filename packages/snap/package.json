@@ -54,7 +54,8 @@
     "common": "*",
     "permissionless": "^0.0.12",
     "uuid": "^9.0.0",
-    "viem": "1.19.3"
+    "viem": "1.19.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",
