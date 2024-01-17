@@ -94,7 +94,7 @@ const Landing: React.FC = () => {
       <span className="p-landing_networks-title">Supported Networks</span>
 
       <Surface className="p-landing_networks">
-        <Marquee duration={15_000} reversed className="p-landing_networks_content">
+        <Marquee duration={40_000} reversed className="p-landing_networks_content">
           {Object.entries(NetworksLogos).map(([key, logo]) => (
             <Button key={key} theme="chip" as="div">
               <logo.wide.component height={logo.wide.preferredHeight} />

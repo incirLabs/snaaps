@@ -18,13 +18,14 @@ body {
   flex-direction: column;
 
   &_warning-banner {
-    padding: rem(10px);
+    padding: rem(6px);
     background-color: $g-colors-text-strong;
     color: $g-colors-white;
+    font-size: rem(12px);
 
     &_content {
       display: flex;
-      gap: rem(20px);
+      gap: rem(10px);
       align-items: center;
       font-weight: 600;
       white-space: nowrap;

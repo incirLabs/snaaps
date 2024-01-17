@@ -5,7 +5,7 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <div className="app_warning-banner">
-        <Marquee duration={20_000} className="app_warning-banner_content">
+        <Marquee duration={60_000} className="app_warning-banner_content">
           <span>Currently In Beta</span>
           <span>-</span>
           <span>Take Your Risk</span>
