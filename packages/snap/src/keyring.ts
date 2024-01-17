@@ -81,7 +81,7 @@ export class SimpleKeyring implements Keyring {
     const result = CreateAccountOptionsSchema.safeParse(unsafeOptions);
     if (!result.success) throwError(result.error.message);
 
-    const {address} = result.data;
+    const address = result.data.address.toLowerCase();
 
     const signerPrivateKey =
       'privateKey' in result.data

@@ -7,7 +7,7 @@ export const CreateAccountOptionsSchema = z
   .and(
     z.union([
       z.object({
-        signerIndex: z.number().int().positive(),
+        signerIndex: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
       }),
       z.object({
         privateKey: z.string().regex(/^(0x)?[a-fA-F0-9]{64}$/),
