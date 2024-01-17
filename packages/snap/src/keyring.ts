@@ -26,7 +26,7 @@ import type {Hex} from 'viem';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import {Buffer} from 'buffer';
 
-import {saveState} from './stateManagement';
+import {saveState} from './state';
 import {
   isEvmChain,
   serializeTransaction,
@@ -34,11 +34,11 @@ import {
   throwError,
   numberToHexString,
   isSupportedChain,
-} from './util';
-import {PimlicoClient} from './pimlico';
-import {createGetNonceCall} from './callData';
-import {logger} from './logger';
-import {privateKeyToAddress, getSignerPrivateKey} from './privateKeyUtil';
+} from './utils/helpers';
+import {PimlicoClient} from './utils/pimlico';
+import {createGetNonceCall} from './utils/callData';
+import {logger} from './utils/logger';
+import {privateKeyToAddress, getSignerPrivateKey} from './utils/privateKey';
 
 export type KeyringState = {
   wallets: Record<string, Wallet>;

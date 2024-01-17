@@ -3,9 +3,9 @@ import type {OnKeyringRequestHandler, OnRpcRequestHandler} from '@metamask/snaps
 import {InternalSnapMethod, hasPermission} from 'common';
 
 import {SimpleKeyring} from './keyring';
-import {logger} from './logger';
-import {getState} from './stateManagement';
-import {getSignerAddress} from './privateKeyUtil';
+import {logger} from './utils/logger';
+import {getState} from './state';
+import {getSignerAddress} from './utils/privateKey';
 
 let keyring: SimpleKeyring;
 

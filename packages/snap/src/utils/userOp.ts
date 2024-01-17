@@ -32,10 +32,10 @@ export const DefaultsForUserOp: UserOperation = {
 };
 
 export const fillUserOp = (
-  op: Partial<UserOperation>,
+  userOp: Partial<UserOperation>,
   defaults = DefaultsForUserOp,
 ): UserOperation => {
-  const partial = Object.fromEntries(Object.entries(op).filter(([, value]) => value !== null));
+  const partial = Object.fromEntries(Object.entries(userOp).filter(([, value]) => value !== null));
 
   return {...defaults, ...partial};
 };
