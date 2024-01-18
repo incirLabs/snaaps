@@ -1,7 +1,7 @@
 import {Common, Hardfork} from '@ethereumjs/common';
 import {stripHexPrefix} from '@ethereumjs/util';
 import {bytesToHex} from '@metamask/utils';
-import {getNetworkByChainId} from 'common';
+import {ChainIdsToKeys} from 'common';
 import {keccak256 as ecKeccak256} from 'ethereum-cryptography/keccak';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
@@ -118,7 +118,7 @@ export const getChainIdFromCAIP2 = (caip2: string): number => {
 export const getChainIdFromCAIP2Safe = (caip2: string): number => {
   const chainId = getChainIdFromCAIP2(caip2);
 
-  if (!getNetworkByChainId(chainId)) {
+  if (!ChainIdsToKeys[chainId]) {
     throwError(`Unsupported Chain ID: ${chainId}`);
   }
 
