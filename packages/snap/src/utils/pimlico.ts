@@ -1,14 +1,20 @@
 import {NetworksConfig, type NetworkConfig, type NetworkKeys} from 'common';
-import {bundlerActions, signUserOperationHashWithECDSA, type UserOperation} from 'permissionless';
-import {
-  pimlicoBundlerActions,
-  pimlicoPaymasterActions,
-  type SponsorUserOperationReturnType,
-} from 'permissionless/actions/pimlico';
-import {createClient, http, type Hex} from 'viem';
-import {privateKeyToAccount} from 'viem/accounts';
+import {personalSign} from '@metamask/eth-sig-util';
+import {encode} from '@metamask/abi-utils';
+import {bytesToHex} from '@metamask/utils';
+
+import {fillUserOp, packUserOp, type UserOperation} from './userOp';
 import {createExecuteCall} from './callData';
-import {fillUserOp} from './userOp';
+import {JSONRPCClient} from './jsonRPCClient';
+import {throwError, keccak256, retryUntil} from './helpers';
+import type {
+  GetGasPriceResult,
+  GetUserOpReceiptResult,
+  GetUserOpStatusResult,
+  SendUserOpResult,
+  SponsorUserOpResult,
+  WaitForUserOpReceiptResult,
+} from '../types/pimlico';
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
 
@@ -17,76 +23,141 @@ const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: string) =>
 
 export class PimlicoClient {
   chain: NetworkConfig;
+  entryPoint: string;
 
   bundlerUrl: string;
   paymasterUrl: string;
 
-  constructor(chain: NetworkKeys) {
+  #bundlerClient: (method: string, params?: any) => Promise<any>;
+  #paymasterClient: (method: string, params?: any) => Promise<any>;
+
+  constructor(chain: NetworkKeys, entryPoint: string) {
     this.chain = NetworksConfig[chain];
+    this.entryPoint = entryPoint;
 
     this.bundlerUrl = getPimlicoUrl('bundler', this.chain.pimlico);
-
     this.paymasterUrl = getPimlicoUrl('paymaster', this.chain.pimlico);
+
+    this.#bundlerClient = JSONRPCClient.bind(null, this.bundlerUrl);
+    this.#paymasterClient = JSONRPCClient.bind(null, this.paymasterUrl);
   }
 
-  public get bundlerClient() {
-    return createClient({
-      transport: http(this.bundlerUrl),
-      chain: this.chain.viem as any,
-    })
-      .extend(bundlerActions)
-      .extend(pimlicoBundlerActions);
+  async #getGasPrice(): Promise<GetGasPriceResult> {
+    return this.#bundlerClient('pimlico_getUserOperationGasPrice', []);
   }
 
-  public get paymasterClient() {
-    return createClient({
-      transport: http(this.paymasterUrl),
-      chain: this.chain.viem as any,
-    }).extend(pimlicoPaymasterActions);
+  async #sponsorUserOp(userOp: UserOperation): Promise<SponsorUserOpResult> {
+    return this.#paymasterClient('pm_sponsorUserOperation', [userOp, this.entryPoint]);
   }
 
-  public async getGasPrice() {
-    return this.bundlerClient.getUserOperationGasPrice();
+  #getUserOpHash(userOp: UserOperation) {
+    const encoded = encode(
+      ['bytes32', 'address', 'uint256'],
+      [keccak256(packUserOp(userOp)), this.entryPoint, this.chain.id.toString()],
+    );
+
+    return keccak256(bytesToHex(encoded));
   }
 
-  public async generateUserOp(from: Hex, to: Hex, value: bigint, data: Hex, nonce: bigint) {
-    const callData = createExecuteCall(to, value, data);
-    const gasPrice = await this.getGasPrice();
+  async #sendUserOp(signedUserOp: UserOperation): Promise<SendUserOpResult> {
+    return this.#bundlerClient('eth_sendUserOperation', [signedUserOp, this.entryPoint]);
+  }
+
+  async #getUserOpReceipt(userOpHash: string): Promise<GetUserOpReceiptResult> {
+    return this.#bundlerClient('eth_getUserOperationReceipt', [userOpHash]);
+  }
+
+  async #getUserOpStatus(userOpHash: string): Promise<GetUserOpStatusResult> {
+    return this.#bundlerClient('pimlico_getUserOperationStatus', [userOpHash]);
+  }
+
+  async #waitForUserOpReceipt(
+    userOpHash: string,
+    options: {pollingInterval: number},
+  ): Promise<WaitForUserOpReceiptResult> {
+    const {pollingInterval} = options;
+
+    const status = await retryUntil(
+      async () => this.#getUserOpStatus(userOpHash),
+      (s) => s.status !== 'not_submitted' && s.status !== 'queued',
+      pollingInterval,
+      120_000, // 2 minutes
+    );
+
+    if (!status.ok) {
+      return {
+        success: false,
+        error: 'timeout',
+      };
+    }
+    if (status.result.status === 'not_found' || status.result.status === 'rejected') {
+      return {
+        success: false,
+        error: status.result.status,
+      };
+    }
+
+    const receipt = await retryUntil(
+      async () => this.#getUserOpReceipt(userOpHash),
+      (r) => !!r?.receipt,
+      pollingInterval,
+      120_000, // 2 minutes
+    );
+
+    if (!receipt.ok) {
+      return {
+        success: false,
+        error: 'timeout',
+      };
+    }
+
+    return {
+      success: true,
+      receipt: receipt.result.receipt,
+      transactionHash: receipt.result.receipt.transactionHash,
+    };
+  }
+
+  async generateUserOp(data: {
+    from: string;
+    to: string;
+    value: string;
+    data: string;
+    nonce: string;
+  }) {
+    const callData = createExecuteCall(data.to, data.value, data.data);
+    const gasPrice = await this.#getGasPrice();
 
     return fillUserOp({
-      sender: from,
-      nonce,
+      sender: data.from,
+      nonce: data.nonce,
       callData,
       maxFeePerGas: gasPrice.fast.maxFeePerGas,
       maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
     });
   }
 
-  public async getSponsoredUserOp(userOp: Awaited<ReturnType<typeof this.generateUserOp>>) {
-    const sponsorUserOperationResult: SponsorUserOperationReturnType =
-      await this.paymasterClient.sponsorUserOperation({
-        userOperation: userOp,
-        entryPoint: this.chain.entryPoint,
-      });
+  async getSponsoredUserOp(userOp: UserOperation) {
+    const sponsored = await this.#sponsorUserOp(userOp);
 
     return {
       ...userOp,
-      preVerificationGas: sponsorUserOperationResult.preVerificationGas,
-      verificationGasLimit: sponsorUserOperationResult.verificationGasLimit,
-      callGasLimit: sponsorUserOperationResult.callGasLimit,
-      paymasterAndData: sponsorUserOperationResult.paymasterAndData,
+      preVerificationGas: sponsored.preVerificationGas,
+      verificationGasLimit: sponsored.verificationGasLimit,
+      callGasLimit: sponsored.callGasLimit,
+      paymasterAndData: sponsored.paymasterAndData,
     } satisfies UserOperation;
   }
 
-  public async signUserOp(ownerPK: string, sponsoredUserOperation: UserOperation) {
-    const owner = privateKeyToAccount(ownerPK as Hex);
+  async signUserOp(privateKey: string, sponsoredUserOperation: UserOperation) {
+    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
-    const signature = await signUserOperationHashWithECDSA({
-      account: owner,
-      userOperation: sponsoredUserOperation,
-      chainId: this.chain.viem.id,
-      entryPoint: this.chain.entryPoint,
-    });
+    const userOpHash = this.#getUserOpHash(sponsoredUserOperation);
+
+    const signature = personalSign({
+      privateKey: privateKeyBuffer,
+      data: userOpHash,
+    }) as `0x${string}`;
 
     return {
       ...sponsoredUserOperation,
@@ -94,22 +165,24 @@ export class PimlicoClient {
     };
   }
 
-  public async sendUserOp(signedSponsoredUserOperation: UserOperation) {
-    const userOpHash = await this.bundlerClient.sendUserOperation({
-      userOperation: signedSponsoredUserOperation,
-      entryPoint: this.chain.entryPoint,
-    });
+  async sendUserOp(signedSponsoredUserOperation: UserOperation) {
+    const userOpHash = await this.#sendUserOp(signedSponsoredUserOperation);
 
     return userOpHash;
   }
 
-  public async getReceipt(userOpHash: Hex) {
-    const receipt = await this.bundlerClient.waitForUserOperationReceipt({hash: userOpHash});
-    const txHash = receipt.receipt.transactionHash;
+  async getReceipt(userOpHash: string) {
+    const receipt = await this.#waitForUserOpReceipt(userOpHash, {
+      pollingInterval: 2_000,
+    });
+
+    if (!receipt.success) {
+      throwError(`Could not get receipt. Reason: ${receipt.error}`);
+    }
 
     return {
-      receipt,
-      txHash,
+      receipt: receipt.receipt,
+      txHash: receipt.transactionHash,
     };
   }
 }

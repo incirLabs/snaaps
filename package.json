@@ -64,8 +64,5 @@
       "hardhat>ws>bufferutil": false,
       "hardhat>ws>utf-8-validate": false
     }
-  },
-  "resolutions": {
-    "viem@1.19.3": "patch:viem@npm%3A1.19.3#./.yarn/patches/viem-npm-1.19.3-0e33e44bf3.patch"
   }
 }

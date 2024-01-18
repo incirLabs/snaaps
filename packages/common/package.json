@@ -9,8 +9,6 @@
     "allow-scripts": "yarn workspace root allow-scripts"
   },
   "dependencies": {
-    "@metamask/keyring-api": "^2.0.0",
-    "viem": "^2.1.1",
-    "wagmi": "^2.2.1"
+    "@metamask/keyring-api": "^2.0.0"
   }
 }

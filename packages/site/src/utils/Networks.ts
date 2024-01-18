@@ -8,7 +8,7 @@ export const checkContractExists = async (network: NetworkKeys, address: string)
   try {
     const code = await getBytecode(wagmiConfig, {
       address: address as Hex,
-      chainId: NetworksConfig[network].viem.id,
+      chainId: NetworksConfig[network].id,
     });
 
     return !!code;
@@ -50,7 +50,7 @@ export const getWalletAddress = async (
     address: config.accountFactory,
     functionName: 'getAddress',
     args: [signer, 0],
-    chainId: config.viem.id,
+    chainId: config.id,
   });
 
   return address as string;

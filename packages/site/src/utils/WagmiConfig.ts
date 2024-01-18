@@ -1,12 +1,33 @@
-import {NetworksConfig} from 'common';
+import {type NetworkKeys} from 'common';
 import {createConfig, http} from 'wagmi';
 import {injected} from 'wagmi/connectors';
-import {Chain} from 'viem/chains';
 
-const chains = Object.values(NetworksConfig).map((network) => network.viem) as unknown as [
-  Chain,
-  ...Chain[],
-];
+import {
+  type Chain,
+  linea,
+  scroll,
+  arbitrum,
+  optimism,
+  polygon,
+  mainnet,
+  goerli,
+  gnosis,
+  base,
+  bsc,
+} from 'viem/chains';
+
+const chains = Object.values({
+  linea,
+  scroll,
+  arbitrum,
+  optimism,
+  polygon,
+  ethereum: mainnet,
+  ethereumGoerli: goerli,
+  gnosis,
+  base,
+  bsc,
+} satisfies Record<NetworkKeys, Chain>) as unknown as [Chain, ...Chain[]];
 
 export const wagmiConfig = createConfig({
   chains,

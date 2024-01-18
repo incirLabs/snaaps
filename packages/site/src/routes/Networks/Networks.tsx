@@ -44,8 +44,8 @@ const Networks: React.FC = () => {
     if (!selectedNetwork || !address) return;
     const selected = NetworksConfig[selectedNetwork];
 
-    if (chainId !== selected.viem.id) {
-      await switchChainAsync({chainId: selected.viem.id});
+    if (chainId !== selected.id) {
+      await switchChainAsync({chainId: selected.id});
     }
 
     await writeContractAsync({
@@ -53,7 +53,7 @@ const Networks: React.FC = () => {
       address: selected.accountFactory,
       functionName: 'createAccount',
       args: [signerAddress, 0],
-      chainId: selected.viem.id,
+      chainId: selected.id,
     });
   };
 

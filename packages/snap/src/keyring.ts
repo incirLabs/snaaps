@@ -1,6 +1,5 @@
 import {NetworksConfig, type NetworkKeys} from 'common';
 import {v4 as uuid} from 'uuid';
-import {hexToBigInt, type Hex} from 'viem';
 import {TransactionFactory} from '@ethereumjs/tx';
 import {addHexPrefix, ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import {
@@ -204,7 +203,7 @@ export class SimpleKeyring implements Keyring {
     };
   }
 
-  async #handleSignRequest(method: EthMethod, params: Json): Promise<string> {
+  async #handleSignRequest(method: EthMethod, params: Json): Promise<Json> {
     switch (method) {
       case EthMethod.PersonalSign: {
         const [message, from] = params as [string, string];
@@ -309,27 +308,24 @@ export class SimpleKeyring implements Keyring {
 
       if (!chain) throwError('Chain is not supported');
 
-      const pimlico = new PimlicoClient(chain);
+      const pimlico = new PimlicoClient(chain, NetworksConfig[chain].entryPoint);
 
-      const nonce = await ethereum.request({
+      const nonce = (await ethereum.request({
         method: 'eth_call',
         params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
-      });
+      })) as string;
 
-      const userOp = await pimlico.generateUserOp(
-        wallet.account.address as Hex,
-        typedTx.to?.toString() as Hex,
-        typedTx.value,
-        `0x${typedTx.data.toString('hex')}`,
-        hexToBigInt(nonce as Hex),
-      );
+      const userOp = await pimlico.generateUserOp({
+        from: wallet.account.address,
+        to: typedTx.to?.toString() as string,
+        value: typedTx.value.toString(),
+        data: addHexPrefix(typedTx.data.toString('hex')),
+        nonce,
+      });
 
       const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
 
-      const signedUserOp = await pimlico.signUserOp(
-        addHexPrefix(wallet.privateKey),
-        sponsoredUserOp,
-      );
+      const signedUserOp = await pimlico.signUserOp(wallet.privateKey, sponsoredUserOp);
 
       const userOpHash = await pimlico.sendUserOp(signedUserOp);
 
