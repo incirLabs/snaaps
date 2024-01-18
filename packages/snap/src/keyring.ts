@@ -1,4 +1,4 @@
-import {NetworksConfig, getNetworkByChainId} from 'common';
+import {getNetworkByChainId} from 'common';
 import {v4 as uuid} from 'uuid';
 import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import {
@@ -27,7 +27,7 @@ import {
 import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
 
 import {saveState, type State} from './state';
-import {throwError} from './utils/helpers';
+import {getChainIdFromCAIP2Safe, throwError} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient, getPimlicoUrl} from './utils/pimlico';
@@ -146,13 +146,12 @@ export class SimpleKeyring implements Keyring {
     // This may change in the future if we support multiple bundlers.
 
     return chains.filter((chain) => {
-      if (!chain.startsWith('eip155:')) return false;
-
-      const chainId = parseInt(chain.split(':')[1] ?? '0', 10) ?? 0;
-
-      if (chainId === 0) return false;
-
-      return Object.values(NetworksConfig).some((network) => network.id === chainId);
+      try {
+        getChainIdFromCAIP2Safe(chain);
+        return true;
+      } catch (error) {
+        return false;
+      }
     });
   }
 
