@@ -2941,7 +2941,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/keyring-api@npm:^1.0.0-rc.1, @metamask/keyring-api@npm:^1.1.0":
+"@metamask/keyring-api@npm:^1.1.0":
   version: 1.1.0
   resolution: "@metamask/keyring-api@npm:1.1.0"
   dependencies:
@@ -4719,7 +4719,7 @@ __metadata:
     "@metamask/auto-changelog": ^3.3.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/eth-sig-util": ^7.0.0
-    "@metamask/keyring-api": ^1.0.0-rc.1
+    "@metamask/keyring-api": ^2.0.0
     "@metamask/snaps-cli": ^3.0.0
     "@metamask/snaps-types": ^3.0.0
     "@metamask/utils": ^8.1.0
