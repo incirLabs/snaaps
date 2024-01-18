@@ -21,6 +21,8 @@ import {
   type SubmitRequestResponse,
   type EthBaseTransaction,
   type EthBaseUserOperation,
+  type EthUserOperation,
+  type EthUserOperationPatch,
 } from '@metamask/keyring-api';
 import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
 
@@ -28,7 +30,7 @@ import {saveState, type State} from './state';
 import {throwError} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
-import {getPimlicoUrl} from './utils/pimlico';
+import {PimlicoClient, getPimlicoUrl} from './utils/pimlico';
 import {createExecuteCall, createGetNonceCall} from './utils/callData';
 import {DefaultsForBaseUserOp, fillUserOp} from './utils/userOp';
 
@@ -217,6 +219,11 @@ export class SimpleKeyring implements Keyring {
         return this.#prepareUserOperation(txs, request);
       }
 
+      case EthMethod.PatchUserOperation: {
+        const [userOp] = params as [EthUserOperation, Json];
+        return this.#patchUserOperation(userOp);
+      }
+
       case EthMethod.PersonalSign: {
         const [message, from] = params as [string, string];
         return this.#signPersonalMessage(from, message);
@@ -272,6 +279,20 @@ export class SimpleKeyring implements Keyring {
       nonce,
       bundlerUrl: getPimlicoUrl('bundler', chain.pimlico),
     });
+  }
+
+  async #patchUserOperation(userOp: EthUserOperation): Promise<EthUserOperationPatch> {
+    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
+    const network = getNetworkByChainId(chainId);
+    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
+    const [chainKey, chain] = network;
+
+    const pimlico = new PimlicoClient(chainKey, chain.entryPoint);
+    const sponsored = await pimlico.sponsorUserOp(userOp);
+
+    return {
+      paymasterAndData: sponsored.paymasterAndData,
+    };
   }
 
   #signMessage(from: string, data: string): string {

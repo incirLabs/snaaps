@@ -42,10 +42,6 @@ export class PimlicoClient {
     this.#paymasterClient = JSONRPCClient.bind(null, this.paymasterUrl);
   }
 
-  async #sponsorUserOp(userOp: EthUserOperation): Promise<SponsorUserOpResult> {
-    return this.#paymasterClient('pm_sponsorUserOperation', [userOp, this.entryPoint]);
-  }
-
   #getUserOpHash(userOp: EthUserOperation) {
     const encoded = encode(
       ['bytes32', 'address', 'uint256'],
@@ -118,8 +114,12 @@ export class PimlicoClient {
     return this.#bundlerClient('pimlico_getUserOperationGasPrice', []);
   }
 
+  async sponsorUserOp(userOp: EthUserOperation): Promise<SponsorUserOpResult> {
+    return this.#paymasterClient('pm_sponsorUserOperation', [userOp, this.entryPoint]);
+  }
+
   async getSponsoredUserOp(userOp: EthUserOperation) {
-    const sponsored = await this.#sponsorUserOp(userOp);
+    const sponsored = await this.sponsorUserOp(userOp);
 
     return {
       ...userOp,
