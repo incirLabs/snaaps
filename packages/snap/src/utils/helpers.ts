@@ -1,7 +1,7 @@
+import {ChainIdsToKeys, type NetworkKeys} from 'common';
 import {Common, Hardfork} from '@ethereumjs/common';
 import {stripHexPrefix} from '@ethereumjs/util';
 import {bytesToHex} from '@metamask/utils';
-import {ChainIdsToKeys} from 'common';
 import {keccak256 as ecKeccak256} from 'ethereum-cryptography/keccak';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
@@ -123,4 +123,20 @@ export const getChainIdFromCAIP2Safe = (caip2: string): number => {
   }
 
   return chainId;
+};
+
+/**
+ * Returns the `NetworkKeys` from a CAIP-2 chain ID, throwing an error if it is not supported.
+ * @param caip2 The CAIP-2 chain ID
+ * @returns The chain ID as a number
+ */
+export const getNetworkKeyFromCAIP2Safe = (caip2: string): NetworkKeys => {
+  const chainId = getChainIdFromCAIP2(caip2);
+  const chainKey = ChainIdsToKeys[chainId];
+
+  if (!chainKey) {
+    throwError(`Unsupported Chain ID: ${chainId}`);
+  }
+
+  return chainKey;
 };

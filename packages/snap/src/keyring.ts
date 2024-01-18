@@ -1,4 +1,4 @@
-import {getNetworkByChainId} from 'common';
+import {NetworksConfig} from 'common';
 import {v4 as uuid} from 'uuid';
 import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import {
@@ -27,7 +27,7 @@ import {
 import {type Json, type JsonRpcRequest} from '@metamask/utils';
 
 import {saveState, type State} from './state';
-import {getChainIdFromCAIP2Safe, throwError} from './utils/helpers';
+import {getChainIdFromCAIP2Safe, getNetworkKeyFromCAIP2Safe, throwError} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient, getPimlicoUrl} from './utils/pimlico';
@@ -271,10 +271,7 @@ export class SimpleKeyring implements Keyring {
       params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
     })) as string;
 
-    const chainId = getChainIdFromCAIP2Safe(request.scope);
-    const network = getNetworkByChainId(chainId);
-    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
-    const [, chain] = network;
+    const chain = NetworksConfig[getNetworkKeyFromCAIP2Safe(request.scope)];
 
     const callData = createExecuteCall(tx.to, tx.value, tx.data);
 
@@ -289,10 +286,8 @@ export class SimpleKeyring implements Keyring {
     userOp: EthUserOperation,
     request: KeyringRequest,
   ): Promise<EthUserOperationPatch> {
-    const chainId = getChainIdFromCAIP2Safe(request.scope);
-    const network = getNetworkByChainId(chainId);
-    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
-    const [chainKey, chain] = network;
+    const chainKey = getNetworkKeyFromCAIP2Safe(request.scope);
+    const chain = NetworksConfig[chainKey];
 
     const pimlico = new PimlicoClient(chainKey, chain.entryPoint);
     const sponsored = await pimlico.sponsorUserOp(userOp);
