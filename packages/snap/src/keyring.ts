@@ -116,16 +116,16 @@ export class SimpleKeyring implements Keyring {
       },
       address: data.address,
       methods: [
-        EthMethod.PersonalSign,
-        EthMethod.Sign,
         EthMethod.PrepareUserOperation,
         EthMethod.PatchUserOperation,
         EthMethod.SignUserOperation,
+        EthMethod.Sign,
+        EthMethod.PersonalSign,
         EthMethod.SignTypedDataV1,
         EthMethod.SignTypedDataV3,
         EthMethod.SignTypedDataV4,
       ],
-      type: EthAccountType.Eoa,
+      type: EthAccountType.Erc4337,
     };
 
     await this.#emitEvent(KeyringEvent.AccountCreated, {account});
