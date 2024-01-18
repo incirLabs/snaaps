@@ -1,5 +1,6 @@
 import {encode} from '@metamask/abi-utils';
 import {bytesToHex} from '@metamask/utils';
+import {personalSign} from '@metamask/eth-sig-util';
 import type {EthBaseUserOperation, EthUserOperation} from '@metamask/keyring-api';
 
 import {keccak256} from './helpers';
@@ -62,4 +63,29 @@ export const packUserOp = (userOp: EthUserOperation): string => {
       ],
     ),
   );
+};
+
+export const getUserOpHash = (userOp: EthUserOperation, entryPoint: string, chainId: number) => {
+  const encoded = encode(
+    ['bytes32', 'address', 'uint256'],
+    [keccak256(packUserOp(userOp)), entryPoint, chainId],
+  );
+
+  return keccak256(bytesToHex(encoded));
+};
+
+export const signUserOp = (
+  privateKey: string,
+  userOp: EthUserOperation,
+  entryPoint: string,
+  chainId: number,
+) => {
+  const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+
+  const userOpHash = getUserOpHash(userOp, entryPoint, chainId);
+
+  return personalSign({
+    privateKey: privateKeyBuffer,
+    data: userOpHash,
+  }) as `0x${string}`;
 };

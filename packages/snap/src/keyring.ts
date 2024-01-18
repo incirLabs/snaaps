@@ -32,7 +32,7 @@ import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient, getPimlicoUrl} from './utils/pimlico';
 import {createExecuteCall, createGetNonceCall} from './utils/callData';
-import {DefaultsForBaseUserOp, fillUserOp} from './utils/userOp';
+import {DefaultsForBaseUserOp, fillUserOp, signUserOp} from './utils/userOp';
 
 export class SimpleKeyring implements Keyring {
   #state: State;
@@ -215,13 +215,18 @@ export class SimpleKeyring implements Keyring {
   ): Promise<Json> {
     switch (method) {
       case EthMethod.PrepareUserOperation: {
-        const [txs] = params as [EthBaseTransaction[], KeyringRequest];
+        const [txs] = params as [EthBaseTransaction[]];
         return this.#prepareUserOperation(txs, request);
       }
 
       case EthMethod.PatchUserOperation: {
-        const [userOp] = params as [EthUserOperation, Json];
+        const [userOp] = params as [EthUserOperation];
         return this.#patchUserOperation(userOp);
+      }
+
+      case EthMethod.SignUserOperation: {
+        const [userOp, entryPoint] = params as [EthUserOperation, string];
+        return this.#signUserOperation(userOp, entryPoint);
       }
 
       case EthMethod.PersonalSign: {
@@ -293,6 +298,16 @@ export class SimpleKeyring implements Keyring {
     return {
       paymasterAndData: sponsored.paymasterAndData,
     };
+  }
+
+  async #signUserOperation(userOp: EthUserOperation, entryPoint: string): Promise<string> {
+    const {privateKey} = this.#getWalletByAddressSafe(userOp.sender);
+
+    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
+    const network = getNetworkByChainId(chainId);
+    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
+
+    return signUserOp(privateKey, userOp, entryPoint, chainId);
   }
 
   #signMessage(from: string, data: string): string {

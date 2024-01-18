@@ -1,12 +1,9 @@
 import {NetworksConfig, type NetworkConfig, type NetworkKeys} from 'common';
-import {personalSign} from '@metamask/eth-sig-util';
-import {encode} from '@metamask/abi-utils';
-import {bytesToHex} from '@metamask/utils';
 import type {EthUserOperation} from '@metamask/keyring-api';
 
-import {packUserOp} from './userOp';
+import {signUserOp} from './userOp';
 import {JSONRPCClient} from './jsonRPCClient';
-import {throwError, keccak256, retryUntil} from './helpers';
+import {throwError, retryUntil} from './helpers';
 import type {
   GetGasPriceResult,
   GetUserOpReceiptResult,
@@ -40,15 +37,6 @@ export class PimlicoClient {
 
     this.#bundlerClient = JSONRPCClient.bind(null, this.bundlerUrl);
     this.#paymasterClient = JSONRPCClient.bind(null, this.paymasterUrl);
-  }
-
-  #getUserOpHash(userOp: EthUserOperation) {
-    const encoded = encode(
-      ['bytes32', 'address', 'uint256'],
-      [keccak256(packUserOp(userOp)), this.entryPoint, this.chain.id.toString()],
-    );
-
-    return keccak256(bytesToHex(encoded));
   }
 
   async #sendUserOp(signedUserOp: EthUserOperation): Promise<SendUserOpResult> {
@@ -131,18 +119,9 @@ export class PimlicoClient {
   }
 
   async signUserOp(privateKey: string, sponsoredUserOperation: EthUserOperation) {
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-
-    const userOpHash = this.#getUserOpHash(sponsoredUserOperation);
-
-    const signature = personalSign({
-      privateKey: privateKeyBuffer,
-      data: userOpHash,
-    }) as `0x${string}`;
-
     return {
       ...sponsoredUserOperation,
-      signature,
+      signature: signUserOp(privateKey, sponsoredUserOperation, this.entryPoint, this.chain.id),
     };
   }
 
