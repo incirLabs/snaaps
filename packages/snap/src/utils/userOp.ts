@@ -1,48 +1,35 @@
 import {encode} from '@metamask/abi-utils';
 import {bytesToHex} from '@metamask/utils';
-import {ZERO_ADDRESS, keccak256} from './helpers';
+import type {EthBaseUserOperation, EthUserOperation} from '@metamask/keyring-api';
 
-export type UserOperation = {
-  sender: string;
-  nonce: string;
-  initCode: string;
-  callData: string;
-  callGasLimit: string;
-  verificationGasLimit: string;
-  preVerificationGas: string;
-  maxFeePerGas: string;
-  maxPriorityFeePerGas: string;
-  paymasterAndData: string;
-  signature: string;
-};
+import {keccak256} from './helpers';
 
-export const DefaultsForUserOp: UserOperation = {
-  sender: ZERO_ADDRESS,
+export const DefaultsForBaseUserOp: EthBaseUserOperation = {
   nonce: '0x',
   initCode: '0x',
   callData: '0x',
-  callGasLimit: '0x100000',
-  verificationGasLimit: '0x20000',
-  preVerificationGas: '0x10000',
-  maxFeePerGas: '0x',
-  maxPriorityFeePerGas: '0x',
-  paymasterAndData: '0x',
+  gasLimits: {
+    callGasLimit: '0x100000',
+    verificationGasLimit: '0x20000',
+    preVerificationGas: '0x10000',
+  },
+  bundlerUrl: '',
 
-  // dummy signature
-  signature:
+  dummySignature:
     '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
+  dummyPaymasterAndData: '0x',
 };
 
-export const fillUserOp = (
-  userOp: Partial<UserOperation>,
-  defaults = DefaultsForUserOp,
-): UserOperation => {
+export const fillUserOp = <TUserOP extends object>(
+  defaults: TUserOP,
+  userOp: Partial<TUserOP>,
+): TUserOP => {
   const partial = Object.fromEntries(Object.entries(userOp).filter(([, value]) => value !== null));
 
   return {...defaults, ...partial};
 };
 
-export const packUserOp = (userOp: UserOperation): string => {
+export const packUserOp = (userOp: EthUserOperation): string => {
   const hashedInitCode = keccak256(userOp.initCode);
   const hashedCallData = keccak256(userOp.callData);
   const hashedPaymasterAndData = keccak256(userOp.paymasterAndData);

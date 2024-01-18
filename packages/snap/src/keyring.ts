@@ -1,7 +1,6 @@
-import {NetworksConfig, type NetworkKeys} from 'common';
+import {NetworksConfig, getNetworkByChainId} from 'common';
 import {v4 as uuid} from 'uuid';
-import {TransactionFactory} from '@ethereumjs/tx';
-import {addHexPrefix, ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
+import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import {
   concatSig,
   personalSign,
@@ -20,16 +19,18 @@ import {
   type KeyringAccount,
   type KeyringRequest,
   type SubmitRequestResponse,
+  type EthBaseTransaction,
+  type EthBaseUserOperation,
 } from '@metamask/keyring-api';
 import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
-import type {SnapsGlobalObject} from '@metamask/snaps-types';
 
 import {saveState, type State} from './state';
-import {getCommonForTx, numberToHexString, throwError} from './utils/helpers';
+import {throwError} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
-import {PimlicoClient} from './utils/pimlico';
-import {createGetNonceCall} from './utils/callData';
+import {getPimlicoUrl} from './utils/pimlico';
+import {createExecuteCall, createGetNonceCall} from './utils/callData';
+import {DefaultsForBaseUserOp, fillUserOp} from './utils/userOp';
 
 export class SimpleKeyring implements Keyring {
   #state: State;
@@ -65,7 +66,7 @@ export class SimpleKeyring implements Keyring {
   }
 
   async #emitEvent(event: KeyringEvent, data: Record<string, Json>): Promise<void> {
-    await emitSnapKeyringEvent(snap as SnapsGlobalObject, event, data);
+    await emitSnapKeyringEvent(snap, event, data);
   }
 
   async listAccounts(): Promise<KeyringAccount[]> {
@@ -115,7 +116,9 @@ export class SimpleKeyring implements Keyring {
       methods: [
         EthMethod.PersonalSign,
         EthMethod.Sign,
-        EthMethod.SignTransaction,
+        EthMethod.PrepareUserOperation,
+        EthMethod.PatchUserOperation,
+        EthMethod.SignUserOperation,
         EthMethod.SignTypedDataV1,
         EthMethod.SignTypedDataV3,
         EthMethod.SignTypedDataV4,
@@ -195,7 +198,7 @@ export class SimpleKeyring implements Keyring {
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     const {method, params = []} = request.request as JsonRpcRequest;
 
-    const signature = await this.#handleSignRequest(method as EthMethod, params);
+    const signature = await this.#handleSignRequest(method as EthMethod, params, request);
 
     return {
       pending: false,
@@ -203,16 +206,20 @@ export class SimpleKeyring implements Keyring {
     };
   }
 
-  async #handleSignRequest(method: EthMethod, params: Json): Promise<Json> {
+  async #handleSignRequest(
+    method: EthMethod,
+    params: Json,
+    request: KeyringRequest,
+  ): Promise<Json> {
     switch (method) {
+      case EthMethod.PrepareUserOperation: {
+        const [txs] = params as [EthBaseTransaction[], KeyringRequest];
+        return this.#prepareUserOperation(txs, request);
+      }
+
       case EthMethod.PersonalSign: {
         const [message, from] = params as [string, string];
         return this.#signPersonalMessage(from, message);
-      }
-
-      case EthMethod.SignTransaction: {
-        const [tx] = params as [any];
-        return this.#signTransaction(tx);
       }
 
       case EthMethod.SignTypedDataV1:
@@ -236,6 +243,35 @@ export class SimpleKeyring implements Keyring {
         throw new Error(`EVM method '${method as string}' not supported`);
       }
     }
+  }
+
+  async #prepareUserOperation(
+    txs: EthBaseTransaction[],
+    request: KeyringRequest,
+  ): Promise<EthBaseUserOperation> {
+    // Not handling multiple txs for now as it is still unclear if it will be supported.
+    const tx = txs[0];
+    if (!tx) throwError('No transaction provided');
+
+    const wallet = this.#getWalletByIDSafe(request.account);
+
+    const nonce = (await ethereum.request({
+      method: 'eth_call',
+      params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
+    })) as string;
+
+    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
+    const network = getNetworkByChainId(chainId);
+    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
+    const [, chain] = network;
+
+    const callData = createExecuteCall(tx.to, tx.value, tx.data);
+
+    return fillUserOp(DefaultsForBaseUserOp, {
+      callData,
+      nonce,
+      bundlerUrl: getPimlicoUrl('bundler', chain.pimlico),
+    });
   }
 
   #signMessage(from: string, data: string): string {
@@ -289,52 +325,6 @@ export class SimpleKeyring implements Keyring {
       data: data as unknown as TypedDataV1 | TypedMessage<any>,
       version: opts.version,
     });
-  }
-
-  async #signTransaction(tx: any): Promise<string> {
-    // eslint-disable-next-line no-param-reassign
-    tx.chainId = numberToHexString(tx.chainId);
-
-    const wallet = this.#getWalletByAddressSafe(tx.from);
-
-    const common = getCommonForTx(tx);
-
-    const typedTx = TransactionFactory.fromTxData(tx, {common});
-
-    try {
-      const [chain] = Object.entries(NetworksConfig).find(
-        ([, c]) => c.id === hexToNumber(tx.chainId),
-      ) as [NetworkKeys, any];
-
-      if (!chain) throwError('Chain is not supported');
-
-      const pimlico = new PimlicoClient(chain, NetworksConfig[chain].entryPoint);
-
-      const nonce = (await ethereum.request({
-        method: 'eth_call',
-        params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
-      })) as string;
-
-      const userOp = await pimlico.generateUserOp({
-        from: wallet.account.address,
-        to: typedTx.to?.toString() as string,
-        value: typedTx.value.toString(),
-        data: addHexPrefix(typedTx.data.toString('hex')),
-        nonce,
-      });
-
-      const sponsoredUserOp = await pimlico.getSponsoredUserOp(userOp);
-
-      const signedUserOp = await pimlico.signUserOp(wallet.privateKey, sponsoredUserOp);
-
-      const userOpHash = await pimlico.sendUserOp(signedUserOp);
-
-      await pimlico.getReceipt(userOpHash);
-
-      return '';
-    } catch (err) {
-      return throwError('Error on bundler');
-    }
   }
 
   // Async requests are not used in the current implementation.

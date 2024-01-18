@@ -2,9 +2,9 @@ import {NetworksConfig, type NetworkConfig, type NetworkKeys} from 'common';
 import {personalSign} from '@metamask/eth-sig-util';
 import {encode} from '@metamask/abi-utils';
 import {bytesToHex} from '@metamask/utils';
+import type {EthUserOperation} from '@metamask/keyring-api';
 
-import {fillUserOp, packUserOp, type UserOperation} from './userOp';
-import {createExecuteCall} from './callData';
+import {packUserOp} from './userOp';
 import {JSONRPCClient} from './jsonRPCClient';
 import {throwError, keccak256, retryUntil} from './helpers';
 import type {
@@ -18,7 +18,7 @@ import type {
 
 const PIMLICO_API_KEY = process.env.SNAP_PIMLICO_API_KEY ?? '';
 
-const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: string) =>
+export const getPimlicoUrl = (type: 'bundler' | 'paymaster', chain: string) =>
   `https://api.pimlico.io/v${type === 'bundler' ? 1 : 2}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
 
 export class PimlicoClient {
@@ -42,15 +42,11 @@ export class PimlicoClient {
     this.#paymasterClient = JSONRPCClient.bind(null, this.paymasterUrl);
   }
 
-  async #getGasPrice(): Promise<GetGasPriceResult> {
-    return this.#bundlerClient('pimlico_getUserOperationGasPrice', []);
-  }
-
-  async #sponsorUserOp(userOp: UserOperation): Promise<SponsorUserOpResult> {
+  async #sponsorUserOp(userOp: EthUserOperation): Promise<SponsorUserOpResult> {
     return this.#paymasterClient('pm_sponsorUserOperation', [userOp, this.entryPoint]);
   }
 
-  #getUserOpHash(userOp: UserOperation) {
+  #getUserOpHash(userOp: EthUserOperation) {
     const encoded = encode(
       ['bytes32', 'address', 'uint256'],
       [keccak256(packUserOp(userOp)), this.entryPoint, this.chain.id.toString()],
@@ -59,7 +55,7 @@ export class PimlicoClient {
     return keccak256(bytesToHex(encoded));
   }
 
-  async #sendUserOp(signedUserOp: UserOperation): Promise<SendUserOpResult> {
+  async #sendUserOp(signedUserOp: EthUserOperation): Promise<SendUserOpResult> {
     return this.#bundlerClient('eth_sendUserOperation', [signedUserOp, this.entryPoint]);
   }
 
@@ -118,26 +114,11 @@ export class PimlicoClient {
     };
   }
 
-  async generateUserOp(data: {
-    from: string;
-    to: string;
-    value: string;
-    data: string;
-    nonce: string;
-  }) {
-    const callData = createExecuteCall(data.to, data.value, data.data);
-    const gasPrice = await this.#getGasPrice();
-
-    return fillUserOp({
-      sender: data.from,
-      nonce: data.nonce,
-      callData,
-      maxFeePerGas: gasPrice.fast.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
-    });
+  async getGasPrice(): Promise<GetGasPriceResult> {
+    return this.#bundlerClient('pimlico_getUserOperationGasPrice', []);
   }
 
-  async getSponsoredUserOp(userOp: UserOperation) {
+  async getSponsoredUserOp(userOp: EthUserOperation) {
     const sponsored = await this.#sponsorUserOp(userOp);
 
     return {
@@ -146,10 +127,10 @@ export class PimlicoClient {
       verificationGasLimit: sponsored.verificationGasLimit,
       callGasLimit: sponsored.callGasLimit,
       paymasterAndData: sponsored.paymasterAndData,
-    } satisfies UserOperation;
+    } satisfies EthUserOperation;
   }
 
-  async signUserOp(privateKey: string, sponsoredUserOperation: UserOperation) {
+  async signUserOp(privateKey: string, sponsoredUserOperation: EthUserOperation) {
     const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
     const userOpHash = this.#getUserOpHash(sponsoredUserOperation);
@@ -165,7 +146,7 @@ export class PimlicoClient {
     };
   }
 
-  async sendUserOp(signedSponsoredUserOperation: UserOperation) {
+  async sendUserOp(signedSponsoredUserOperation: EthUserOperation) {
     const userOpHash = await this.#sendUserOp(signedSponsoredUserOperation);
 
     return userOpHash;
