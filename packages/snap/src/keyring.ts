@@ -25,7 +25,12 @@ import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
 import type {SnapsGlobalObject} from '@metamask/snaps-types';
 
 import {saveState, type State} from './state';
-import {getCommonForTx, numberToHexString, throwError} from './utils/helpers';
+import {
+  getChainIdFromCAIP2Safe,
+  getCommonForTx,
+  numberToHexString,
+  throwError,
+} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient} from './utils/pimlico';
@@ -141,13 +146,12 @@ export class SimpleKeyring implements Keyring {
     // This may change in the future if we support multiple bundlers.
 
     return chains.filter((chain) => {
-      if (!chain.startsWith('eip155:')) return false;
-
-      const chainId = parseInt(chain.split(':')[1] ?? '0', 10) ?? 0;
-
-      if (chainId === 0) return false;
-
-      return Object.values(NetworksConfig).some((network) => network.id === chainId);
+      try {
+        getChainIdFromCAIP2Safe(chain);
+        return true;
+      } catch (error) {
+        return false;
+      }
     });
   }
 

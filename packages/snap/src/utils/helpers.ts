@@ -1,6 +1,7 @@
 import {Common, Hardfork} from '@ethereumjs/common';
 import {stripHexPrefix} from '@ethereumjs/util';
 import {bytesToHex} from '@metamask/utils';
+import {getNetworkByChainId} from 'common';
 import {keccak256 as ecKeccak256} from 'ethereum-cryptography/keccak';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
@@ -89,3 +90,37 @@ export async function retryUntil<TResult>(
     result,
   };
 }
+
+/**
+ * Returns the chain ID from a CAIP-2 chain ID, throwing an error if it is not valid EVM chain ID.
+ * @param caip2 The CAIP-2 chain ID
+ * @returns The chain ID as a number
+ */
+export const getChainIdFromCAIP2 = (caip2: string): number => {
+  if (!caip2.startsWith('eip155:')) {
+    throwError(`Non-EVM CAIP-2 Chain ID: ${caip2}`);
+  }
+
+  const chainId = Number(caip2.split(':')[1]);
+
+  if (!chainId) {
+    throwError(`Invalid CAIP-2 Chain ID: ${caip2}`);
+  }
+
+  return chainId;
+};
+
+/**
+ * Returns the chain ID from a CAIP-2 chain ID, throwing an error if it is not supported.
+ * @param caip2 The CAIP-2 chain ID
+ * @returns The chain ID as a number
+ */
+export const getChainIdFromCAIP2Safe = (caip2: string): number => {
+  const chainId = getChainIdFromCAIP2(caip2);
+
+  if (!getNetworkByChainId(chainId)) {
+    throwError(`Unsupported Chain ID: ${chainId}`);
+  }
+
+  return chainId;
+};
