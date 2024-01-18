@@ -24,7 +24,7 @@ import {
   type EthUserOperation,
   type EthUserOperationPatch,
 } from '@metamask/keyring-api';
-import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
+import {type Json, type JsonRpcRequest} from '@metamask/utils';
 
 import {saveState, type State} from './state';
 import {getChainIdFromCAIP2Safe, throwError} from './utils/helpers';
@@ -220,12 +220,12 @@ export class SimpleKeyring implements Keyring {
 
       case EthMethod.PatchUserOperation: {
         const [userOp] = params as [EthUserOperation];
-        return this.#patchUserOperation(userOp);
+        return this.#patchUserOperation(userOp, request);
       }
 
       case EthMethod.SignUserOperation: {
         const [userOp, entryPoint] = params as [EthUserOperation, string];
-        return this.#signUserOperation(userOp, entryPoint);
+        return this.#signUserOperation(userOp, entryPoint, request);
       }
 
       case EthMethod.PersonalSign: {
@@ -271,7 +271,7 @@ export class SimpleKeyring implements Keyring {
       params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
     })) as string;
 
-    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
+    const chainId = getChainIdFromCAIP2Safe(request.scope);
     const network = getNetworkByChainId(chainId);
     if (!network) throwError(`Chain with id '${chainId}' is not supported`);
     const [, chain] = network;
@@ -285,8 +285,11 @@ export class SimpleKeyring implements Keyring {
     });
   }
 
-  async #patchUserOperation(userOp: EthUserOperation): Promise<EthUserOperationPatch> {
-    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
+  async #patchUserOperation(
+    userOp: EthUserOperation,
+    request: KeyringRequest,
+  ): Promise<EthUserOperationPatch> {
+    const chainId = getChainIdFromCAIP2Safe(request.scope);
     const network = getNetworkByChainId(chainId);
     if (!network) throwError(`Chain with id '${chainId}' is not supported`);
     const [chainKey, chain] = network;
@@ -299,12 +302,14 @@ export class SimpleKeyring implements Keyring {
     };
   }
 
-  async #signUserOperation(userOp: EthUserOperation, entryPoint: string): Promise<string> {
+  async #signUserOperation(
+    userOp: EthUserOperation,
+    entryPoint: string,
+    request: KeyringRequest,
+  ): Promise<string> {
     const {privateKey} = this.#getWalletByAddressSafe(userOp.sender);
 
-    const chainId = hexToNumber((await ethereum.request({method: 'eth_chainId'})) as string);
-    const network = getNetworkByChainId(chainId);
-    if (!network) throwError(`Chain with id '${chainId}' is not supported`);
+    const chainId = getChainIdFromCAIP2Safe(request.scope);
 
     return signUserOp(privateKey, userOp, entryPoint, chainId);
   }
