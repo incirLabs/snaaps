@@ -361,22 +361,4 @@ export class SimpleKeyring implements Keyring {
       version: opts.version,
     });
   }
-
-  // Async requests are not used in the current implementation.
-  // The following methods are just stubs to satisfy the interface.
-  async listRequests(): Promise<KeyringRequest[]> {
-    return [];
-  }
-
-  async getRequest(id: string): Promise<KeyringRequest> {
-    throwError(`Request with id '${id}' not found`);
-  }
-
-  async approveRequest(id: string): Promise<void> {
-    throwError(`Request with id '${id}' not found`);
-  }
-
-  async rejectRequest(id: string): Promise<void> {
-    throwError(`Request with id '${id}' not found`);
-  }
 }
