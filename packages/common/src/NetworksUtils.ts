@@ -1,11 +1,12 @@
 import {NetworksConfig, NetworkConfig, NetworkKeys} from './Networks';
 
+export const ChainIdsToKeys = Object.fromEntries(
+  Object.entries(NetworksConfig).map(([key, {id}]) => [id, key]),
+) as {[key: number]: NetworkKeys};
+
 export const getNetworkByChainId = (chainId: number): [NetworkKeys, NetworkConfig] | null => {
-  const chainKey = (Object.keys(NetworksConfig) as NetworkKeys[]).find(
-    (key) => NetworksConfig[key].id === chainId,
-  );
+  const networkKey = ChainIdsToKeys[chainId];
+  if (!networkKey) return null;
 
-  if (!chainKey) return null;
-
-  return [chainKey, NetworksConfig[chainKey]];
+  return [networkKey, NetworksConfig[networkKey]];
 };

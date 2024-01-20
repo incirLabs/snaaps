@@ -1,8 +1,9 @@
 import cx from 'classnames';
+import {createAsAble} from '../../utils/createAsAble';
 
 type Column = number | 'auto';
 
-interface Props {
+export type ColProps = {
   children?: React.ReactNode;
   className?: string;
   span?: Column;
@@ -12,9 +13,9 @@ interface Props {
   xl?: Column;
   xxl?: Column;
   auto?: boolean;
-}
+};
 
-const Col: React.FC<Props> = (props) => {
+const Col = createAsAble<'div', ColProps>('div', (AsAble, props) => {
   const {
     children,
     className,
@@ -25,10 +26,11 @@ const Col: React.FC<Props> = (props) => {
     xl = -1,
     xxl = -1,
     auto,
+    ...restProps
   } = props;
 
   return (
-    <div
+    <AsAble
       className={cx(
         'col',
         {'col-auto': auto},
@@ -40,10 +42,11 @@ const Col: React.FC<Props> = (props) => {
         {[`col-xxl-${xxl}`]: xxl !== -1},
         className,
       )}
+      {...restProps}
     >
       {children}
-    </div>
+    </AsAble>
   );
-};
+});
 
 export default Col;

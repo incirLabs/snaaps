@@ -3,7 +3,7 @@ import {createAsAble} from '../../utils/createAsAble';
 
 import './styles.scss';
 
-export type InputProps = JSX.IntrinsicElements['input'] & {
+export type InputProps = {
   /**
    * Label to display above the input.
    */
