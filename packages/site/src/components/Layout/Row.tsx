@@ -1,14 +1,19 @@
 import cx from 'classnames';
+import {createAsAble} from '../../utils/createAsAble';
 
-interface Props {
+export type RowProps = {
   children?: React.ReactNode;
   className?: string;
-}
-
-const Row: React.FC<Props> = (props) => {
-  const {children, className} = props;
-
-  return <div className={cx('row', className)}>{children}</div>;
 };
+
+const Row = createAsAble<'div', RowProps>('div', (AsAble, props) => {
+  const {children, className, ...restProps} = props;
+
+  return (
+    <AsAble className={cx('row', className)} {...restProps}>
+      {children}
+    </AsAble>
+  );
+});
 
 export default Row;
