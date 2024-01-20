@@ -3,7 +3,7 @@ import {createAsAble} from '../../utils/createAsAble';
 
 import './styles.scss';
 
-export type ButtonProps = JSX.IntrinsicElements['button'] & {
+export type ButtonProps = {
   children?: React.ReactNode;
   theme: 'primary' | 'chip' | 'text';
   color?: 'default' | 'danger' | 'dark';
