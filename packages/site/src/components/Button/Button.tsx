@@ -8,6 +8,7 @@ export type ButtonProps = {
   theme: 'primary' | 'chip' | 'text';
   color?: 'default' | 'danger' | 'dark';
   block?: boolean;
+  disabled?: boolean;
 };
 
 export const Button = createAsAble<'button', ButtonProps>('button', (AsAble, props) => {
