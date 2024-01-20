@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {BrowserRouter} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {Web3Providers} from './Web3Providers';
+import {SnapAccountsProvider} from './hooks';
 import App from './App';
 
 import './bootstrap.scss';
@@ -17,9 +18,11 @@ const Root: React.FC = () => {
     <StrictMode>
       <BrowserRouter>
         <Web3Providers>
-          <QueryClientProvider client={queryClient}>
-            <App />
-          </QueryClientProvider>
+          <SnapAccountsProvider>
+            <QueryClientProvider client={queryClient}>
+              <App />
+            </QueryClientProvider>
+          </SnapAccountsProvider>
         </Web3Providers>
       </BrowserRouter>
     </StrictMode>

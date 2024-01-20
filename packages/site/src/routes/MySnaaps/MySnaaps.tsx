@@ -1,38 +1,24 @@
-import {Env} from 'common';
-import {useState} from 'react';
 import cx from 'classnames';
 import {Link} from 'react-router-dom';
-import {KeyringAccount, KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
-import {useMount} from '../../hooks';
+import {useMount, useSnapAccounts} from '../../hooks';
 import {Paths} from '../Paths';
 
 import './styles.scss';
 
 const MySnaaps: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [accounts, setAccounts] = useState<KeyringAccount[]>([]);
+  const [snapAccounts, reloadSnapAccounts, loading] = useSnapAccounts();
 
   useMount(() => {
-    (async () => {
-      if (loading) return;
-      setLoading(true);
-
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
-
-      const wallets = await client.listAccounts();
-
-      setAccounts(wallets);
-      setLoading(false);
-    })();
+    reloadSnapAccounts();
   });
 
   return (
     <PageContainer className={cx('p-my-snaaps')}>
       <PageContainer.Card className="p-my-snaaps_content" title="Select an Account">
-        {accounts.length > 0 || loading ? (
+        {Object.values(snapAccounts).length > 0 || loading ? (
           <div className="p-my-snaaps_wallets">
-            {accounts.map((account) => (
+            {Object.values(snapAccounts).map((account) => (
               <AccountCard
                 key={account.id}
                 text={account.address}
