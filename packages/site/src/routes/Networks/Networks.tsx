@@ -102,23 +102,6 @@ const Networks: React.FC = () => {
         </div>
 
         <div className="p-networks_buttons">
-          {deployedNetworks.length === NetworkKeys.length ? (
-            <Button theme="chip" color="dark" disabled>
-              All Chains Deployed
-            </Button>
-          ) : (
-            <Button
-              theme="chip"
-              color="dark"
-              disabled
-              onClick={() => {
-                // TODO: discuss how to handle this
-              }}
-            >
-              Deploy All
-            </Button>
-          )}
-
           {selectedNetwork ? (
             <Button theme="chip" onClick={deployContract}>
               Deploy on {NetworksConfig[selectedNetwork].name}

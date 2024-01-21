@@ -85,6 +85,12 @@ const CreateNew: React.FC = () => {
   return (
     <PageContainer className={cx('p-create-new')}>
       <PageContainer.Card className="p-create-new_content" title="Create a new AA Wallet">
+        <span className="mt-1 mb-4">
+          These are the accounts you can use. They are generated through your MetaMask mnemonic.
+          <br />
+          If you reinstall MetaMask with the same mnemonic, the same accounts will be generated.
+        </span>
+
         <div className="p-create-new_wallets">
           {wallets.map((wallet) => (
             <AccountCard
@@ -94,8 +100,8 @@ const CreateNew: React.FC = () => {
               right={
                 snapAccountAddresses.includes(wallet.walletAddress.toLowerCase()) ? (
                   <Button
+                    theme="rounded"
                     className="d-block w-100"
-                    theme="chip"
                     as={Link}
                     to={Paths.MySnaap(wallet.walletAddress).MySnaap}
                   >
@@ -103,7 +109,7 @@ const CreateNew: React.FC = () => {
                   </Button>
                 ) : (
                   <Button
-                    theme="chip"
+                    theme="rounded"
                     color="dark"
                     className="d-block w-100"
                     onClick={() => onSetupClick(wallet)}

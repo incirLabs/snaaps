@@ -15,7 +15,7 @@ const MySnaaps: React.FC = () => {
 
   return (
     <PageContainer className={cx('p-my-snaaps')}>
-      <PageContainer.Card className="p-my-snaaps_content" title="Select an Account">
+      <PageContainer.Card className="p-my-snaaps_content" title="Your Accounts">
         {Object.values(snapAccounts).length > 0 || loading ? (
           <div className="p-my-snaaps_wallets">
             {Object.values(snapAccounts).map((account) => (
@@ -24,7 +24,12 @@ const MySnaaps: React.FC = () => {
                 text={account.address}
                 walletAddress={account.address}
                 right={
-                  <Button theme="chip" as={Link} to={Paths.MySnaap(account.address).MySnaap}>
+                  <Button
+                    theme="rounded"
+                    className="d-block w-100"
+                    as={Link}
+                    to={Paths.MySnaap(account.address).MySnaap}
+                  >
                     Configure
                   </Button>
                 }
@@ -32,15 +37,25 @@ const MySnaaps: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="d-flex f-dir-col align-center">
-            <h3>You don't have any wallets</h3>
-            <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
-              Get an AA Wallet
-            </Button>
+          <div className="p-my-snaaps_no-accounts">
+            <div className="p-my-snaaps_no-accounts_content">
+              <h3>No wallet is configured.</h3>
+              <h3>Configure your accounts to unlock features. 🚀</h3>
+            </div>
           </div>
         )}
 
         {loading ? <ActivityIndicator size="normal" className="w-100" /> : null}
+
+        <div className="p-my-snaaps_buttons">
+          <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
+            Get an AA Wallet 🦊
+          </Button>
+
+          <Button theme="chip" as={Link} to={Paths.Landing.Integrate}>
+            Integrate Your AA Wallet
+          </Button>
+        </div>
       </PageContainer.Card>
     </PageContainer>
   );

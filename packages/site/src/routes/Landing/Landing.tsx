@@ -7,6 +7,7 @@ import {useMetamask, useProviderState} from '../../hooks';
 import {Paths} from '../Paths';
 
 import {NetworksLogos} from '../../assets/NetworksLogos';
+import {LogoSquare} from '../../assets/LogoSquare';
 
 import './styles.scss';
 
@@ -67,34 +68,16 @@ const Landing: React.FC = () => {
               ) : null}
 
               {providerState.connected && providerState.snapInstalled ? (
-                <div className="p-landing_info_content_buttons-group">
-                  <div className="p-landing_info_content_buttons">
-                    <Button
-                      theme="chip"
-                      color="dark"
-                      className="w-100"
-                      as={Link}
-                      to={Paths.MySnaaps.Root}
-                    >
-                      Open snAAps 😸
-                    </Button>
-                  </div>
-
-                  <div className="p-landing_info_content_buttons">
-                    <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
-                      Get an AA Wallet
-                    </Button>
-
-                    <Button theme="chip" as={Link} to={Paths.Landing.Integrate}>
-                      Integrate Your AA Wallet 🦊
-                    </Button>
-                  </div>
-
-                  <div className="p-landing_info_content_buttons">
-                    <Button theme="chip" onClick={() => installSnap()}>
-                      Reinstall SnAAp 😸
-                    </Button>
-                  </div>
+                <div className="p-landing_info_content_buttons w-50">
+                  <Button
+                    theme="chip"
+                    color="dark"
+                    className="p-landing_info_open-snaaps-button"
+                    as={Link}
+                    to={Paths.MySnaaps.Root}
+                  >
+                    <LogoSquare width={18} fill="#fff" /> Open snAAps
+                  </Button>
                 </div>
               ) : null}
             </div>

@@ -58,6 +58,14 @@
         flex-direction: row;
       }
     }
+
+    &_open-snaaps-button {
+      display: flex;
+      width: 100%;
+      gap: spacing(small);
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   &_networks-title {
