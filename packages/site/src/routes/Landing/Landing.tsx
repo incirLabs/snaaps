@@ -28,7 +28,7 @@ const Landing: React.FC = () => {
           <Col span={24} lg={15} className="d-flex">
             <div className="p-landing_info_content">
               <h1 className="p-landing_info_content_title">
-                Control Your AA Account on Metamask Snaps
+                Control Your AA Wallet on Metamask Snaps
               </h1>
 
               {!providerState.flaskInstalled ? (
@@ -81,12 +81,12 @@ const Landing: React.FC = () => {
                   </div>
 
                   <div className="p-landing_info_content_buttons">
-                    <Button theme="chip" color="dark" as={Link} to={Paths.Landing.Integrate}>
-                      Integrate Your AA Wallet 🦊
+                    <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
+                      Get an AA Wallet
                     </Button>
 
-                    <Button theme="chip" as={Link} to={Paths.Landing.CreateNew}>
-                      Get an AA Wallet
+                    <Button theme="chip" as={Link} to={Paths.Landing.Integrate}>
+                      Integrate Your AA Wallet 🦊
                     </Button>
                   </div>
 
