@@ -49,11 +49,11 @@ const MySnaaps: React.FC = () => {
 
         <div className="p-my-snaaps_buttons">
           <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
-            Get an AA Wallet 🦊
+            Get a new AA Wallet 🦊
           </Button>
 
           <Button theme="chip" as={Link} to={Paths.Landing.Integrate}>
-            Integrate Your AA Wallet
+            Integrate existing AA Wallet
           </Button>
         </div>
       </PageContainer.Card>

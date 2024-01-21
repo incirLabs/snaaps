@@ -18,6 +18,7 @@ body {
   flex-direction: column;
 
   &_warning-banner {
+    overflow: hidden;
     padding: rem(6px);
     background-color: $g-colors-text-strong;
     color: $g-colors-white;
