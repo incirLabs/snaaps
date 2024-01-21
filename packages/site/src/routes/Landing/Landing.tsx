@@ -7,7 +7,6 @@ import {useMetamask, useProviderState} from '../../hooks';
 import {Paths} from '../Paths';
 
 import {NetworksLogos} from '../../assets/NetworksLogos';
-import LandingPlaceholder from '../../assets/LandingPlaceholder.png';
 
 import './styles.scss';
 
@@ -22,14 +21,14 @@ const Landing: React.FC = () => {
         <Row className="g-5">
           <Col span={24} lg={9} className="d-flex f-dir-col align-center">
             <div className="p-landing_info_image">
-              <img src={LandingPlaceholder} alt="Placeholder" />
+              <iframe src="/LandingAnim.html" width="100%" height="100%" />
             </div>
           </Col>
 
           <Col span={24} lg={15} className="d-flex">
             <div className="p-landing_info_content">
               <h1 className="p-landing_info_content_title">
-                Control Your AA Acount on Metamask Snaps
+                Control Your AA Account on Metamask Snaps
               </h1>
 
               {!providerState.flaskInstalled ? (

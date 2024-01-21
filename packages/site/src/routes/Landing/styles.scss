@@ -7,15 +7,17 @@
 
     &_image {
       overflow: hidden;
+      width: 100%;
       max-width: rem(400px);
-      border: 1px solid $g-colors-border;
       aspect-ratio: 1;
       border-radius: 2px;
 
-      img {
+      iframe {
         width: 100%;
         height: 100%;
+        border: 0;
         object-fit: cover;
+        overflow: hidden;
       }
     }
 
