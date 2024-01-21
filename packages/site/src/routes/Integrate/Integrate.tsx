@@ -1,4 +1,4 @@
-import {Env, NetworkKeys, NetworksConfig} from 'common';
+import {Env, NetworksConfig} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
 import {isAddress, isHash} from 'viem';
@@ -58,7 +58,7 @@ const Integrate: React.FC = () => {
 
       const account = await client.createAccount({
         address: address as string,
-        privateKey: privateKey as string,
+        privateKey: privateKey?.slice(2) as string,
       });
 
       navigate(Paths.MySnaap(account.address).Networks);
@@ -94,7 +94,7 @@ const Integrate: React.FC = () => {
           {step !== 'address' && deployedNetworks.length > 0 ? (
             <>
               <div className="p-integrate_networks">
-                {NetworkKeys.map((key) => {
+                {deployedNetworks.map((key) => {
                   const network = NetworksConfig[key];
                   const logo = NetworksLogos[key];
 
@@ -116,7 +116,7 @@ const Integrate: React.FC = () => {
                 label="Enter Your Signer Private Key"
                 placeholder="0x0000000"
                 error={privateKeyError}
-                value={privateKey}
+                value={privateKeyInput}
                 readOnly={step !== 'privateKey'}
                 onChange={(e) => setPrivateKeyInput(e.target.value)}
               />

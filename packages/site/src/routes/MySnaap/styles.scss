@@ -1,5 +1,7 @@
 @import '../../styles';
 
 .p-my-snaap {
-  //
+  &_content {
+    flex: 1;
+  }
 }

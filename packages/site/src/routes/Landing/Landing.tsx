@@ -80,6 +80,14 @@ const Landing: React.FC = () => {
                   </Button>
                 </div>
               ) : null}
+
+              {process.env.NODE_ENV === 'development' ? (
+                <div className="p-landing_info_content_buttons">
+                  <Button theme="chip" onClick={() => installSnap()}>
+                    Reinstall SnAAp 😸
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </Col>
         </Row>
