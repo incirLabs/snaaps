@@ -62,7 +62,7 @@ const Landing: React.FC = () => {
               {providerState.connected && !providerState.snapInstalled ? (
                 <div className="p-landing_info_content_buttons">
                   <Button theme="chip" color="dark" onClick={() => installSnap()}>
-                    Install SnAAp 😸
+                    Install SnAAp  
                   </Button>
                 </div>
               ) : null}
@@ -84,7 +84,7 @@ const Landing: React.FC = () => {
               {process.env.NODE_ENV === 'development' ? (
                 <div className="p-landing_info_content_buttons">
                   <Button theme="chip" onClick={() => installSnap()}>
-                    Reinstall SnAAp 😸
+                    Reinstall SnAAp  
                   </Button>
                 </div>
               ) : null}
