@@ -36,6 +36,14 @@ export const JSONRPCClient = async (
     throwError('JSON-RPC Request failed');
   }
 
+  console.log(
+    'internal json-rpc',
+    url,
+    method,
+    JSON.stringify(params, null, 2),
+    JSON.stringify(json, null, 2),
+  );
+
   if (typeof json !== 'object' && json !== null) throwError('Invalid JSON response');
   if (json.error) throwError(`Internal JSON-RPC error: ${JSON.stringify(json.error, null, 2)}`);
   if (json.result === undefined) throwError('Invalid JSON-RPC response');

@@ -1,4 +1,4 @@
-import {NetworksConfig} from 'common';
+import {ChainIdsToKeys, NetworksConfig} from 'common';
 import {v4 as uuid} from 'uuid';
 import {ecsign, stripHexPrefix, toBuffer} from '@ethereumjs/util';
 import {
@@ -24,18 +24,25 @@ import {
   type EthUserOperation,
   type EthUserOperationPatch,
 } from '@metamask/keyring-api';
-import {type Json, type JsonRpcRequest} from '@metamask/utils';
+import {hexToNumber, type Json, type JsonRpcRequest} from '@metamask/utils';
 
 import {saveState, type State} from './state';
-import {getChainIdFromCAIP2Safe, getNetworkKeyFromCAIP2Safe, throwError} from './utils/helpers';
+import {
+  getChainIdFromCAIP2Safe,
+  getNetworkKeyFromCAIP2Safe,
+  keccak256,
+  numberToHexString,
+  throwError,
+} from './utils/helpers';
 import {CreateAccountOptionsSchema, AccountOptionsSchema} from './utils/zod';
 import {getSignerPrivateKey, privateKeyToAddress} from './utils/privateKey';
 import {PimlicoClient, getPimlicoUrl} from './utils/pimlico';
 import {createExecuteCall, createGetNonceCall} from './utils/callData';
-import {DefaultsForBaseUserOp, fillUserOp, signUserOp} from './utils/userOp';
+import {DefaultsForBaseUserOp, DefaultsForETHUserOp, fillUserOp, signUserOp} from './utils/userOp';
 
 export class SimpleKeyring implements Keyring {
   #state: State;
+  #userOp = DefaultsForETHUserOp;
 
   constructor(state: State) {
     this.#state = state;
@@ -212,9 +219,11 @@ export class SimpleKeyring implements Keyring {
     params: Json,
     request: KeyringRequest,
   ): Promise<Json> {
+    console.log('req', method, JSON.stringify(request, null, 2));
+
     switch (method) {
       case EthMethod.PrepareUserOperation: {
-        const [txs] = params as [EthBaseTransaction[]];
+        const txs = params as EthBaseTransaction[];
         return this.#prepareUserOperation(txs, request);
       }
 
@@ -224,8 +233,8 @@ export class SimpleKeyring implements Keyring {
       }
 
       case EthMethod.SignUserOperation: {
-        const [userOp, entryPoint] = params as [EthUserOperation, string];
-        return this.#signUserOperation(userOp, entryPoint, request);
+        const [userOp] = params as [EthUserOperation];
+        return this.#signUserOperation(userOp, request);
       }
 
       case EthMethod.PersonalSign: {
@@ -266,47 +275,70 @@ export class SimpleKeyring implements Keyring {
 
     const wallet = this.#getWalletByIDSafe(request.account);
 
-    const nonce = (await ethereum.request({
+    const nonceHex = (await ethereum.request({
       method: 'eth_call',
       params: [{to: wallet.account.address, data: createGetNonceCall()}, 'latest'],
     })) as string;
+    const nonce = numberToHexString(hexToNumber(nonceHex));
+    const chainId = (await ethereum.request({method: 'eth_chainId'})) as string;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const chainKey = ChainIdsToKeys[parseInt(chainId, 16)]!;
+    const chain = NetworksConfig[chainKey];
 
-    const chain = NetworksConfig[getNetworkKeyFromCAIP2Safe(request.scope)];
+    const pimlico = new PimlicoClient(chainKey, chain.entryPoint);
 
-    const callData = createExecuteCall(tx.to, tx.value, tx.data);
+    const callData = createExecuteCall(tx.to, tx.value, tx.data || '0x');
 
-    return fillUserOp(DefaultsForBaseUserOp, {
+    this.#userOp = fillUserOp(DefaultsForETHUserOp, {
+      sender: wallet.account.address,
       callData,
       nonce,
-      bundlerUrl: getPimlicoUrl('bundler', chain.pimlico),
+      maxFeePerGas: '0x0',
+      maxPriorityFeePerGas: '0x0',
     });
+
+    const sponsored = await pimlico.sponsorUserOp(this.#userOp);
+
+    this.#userOp = fillUserOp(this.#userOp, sponsored);
+
+    const baseUserOp = fillUserOp(DefaultsForBaseUserOp, {
+      callData: this.#userOp.callData,
+      nonce: this.#userOp.nonce,
+      bundlerUrl: pimlico.bundlerUrl,
+      gasLimits: {
+        callGasLimit: this.#userOp.callGasLimit,
+        preVerificationGas: this.#userOp.preVerificationGas,
+        verificationGasLimit: this.#userOp.verificationGasLimit,
+      },
+    });
+
+    console.log('prepare return', JSON.stringify(baseUserOp, null, 2));
+    return baseUserOp;
   }
 
   async #patchUserOperation(
     userOp: EthUserOperation,
     request: KeyringRequest,
   ): Promise<EthUserOperationPatch> {
-    const chainKey = getNetworkKeyFromCAIP2Safe(request.scope);
-    const chain = NetworksConfig[chainKey];
-
-    const pimlico = new PimlicoClient(chainKey, chain.entryPoint);
-    const sponsored = await pimlico.sponsorUserOp(userOp);
-
     return {
-      paymasterAndData: sponsored.paymasterAndData,
+      paymasterAndData: this.#userOp.paymasterAndData,
     };
   }
 
-  async #signUserOperation(
-    userOp: EthUserOperation,
-    entryPoint: string,
-    request: KeyringRequest,
-  ): Promise<string> {
+  async #signUserOperation(userOp: EthUserOperation, _request: KeyringRequest): Promise<string> {
     const {privateKey} = this.#getWalletByAddressSafe(userOp.sender);
 
-    const chainId = getChainIdFromCAIP2Safe(request.scope);
+    const chainId = (await ethereum.request({method: 'eth_chainId'})) as string;
 
-    return signUserOp(privateKey, userOp, entryPoint, chainId);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const chainKey = ChainIdsToKeys[parseInt(chainId, 16)]!;
+    const chain = NetworksConfig[chainKey];
+
+    const ret = signUserOp(privateKey, this.#userOp, chain.entryPoint, parseInt(chainId, 16));
+
+    console.log('sign end', ret);
+
+    return ret;
   }
 
   #signMessage(from: string, data: string): string {

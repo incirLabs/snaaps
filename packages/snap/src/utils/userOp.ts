@@ -21,6 +21,21 @@ export const DefaultsForBaseUserOp: EthBaseUserOperation = {
   dummyPaymasterAndData: '0x',
 };
 
+export const DefaultsForETHUserOp: EthUserOperation = {
+  sender: '0x',
+  nonce: '0x',
+  initCode: '0x',
+  callData: '0x',
+  callGasLimit: '0x100000',
+  verificationGasLimit: '0x20000',
+  preVerificationGas: '0x10000',
+  maxFeePerGas: '0x',
+  maxPriorityFeePerGas: '0x',
+  paymasterAndData: '0x',
+  signature:
+    '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
+};
+
 export const fillUserOp = <TUserOP extends object>(
   defaults: TUserOP,
   userOp: Partial<TUserOP>,
@@ -83,6 +98,8 @@ export const signUserOp = (
   const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
   const userOpHash = getUserOpHash(userOp, entryPoint, chainId);
+
+  console.log('userOpHash', userOpHash, JSON.stringify(userOp, null, 2));
 
   return personalSign({
     privateKey: privateKeyBuffer,
