@@ -255,7 +255,7 @@
         BG.logo.src = BG.logo_path + BG.logo_ext;
         // setup canvas
         BG.wrapper = document.getElementById('intro');
-        $(BG.wrapper).prepend(
+        $(BG.wrapper).append(
           '<canvas id="bg-canvas" width="' +
             window.innerWidth +
             '" height="' +
@@ -264,7 +264,7 @@
         );
         BG.canvas = document.getElementById('bg-canvas');
         BG.ctx = BG.canvas.getContext('2d');
-        $(BG.wrapper).append(BG.logo);
+        $(BG.wrapper).prepend(BG.logo);
         // wire ticker listener
         Ticker.addListener(BG.tick);
         // start
