@@ -103,7 +103,7 @@ const Networks: React.FC = () => {
 
         <div className="p-networks_buttons">
           {selectedNetwork ? (
-            <Button theme="chip" onClick={deployContract}>
+            <Button theme="chip" color="dark" onClick={deployContract}>
               Deploy on {NetworksConfig[selectedNetwork].name}
             </Button>
           ) : (

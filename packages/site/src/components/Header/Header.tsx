@@ -1,20 +1,15 @@
-import {NetworkKeys} from 'common';
 import {Link} from 'react-router-dom';
-import {Paths} from '../../routes/Paths';
 
-import {NetworksLogos} from '../../assets/NetworksLogos';
 import {LogoSquare} from '../../assets/LogoSquare';
-import {PlusIcon} from '../../assets/Icons/PlusIcon';
 
 import './styles.scss';
 
 export type HeaderProps = {
-  networks?: NetworkKeys[];
-  walletAddress?: string;
+  right?: React.ReactNode;
 };
 
 export const Header: React.FC<HeaderProps> = (props) => {
-  const {networks, walletAddress} = props;
+  const {right} = props;
 
   return (
     <div className="c-header">
@@ -23,30 +18,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
         snAAps
       </Link>
 
-      {networks ? (
-        <div className="c-header_networks">
-          {walletAddress ? (
-            <Link
-              to={Paths.MySnaap(walletAddress).Networks}
-              className="c-header_networks_add-button"
-            >
-              <PlusIcon width={14} height={14} />
-            </Link>
-          ) : null}
-
-          {networks.map((networkKey) => {
-            const logo = NetworksLogos[networkKey];
-
-            return (
-              <logo.square.component
-                key={networkKey}
-                width={logo.square.preferredHeight * 1.2}
-                height={logo.square.preferredHeight * 1.2}
-              />
-            );
-          })}
-        </div>
-      ) : null}
+      {right}
     </div>
   );
 };

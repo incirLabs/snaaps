@@ -45,7 +45,7 @@ const MySnaaps: React.FC = () => {
           </div>
         )}
 
-        {loading ? <ActivityIndicator size="normal" className="w-100" /> : null}
+        {loading ? <ActivityIndicator size="normal" className="flex-1 w-100" /> : null}
 
         <div className="p-my-snaaps_buttons">
           <Button theme="chip" color="dark" as={Link} to={Paths.Landing.CreateNew}>
