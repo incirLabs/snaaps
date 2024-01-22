@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
-      html, body {
+      html,
+      body {
         padding: 0;
         margin: 0;
         box-sizing: border-box;
         overflow: hidden;
       }
-      
+
       /* STYLES */
       body {
         font-family: 'Teko', sans-serif;
@@ -219,9 +220,24 @@
   <body>
     <section id="intro"></section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"
+      type="text/javascript"
+    ></script>
     <script>
       // Basically all the JS from caleb-miller.com
+
+      var ballLogos = [
+        '/networks-ball-logos/1.png',
+        '/networks-ball-logos/2.png',
+        '/networks-ball-logos/3.png',
+        '/networks-ball-logos/4.png',
+        '/networks-ball-logos/5.png',
+        '/networks-ball-logos/6.png',
+        '/networks-ball-logos/7.png',
+        '/networks-ball-logos/8.png',
+        '/networks-ball-logos/9.png',
+      ];
 
       $(document).ready(function () {
         var long_side = 300;
@@ -345,6 +361,7 @@
         // devicePixelRatio alias
         dpr: window.devicePixelRatio || 1,
       };
+
       // start/reset animation
       BG.init = function () {
         // resize canvas
@@ -410,15 +427,15 @@
         var center_x = width * 0.5;
         var center_y = height * 0.5;
         var radius = Math.min(width, height) * 0.35;
-        var max_ball_radius = radius * 0.185;
+        var max_ball_radius = radius * 0.3;
 
         // start off slowly adding balls (one every ~4 frames)
-        if (balls.length < 30) {
+        if (balls.length < ballLogos.length * 3) {
           BG.init_time += frame_time;
           if (BG.init_time > 60) {
             BG.init_time = 0;
             var ball = ball_pool.pop() || new BG.Ball();
-            ball.init(center_x, center_y, max_ball_radius);
+            ball.init(center_x, center_y, max_ball_radius, balls.length % ballLogos.length);
             balls.push(ball);
           }
         }
@@ -427,7 +444,7 @@
         ctx.fillStyle = '#fff'; // temporary fix for Safari - clearRect() shouldn't need a fillStyle to work
         ctx.clearRect(0, 0, width, height);
         // ensure proper blend mode
-        ctx.globalCompositeOperation = 'lighter';
+        // ctx.globalCompositeOperation = 'lighter';
 
         // increase input force
         if (Input.touching) {
@@ -499,7 +516,9 @@
       // Ball definition
       BG.Ball = function () {
         // sprite properties
+        this.idx = 0;
         this.color = '';
+        this.backgroundImage = '';
         this.radius = 0;
         this.x = 0;
         this.y = 0;
@@ -524,7 +543,8 @@
         this.wave_height = 0;
         this.wave_offset = 0;
       };
-      BG.Ball.prototype.init = function (x, y, max_radius) {
+      BG.Ball.prototype.init = function (x, y, max_radius, idx) {
+        this.idx = idx;
         // size
         this.radius = Math.random() * max_radius * 0.5 + max_radius * 0.5;
         this.width = this.radius * 2 + 1; // without adding a pixel, balls develop a flat edge on bottom and right side... ??
@@ -535,7 +555,7 @@
         this.x = x - this.radius;
         this.y = y - this.radius;
         // set start color
-        this.setColor(BG.hue);
+        this.setBackground();
         // position on circle
         var PI2 = Math.PI * 2;
         this.position = Math.random() * PI2;
@@ -553,18 +573,37 @@
         // randomize hue a bit
         hue += (Math.random() * 70 - 35) | 0;
         // set color and render
-        this.color = 'hsla(' + hue + ', 100%, 55%, 0.2)';
+        this.color = 'hsla(' + hue + ', 100%, 55%, 1)';
         this.redraw = true;
         this.render();
       };
+
+      BG.Ball.prototype.setBackground = function () {
+        this.backgroundImage = ballLogos[this.idx];
+        this.redraw = true;
+        this.render();
+      };
+
       BG.Ball.prototype.render = function () {
         if (this.redraw) {
-          this.redraw = false;
+          /* this.redraw = false;
           this.ctx.clearRect(0, 0, this.width, this.height);
           this.ctx.fillStyle = this.color;
           this.ctx.beginPath();
           this.ctx.arc(this.radius, this.radius, this.radius, 0, Math.PI * 2);
-          this.ctx.fill();
+          this.ctx.fill(); */
+
+          //
+
+          let imageObj = new Image();
+          imageObj.onload = function () {
+            this.ctx.clearRect(0, 0, this.width, this.height);
+
+            this.ctx.globalCompositeOperation = 'source-out';
+
+            this.ctx.drawImage(imageObj, 0, 0, this.width, this.height);
+          }.bind(this);
+          imageObj.src = this.backgroundImage;
         }
       };
 
