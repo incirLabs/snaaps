@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "snAAps Account Abstraction keyring snap",
   "proposedName": "snAAps",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/incirLabs/snaaps.git"
   },
   "source": {
-    "shasum": "Z3K3KIL+heic2cwpV7LOKyhD/Xb5/Bm/auw7/Uy7a8g=",
+    "shasum": "SpHdxV0O+C/3KHrP4u9r1KNSvUelrPEt9dGQSRzqzok=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
