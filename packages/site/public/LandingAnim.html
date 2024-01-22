@@ -228,15 +228,15 @@
       // Basically all the JS from caleb-miller.com
 
       var ballLogos = [
-        '/networks-ball-logos/1.png',
-        '/networks-ball-logos/2.png',
-        '/networks-ball-logos/3.png',
-        '/networks-ball-logos/4.png',
-        '/networks-ball-logos/5.png',
-        '/networks-ball-logos/6.png',
-        '/networks-ball-logos/7.png',
-        '/networks-ball-logos/8.png',
-        '/networks-ball-logos/9.png',
+        '/networks-ball-logos/arbitrum.png',
+        '/networks-ball-logos/base.png',
+        '/networks-ball-logos/bnbchain.png',
+        '/networks-ball-logos/ethereum.png',
+        '/networks-ball-logos/gnosis.png',
+        '/networks-ball-logos/linea.png',
+        '/networks-ball-logos/optimism.png',
+        '/networks-ball-logos/polygon.png',
+        '/networks-ball-logos/scroll.png',
       ];
 
       $(document).ready(function () {
@@ -255,7 +255,7 @@
         BG.logo.src = BG.logo_path + BG.logo_ext;
         // setup canvas
         BG.wrapper = document.getElementById('intro');
-        $(BG.wrapper).prepend(
+        $(BG.wrapper).append(
           '<canvas id="bg-canvas" width="' +
             window.innerWidth +
             '" height="' +
@@ -264,7 +264,7 @@
         );
         BG.canvas = document.getElementById('bg-canvas');
         BG.ctx = BG.canvas.getContext('2d');
-        $(BG.wrapper).append(BG.logo);
+        $(BG.wrapper).prepend(BG.logo);
         // wire ticker listener
         Ticker.addListener(BG.tick);
         // start
@@ -334,9 +334,9 @@
         logo_loaded: false,
         logo: null,
         logo_path:
-          'https://imgdb.net/storage/uploads/07eb5389a19eff173e5d3c8f21242e6ad9d534936152f37750a3ed56c0bd53a1',
+          '/networks-ball-logos/center-logo',
         logo_ext: '.png',
-        logo_opacity: '0.85',
+        logo_opacity: '1',
         logo_size: 0,
         showLogo: function () {
           if (BG.logo_loaded)
