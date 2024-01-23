@@ -18,7 +18,7 @@ snAAps is designed for:
 
 Simply put, with snAAps, you can use any dApp with your AA wallet.
 
-## Features:
+## Features
 
 - Integrate your existing AA wallet with MetaMask.
 - Obtain a new AA wallet compatible with various Layer 2 networks.
