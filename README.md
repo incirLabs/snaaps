@@ -28,7 +28,7 @@ Simply put, with snAAps, you can use any dApp with your AA wallet.
 
 ## Currently Supported Networks:
 
-Ethereum, Linea, Optimism, Arbitrum, Polygon, Base, BNBChain, Gnosis Safe.
+Ethereum, Linea, Optimism, Arbitrum, Polygon, Scroll, Base, BNBChain, Gnosis Chain.
 
 ### CALL FOR DEVS
 
