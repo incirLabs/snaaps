@@ -2,9 +2,9 @@ import cx from 'classnames';
 import {Link, useParams} from 'react-router-dom';
 import {Button, Surface, PageContainer, Bubble, ActivityIndicator} from '../../components';
 import {useSignerAddress} from '../../hooks';
+import {Paths} from '../Paths';
 
 import './styles.scss';
-import {Paths} from '../Paths';
 
 const MySnaap: React.FC = () => {
   const {address} = useParams();
@@ -38,6 +38,10 @@ const MySnaap: React.FC = () => {
         <div className="d-flex">
           <Button theme="chip" color="dark" as={Link} to={Paths.MySnaaps.MySnaaps}>
             Go to your Accounts
+          </Button>
+
+          <Button theme="chip" color="dark" as={Link} to={Paths.MySnaap(address ?? '').PastTxs}>
+            Past Transactions
           </Button>
         </div>
       </PageContainer.Card>
