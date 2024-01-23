@@ -16,8 +16,8 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspaces foreach --parallel --verbose --interlaced run start",
-    "build": "yarn workspaces foreach --parallel --verbose --topological run build",
+    "start": "yarn workspace contracts hardhat compile && yarn workspaces foreach --parallel --verbose --interlaced run start",
+    "build": "yarn workspace contracts hardhat compile && yarn workspaces foreach --parallel --verbose --topological run build",
     "test": "yarn workspaces foreach --parallel --verbose run test",
     "lint": "yarn workspaces foreach --parallel --verbose run lint",
     "lint:check": "yarn workspaces foreach --parallel --verbose run lint:check",
