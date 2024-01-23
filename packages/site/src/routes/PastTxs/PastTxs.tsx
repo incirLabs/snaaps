@@ -12,13 +12,15 @@ import {Paths} from '../Paths';
 
 import './styles.scss';
 
-const blocksPerBatch = 1000;
+const blocksPerBatch = 2000;
+const batchSize = 5;
 
 const PastTxs: React.FC = () => {
   const {address} = useParams();
 
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkKeys | null>(null);
   const [lastBlock, setLastBlock] = useState(-1);
   const [emptyBlocks, setEmptyBlocks] = useState(0);
   const [pastEvents, setPastEvents] = useState<{log: Log; tx: FormattedTransaction}[]>([]);
@@ -65,16 +67,24 @@ const PastTxs: React.FC = () => {
 
     setLoading(true);
 
-    const newEvents = await getPastEvents(lastBlock - blocksPerBatch, lastBlock);
+    const newEvents = (
+      await Promise.all(
+        Array.from({length: batchSize}).map(async (_, i) =>
+          getPastEvents(lastBlock - (i + 1) * blocksPerBatch, lastBlock - i * blocksPerBatch),
+        ),
+      )
+    )
+      .flat()
+      .filter(<T,>(e: T): e is NonNullable<T> => e !== null);
 
-    if (newEvents === null || newEvents.length === 0) {
-      setEmptyBlocks(emptyBlocks + blocksPerBatch);
+    if (newEvents.length === 0) {
+      setEmptyBlocks(emptyBlocks + batchSize * blocksPerBatch);
     } else {
       setEmptyBlocks(0);
       setPastEvents([...pastEvents, ...newEvents]);
     }
 
-    setLastBlock(lastBlock - blocksPerBatch);
+    setLastBlock(lastBlock - batchSize * blocksPerBatch);
     setLoading(false);
   };
 
@@ -86,23 +96,24 @@ const PastTxs: React.FC = () => {
 
       const blockNumber = Number(await getBlockNumber(client));
 
+      setEmptyBlocks(0);
       setPastEvents([]);
-
-      const events = await getPastEvents(blockNumber - blocksPerBatch, blockNumber);
-
-      if (events === null || events.length === 0) {
-        setEmptyBlocks(emptyBlocks + blocksPerBatch);
-      } else {
-        setEmptyBlocks(0);
-        setPastEvents(events);
-      }
-
-      setLastBlock(blockNumber - blocksPerBatch);
+      setLastBlock(blockNumber);
+      setInitialized(false);
       setLoading(false);
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedNetwork]);
+
+  useEffect(() => {
+    if (initialized) return;
+
+    loadMore();
+    setInitialized(true);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialized]);
 
   return (
     <PageContainer className={cx('p-past-txs')}>
