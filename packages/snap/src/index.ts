@@ -12,7 +12,7 @@ let keyring: SimpleKeyring;
 /**
  * Return the keyring instance. If it doesn't exist, create it.
  */
-async function getKeyring(): Promise<SimpleKeyring> {
+const getKeyring = async (): Promise<SimpleKeyring> => {
   if (!keyring) {
     const state = await getState();
 
@@ -20,7 +20,7 @@ async function getKeyring(): Promise<SimpleKeyring> {
   }
 
   return keyring;
-}
+};
 
 export const onRpcRequest: OnRpcRequestHandler = async ({origin, request}) => {
   logger.debug(`RPC request (origin="${origin}"):`, JSON.stringify(request, undefined, 2));

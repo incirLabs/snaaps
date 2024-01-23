@@ -55,3 +55,13 @@ export const getWalletAddress = async (
 
   return address as string;
 };
+
+export const addHexPrefix = (hex: string) => {
+  if (hex.startsWith('0x')) return hex;
+  return `0x${hex}`;
+};
+
+export const stripHexPrefix = (hex: string) => {
+  if (!hex.startsWith('0x')) return hex;
+  return hex.slice(2);
+};

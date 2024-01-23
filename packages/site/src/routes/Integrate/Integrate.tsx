@@ -1,4 +1,4 @@
-import {Env, NetworkKeys, NetworksConfig} from 'common';
+import {Env, NetworksConfig} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
 import {isAddress, isHash} from 'viem';
@@ -7,6 +7,7 @@ import {useNavigate} from 'react-router-dom';
 import {Button, PageContainer, Input, NetworkButton, ActivityIndicator} from '../../components';
 import {useDeployedNetworks} from '../../hooks';
 import {Paths} from '../Paths';
+import {addHexPrefix, stripHexPrefix} from '../../utils/Networks';
 
 import {NetworksLogos} from '../../assets/NetworksLogos';
 
@@ -15,15 +16,13 @@ import './styles.scss';
 const Integrate: React.FC = () => {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState<'address' | 'privateKey' | 'add'>('address');
+  const [step, setStep] = useState<'address' | 'privateKey'>('address');
 
-  const [addressInput, setAddressInput] = useState('');
+  const [address, setAddress] = useState<string>('');
   const [addressError, setAddressError] = useState<string | undefined>(undefined);
-  const [address, setAddress] = useState<string | undefined>(undefined);
 
-  const [privateKeyInput, setPrivateKeyInput] = useState('');
+  const [privateKey, setPrivateKey] = useState<string>('');
   const [privateKeyError, setPrivateKeyError] = useState<string | undefined>(undefined);
-  const [privateKey, setPrivateKey] = useState<string | undefined>(undefined);
 
   const {deployedNetworks, loading: networksLoading} = useDeployedNetworks(address);
 
@@ -31,34 +30,29 @@ const Integrate: React.FC = () => {
 
   const onIntegrateClick = async () => {
     if (step === 'address') {
-      if (!isAddress(addressInput)) {
+      if (!isAddress(address)) {
         setAddressError('Invalid address');
         return;
       }
 
       setAddressError(undefined);
-      setAddress(addressInput);
       setStep('privateKey');
     }
 
     if (step === 'privateKey') {
       // Private keys also has 32 bytes, so it's a valid `hash`
-      if (!isHash(privateKeyInput)) {
-        setAddressError('Invalid private key');
+      if (!isHash(addHexPrefix(privateKey))) {
+        setPrivateKeyError('Invalid private key');
         return;
       }
 
       setPrivateKeyError(undefined);
-      setPrivateKey(privateKeyInput);
-      setStep('add');
-    }
 
-    if (step === 'add') {
       const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
 
       const account = await client.createAccount({
-        address: address as string,
-        privateKey: privateKey as string,
+        address: addHexPrefix(address),
+        privateKey: stripHexPrefix(privateKey),
       });
 
       navigate(Paths.MySnaap(account.address).Networks);
@@ -76,9 +70,9 @@ const Integrate: React.FC = () => {
             label="Enter Your Smart Contract Wallet Address"
             placeholder="0x0000000"
             error={addressError}
-            value={addressInput}
+            value={address}
             readOnly={step !== 'address'}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => setAddress(e.target.value)}
           />
 
           {step !== 'address' && !networksLoading && deployedNetworks.length === 0 ? (
@@ -94,7 +88,7 @@ const Integrate: React.FC = () => {
           {step !== 'address' && deployedNetworks.length > 0 ? (
             <>
               <div className="p-integrate_networks">
-                {NetworkKeys.map((key) => {
+                {deployedNetworks.map((key) => {
                   const network = NetworksConfig[key];
                   const logo = NetworksLogos[key];
 
@@ -118,7 +112,7 @@ const Integrate: React.FC = () => {
                 error={privateKeyError}
                 value={privateKey}
                 readOnly={step !== 'privateKey'}
-                onChange={(e) => setPrivateKeyInput(e.target.value)}
+                onChange={(e) => setPrivateKey(e.target.value)}
               />
             </>
           ) : null}

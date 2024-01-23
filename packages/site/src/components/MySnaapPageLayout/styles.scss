@@ -31,4 +31,35 @@
       font-weight: 900;
     }
   }
+
+  &_header {
+    &_card {
+      display: flex;
+      gap: spacing(normal);
+      flex-direction: row;
+      padding: spacing(3xsmall);
+      padding-left: spacing(normal);
+    }
+
+    &_networks {
+      display: flex;
+      gap: spacing(2xsmall);
+      flex-direction: row;
+      align-items: center;
+    }
+
+    &_add-button {
+      @extend %button-clean;
+
+      display: flex;
+      width: rem(28px);
+      height: rem(28px);
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $g-colors-border;
+      background: $g-colors-white;
+      border-radius: 999px;
+      color: $g-colors-black;
+    }
+  }
 }

@@ -2,31 +2,38 @@
 
 .p-landing {
   &_info {
-    display: flex;
-    gap: spacing(normal);
-    flex-direction: row;
+    min-height: 0;
+    padding: calc(var(--bs-gutter-y) * 0.5) calc(var(--bs-gutter-x) * 0.5);
 
     &_image {
       overflow: hidden;
-      flex: 2;
-      border: 1px solid $g-colors-border;
+      width: 100%;
+      max-width: rem(400px);
       aspect-ratio: 1;
       border-radius: 2px;
 
-      img {
+      iframe {
+        overflow: hidden;
         width: 100%;
         height: 100%;
+        border: 0;
         object-fit: cover;
+        outline: none;
       }
     }
 
     &_content {
       display: flex;
-      flex: 3;
+      width: 100%;
+      gap: spacing(xlarge);
       flex-direction: column;
       align-items: center;
-      justify-content: space-around;
-      padding: spacing(xlarge) spacing(7xlarge);
+      justify-content: center;
+      padding: 0 spacing(7xlarge);
+
+      @media (max-width: 576px) {
+        padding: 0 spacing(2xsmall);
+      }
 
       &_title {
         font-size: rem(36px);
@@ -50,6 +57,14 @@
         gap: spacing(normal);
         flex-direction: row;
       }
+    }
+
+    &_open-snaaps-button {
+      display: flex;
+      width: 100%;
+      gap: spacing(small);
+      align-items: center;
+      justify-content: center;
     }
   }
 
@@ -81,9 +96,6 @@
   }
 
   &_features {
-    display: flex;
-    gap: spacing(normal);
-    flex-direction: row;
     margin-top: spacing(2xlarge);
 
     &_card {

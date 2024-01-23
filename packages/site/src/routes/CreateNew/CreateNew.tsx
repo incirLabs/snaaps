@@ -1,10 +1,10 @@
 import {Env, InternalSnapMethod} from 'common';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
 import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../components';
-import {useMount} from '../../hooks';
+import {useMount, useSnapAccounts} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
 import {getWalletAddress} from '../../utils/Networks';
 import {Paths} from '../Paths';
@@ -19,10 +19,12 @@ type Wallet = Signer & {
 const CreateNew: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [addedWallets, setAddedWallets] = useState<string[]>([]);
   const [page, setPage] = useState(0);
 
   const navigate = useNavigate();
+  const [snapAccounts, reloadSnapAccounts] = useSnapAccounts();
+
+  const snapAccountAddresses = Object.keys(snapAccounts);
 
   const getWallets = async () => {
     if (loading) return;
@@ -58,34 +60,37 @@ const CreateNew: React.FC = () => {
     setPage(page + 1);
   };
 
-  useEffect(() => {
-    (async () => {
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
-
-      const accounts = await client.listAccounts();
-
-      setAddedWallets(accounts.map((account) => account.address));
-    })();
-  }, []);
-
   useMount(() => {
     getWallets();
+    reloadSnapAccounts();
   });
 
   const onSetupClick = async (wallet: Wallet) => {
-    const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+    try {
+      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
 
-    const account = await client.createAccount({
-      address: wallet.walletAddress,
-      signerIndex: wallet.index,
-    });
+      const account = await client.createAccount({
+        address: wallet.walletAddress,
+        signerIndex: wallet.index,
+      });
 
-    navigate(Paths.MySnaap(account.address).Networks);
+      navigate(Paths.MySnaap(account.address).Networks);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      reloadSnapAccounts();
+    }
   };
 
   return (
     <PageContainer className={cx('p-create-new')}>
       <PageContainer.Card className="p-create-new_content" title="Create a new AA Wallet">
+        <span className="mt-1 mb-4">
+          These are the accounts you can use. They are generated through your MetaMask mnemonic.
+          <br />
+          If you reinstall MetaMask with the same mnemonic, the same accounts will be generated.
+        </span>
+
         <div className="p-create-new_wallets">
           {wallets.map((wallet) => (
             <AccountCard
@@ -93,10 +98,10 @@ const CreateNew: React.FC = () => {
               text={`${wallet.index + 1} - ${wallet.walletAddress}`}
               walletAddress={wallet.walletAddress}
               right={
-                addedWallets.includes(wallet.walletAddress) ? (
+                snapAccountAddresses.includes(wallet.walletAddress.toLowerCase()) ? (
                   <Button
+                    theme="rounded"
                     className="d-block w-100"
-                    theme="chip"
                     as={Link}
                     to={Paths.MySnaap(wallet.walletAddress).MySnaap}
                   >
@@ -104,7 +109,7 @@ const CreateNew: React.FC = () => {
                   </Button>
                 ) : (
                   <Button
-                    theme="chip"
+                    theme="rounded"
                     color="dark"
                     className="d-block w-100"
                     onClick={() => onSetupClick(wallet)}

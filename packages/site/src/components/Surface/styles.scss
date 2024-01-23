@@ -17,6 +17,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: spacing(small);
+    padding-left: spacing(normal);
     margin: 0;
+    border: 0.5px solid $g-colors-border;
+    background-color: $g-colors-white;
+    box-shadow: rgba(102, 109, 128, 0.08) 0 4px 8px 0, rgba(102, 109, 128, 0.08) 0 1px 1px 0;
   }
 }

@@ -7,15 +7,15 @@ import './styles.scss';
 export const Footer: React.FC = () => {
   return (
     <div className="c-footer">
-      <a href="https://github.com/incirLabs/snaaps">
+      <a href="https://github.com/incirLabs/snaaps" target="_blank" rel="noreferrer">
         <GithubLogo width={32} />
       </a>
 
-      <a href="https://x.com">
+      <a href="https://x.com/usesnaaps" target="_blank" rel="noreferrer">
         <XLogo width={32} />
       </a>
 
-      <a href="mailto:contact@ugureren.net">
+      <a href="mailto:team@usesnaaps.com" target="_blank" rel="noreferrer">
         <EmailIcon width={32} />
       </a>
     </div>

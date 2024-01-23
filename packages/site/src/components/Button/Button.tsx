@@ -3,11 +3,12 @@ import {createAsAble} from '../../utils/createAsAble';
 
 import './styles.scss';
 
-export type ButtonProps = JSX.IntrinsicElements['button'] & {
+export type ButtonProps = {
   children?: React.ReactNode;
-  theme: 'primary' | 'chip' | 'text';
+  theme: 'primary' | 'chip' | 'text' | 'rounded';
   color?: 'default' | 'danger' | 'dark';
   block?: boolean;
+  disabled?: boolean;
 };
 
 export const Button = createAsAble<'button', ButtonProps>('button', (AsAble, props) => {
@@ -18,12 +19,9 @@ export const Button = createAsAble<'button', ButtonProps>('button', (AsAble, pro
       type="button"
       className={cx(
         'c-button',
+        `c-button--${theme}`,
         {
           'c-button--block': block,
-
-          'c-button--primary': theme === 'primary',
-          'c-button--chip': theme === 'chip',
-          'c-button--text': theme === 'text',
 
           'c-button_color--danger': color === 'danger',
           'c-button_color--dark': color === 'dark',

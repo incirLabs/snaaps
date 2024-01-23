@@ -6,22 +6,27 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  padding: spacing(small);
+  padding-left: spacing(normal);
+  border: 0.5px solid $g-colors-border;
+  background-color: $g-colors-white;
+  box-shadow: rgba(102, 109, 128, 0.08) 0 4px 8px 0, rgba(102, 109, 128, 0.08) 0 1px 1px 0;
 
   &_text {
-    flex: auto;
+    flex: 6;
     color: $g-colors-text-strong;
     font-size: rem(14px);
   }
 
   &_chains {
     display: flex;
-    flex: auto;
+    flex: 3;
     flex-direction: row;
     align-items: center;
     justify-content: center;
   }
 
   &_right {
-    flex: 1;
+    flex: 2;
   }
 }

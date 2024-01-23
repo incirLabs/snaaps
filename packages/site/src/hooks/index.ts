@@ -7,3 +7,4 @@ export {useSignerAddress} from './useSignerAddress';
 export {useContractAddress} from './useContractAddress';
 export {useDeployedNetworks} from './useDeployedNetworks';
 export {useWindowDimensions} from './useWindowDimensions';
+export {SnapAccountsProvider, useSnapAccounts} from './SnapAccountsContext';

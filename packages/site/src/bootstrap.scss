@@ -1,8 +1,9 @@
 /* stylelint-disable meowtec/no-px, scss/at-import-partial-extension-blacklist, scss/at-import-partial-extension */
 
+$grid-columns: 24;
 $container-max-widths: (
   sm: 540px,
-  md: 720px,
+  md: 780px,
   lg: 960px,
   xl: 1040px,
   xxl: 1200px,
