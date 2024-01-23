@@ -2,8 +2,12 @@ name: Deploy Docs to GitHub Pages
 
 on:
   push:
-    branches: [main, docs]
+    branches: [main]
     paths: [docs/**]
+  pull_request:
+    branches: [main]
+    paths: [docs/**]
+  workflow_dispatch:
 
 jobs:
   deploy:
