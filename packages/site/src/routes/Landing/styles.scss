@@ -29,7 +29,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 spacing(7xlarge);
+      padding: 0 spacing(2xlarge);
 
       @media (max-width: 576px) {
         padding: 0 spacing(2xsmall);
@@ -148,10 +148,12 @@
       flex: 1;
       flex-direction: column;
       align-items: center;
+      padding: spacing(medium) spacing(5xlarge);
       background: transparent;
       color: $g-colors-text-light;
       font-size: rem(13px);
       font-weight: 600;
+      text-align: center;
     }
   }
 }

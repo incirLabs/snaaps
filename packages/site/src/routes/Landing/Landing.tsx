@@ -30,7 +30,7 @@ const Landing: React.FC = () => {
             {process.env.NODE_ENV === 'development' ? (
               <div className="p-landing_info_content">
                 <h1 className="p-landing_info_content_title">
-                  Control Your AA Wallet on Metamask Snaps
+                  snAAps Allows You to Use Your ERC4337 Accounts Directly On MetaMask
                 </h1>
 
                 {!providerState.flaskInstalled ? (
@@ -93,7 +93,7 @@ const Landing: React.FC = () => {
             ) : (
               <div className="p-landing_info_content">
                 <h1 className="p-landing_info_content_title">
-                  Control Your AA Wallet on Metamask Snaps
+                  snAAps Allows You to Use Your ERC4337 Accounts Directly On MetaMask
                 </h1>
 
                 <div className="p-landing_info_content_buttons w-100">
@@ -128,13 +128,18 @@ const Landing: React.FC = () => {
           <Col span={24} md={12} className="d-flex">
             <Surface className="p-landing_features_card">
               <Surface>
-                <h4 className="p-landing_features_title">Setup Your AA Wallet in Minutes</h4>
+                <h4 className="p-landing_features_title">Get a New ERC4337 Wallet in Minutes</h4>
               </Surface>
 
               <Surface className="p-landing_features_content">
-                <span>Control Your AA Wallet Directly On Metamask</span>
-                <span>Same Address for All L2 Networks</span>
-                <span>Make Any TX with Any dApp with Your AA</span>
+                <span>
+                  If you don't already have an ERC4337 wallet, quickly get yourself a wallet address
+                  supported on Ethereum and L2 networks.
+                </span>
+                <span>
+                  With this wallet, you can perform all transactions on MetaMask in the way you're
+                  accustomed to.
+                </span>
               </Surface>
             </Surface>
           </Col>
@@ -142,12 +147,14 @@ const Landing: React.FC = () => {
           <Col span={24} md={12} className="d-flex">
             <Surface className="p-landing_features_card">
               <Surface>
-                <h4 className="p-landing_features_title">Control Your AA Wallet</h4>
+                <h4 className="p-landing_features_title">
+                  Control Your Existing AA Wallet On Your Metamask
+                </h4>
               </Surface>
 
               <Surface className="p-landing_features_content">
-                <span>Control Your AA Wallet Directly On Metamask</span>
-                <span>Only For Supported Wallets</span>
+                <span>Start using your current ERC4337 account on your MetaMask.</span>
+                <span>Currently, Only For Supported Wallets*</span>
               </Surface>
             </Surface>
           </Col>
