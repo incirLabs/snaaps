@@ -95,7 +95,7 @@ export const FAQContent: [handle: React.ReactNode, content: React.ReactNode][] =
       <br />
       If you want to support us financially, you can donate to our Ethereum address:
       <br />
-      usesnAAps.eth
+      snAAps.eth
       <br />
       <code>0x8f634ba17db7619977aa5f1049be1d9f65563d7f</code>
       <br />
