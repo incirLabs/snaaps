@@ -1,8 +1,20 @@
+import {ErrorCodes} from 'common';
+import {useState} from 'react';
 import cx from 'classnames';
 import {useConnect} from 'wagmi';
 import {injected} from 'wagmi/connectors';
 import {Link} from 'react-router-dom';
-import {Accordion, Button, Surface, PageContainer, Marquee, Row, Col} from '../../components';
+import {
+  Accordion,
+  Button,
+  Surface,
+  PageContainer,
+  Marquee,
+  Row,
+  Col,
+  showToast,
+  ActivityIndicator,
+} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
 import {Paths} from '../Paths';
 import {FAQContent} from './FAQContent';
@@ -16,6 +28,66 @@ const Landing: React.FC = () => {
   const [, , installSnap] = useMetamask();
   const providerState = useProviderState();
   const {connect} = useConnect();
+
+  const [emailLoading, setEmailLoading] = useState(false);
+
+  const onEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (emailLoading) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const email = (e.target as any)?.email?.value;
+
+    if (!email) {
+      showToast({
+        title: 'Email is required',
+        message: 'Please enter a valid email address',
+        type: 'error',
+      });
+      return;
+    }
+
+    setEmailLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/email`, {
+        method: 'POST',
+        body: JSON.stringify({email}),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const json = await response.json();
+
+      if (!response.ok || !json.email) {
+        let message = '';
+        if (json?.code === ErrorCodes.FillAllFields)
+          message = 'Please enter a valid email address.';
+        if (json?.code === ErrorCodes.AlreadyExists) message = 'This email is already registered.';
+
+        throw new Error(message);
+      }
+
+      showToast({
+        title: 'Success',
+        message: `You have been registered successfully with the email address: ${json.email}`,
+        type: 'success',
+      });
+    } catch (error) {
+      let message = 'Something went wrong. Please try again later.';
+      if (error instanceof Error && error.message) message = error.message;
+
+      showToast({
+        title: 'Error',
+        message,
+        type: 'error',
+      });
+    } finally {
+      setEmailLoading(false);
+      (e.target as HTMLFormElement).reset();
+    }
+  };
 
   return (
     <PageContainer className={cx('p-landing')}>
@@ -98,13 +170,22 @@ const Landing: React.FC = () => {
                 </h1>
 
                 <div className="p-landing_info_content_buttons w-100">
-                  <div className="p-landing_info_content_register">
-                    <input type="text" placeholder="Drop Your Email Here to" />
+                  <form method="GET" onSubmit={onEmailSubmit}>
+                    <div className="p-landing_info_content_register">
+                      <input name="email" type="email" placeholder="Drop Your Email Here to" />
 
-                    <Button theme="chip" color="dark">
-                      Register For Alpha
-                    </Button>
-                  </div>
+                      <Button
+                        type="submit"
+                        theme="chip"
+                        color="dark"
+                        className="d-flex align-center gap-2"
+                        disabled={emailLoading}
+                      >
+                        {emailLoading ? <ActivityIndicator size="small" color="white" /> : null}
+                        Register For Alpha
+                      </Button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
