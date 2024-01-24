@@ -31,14 +31,12 @@ const Landing: React.FC = () => {
   const responsive = useResponsive();
 
   const [emailLoading, setEmailLoading] = useState(false);
+  const [email, setEmail] = useState('');
 
   const onEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (emailLoading) return;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const email = (e.target as any)?.email?.value;
 
     if (!email) {
       showToast({
@@ -86,7 +84,7 @@ const Landing: React.FC = () => {
       });
     } finally {
       setEmailLoading(false);
-      (e.target as HTMLFormElement).reset();
+      setEmail('');
     }
   };
 
@@ -175,7 +173,12 @@ const Landing: React.FC = () => {
                     {!responsive.sm ? (
                       <div className="p-landing_info_content_register-small">
                         <div className="p-landing_info_content_register">
-                          <input name="email" type="email" placeholder="Drop Your Email Here to" />
+                          <input
+                            type="email"
+                            placeholder="Drop Your Email Here to"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
                         </div>
 
                         <Button
@@ -191,7 +194,12 @@ const Landing: React.FC = () => {
                       </div>
                     ) : (
                       <div className="p-landing_info_content_register">
-                        <input name="email" type="email" placeholder="Drop Your Email Here to" />
+                        <input
+                          type="email"
+                          placeholder="Drop Your Email Here to"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
 
                         <Button
                           type="submit"
