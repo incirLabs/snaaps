@@ -5,12 +5,12 @@ import {Link} from 'react-router-dom';
 import {Accordion, Button, Surface, PageContainer, Marquee, Row, Col} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
 import {Paths} from '../Paths';
+import {FAQContent} from './FAQContent';
 
 import {NetworksLogos} from '../../assets/NetworksLogos';
 import {LogoSquare} from '../../assets/LogoSquare';
 
 import './styles.scss';
-import {FAQContent} from './FAQ';
 
 const Landing: React.FC = () => {
   const [, , installSnap] = useMetamask();
