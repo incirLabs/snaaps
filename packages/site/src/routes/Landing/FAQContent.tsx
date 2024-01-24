@@ -82,4 +82,27 @@ export const FAQContent: [handle: React.ReactNode, content: React.ReactNode][] =
       <b>Do not use it with your main wallet.</b>
     </>,
   ],
+
+  [
+    'How can I support you?',
+    <>
+      You can help us by contributing to our Github repository, or by spreading the word about our
+      project.
+      <br />
+      We're also looking for investors to help us with our development. If you're interested, you
+      can contact us at
+      <a href="mailto:team@usesnaaps.com"> team@usesnaaps.com</a>.
+      <br />
+      If you want to support us financially, you can donate to our Ethereum address:
+      <br />
+      usesnAAps.eth
+      <br />
+      <code>0x8f634ba17db7619977aa5f1049be1d9f65563d7f</code>
+      <br />
+      <b>Thank you for your support!</b>
+      <br />
+      <br />
+      <b>Disclaimer:</b> This is not an investment advice.
+    </>,
+  ],
 ];
