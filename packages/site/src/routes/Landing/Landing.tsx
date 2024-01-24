@@ -4,12 +4,12 @@ import cx from 'classnames';
 import {useConnect} from 'wagmi';
 import {injected} from 'wagmi/connectors';
 import {Link} from 'react-router-dom';
+import {NetworksMarquee} from './NetworksMarquee';
+import {FAQAccordion} from './FAQAccordion';
 import {
-  Accordion,
   Button,
   Surface,
   PageContainer,
-  Marquee,
   Row,
   Col,
   showToast,
@@ -17,9 +17,7 @@ import {
 } from '../../components';
 import {useMetamask, useProviderState, useResponsive} from '../../hooks';
 import {Paths} from '../Paths';
-import {FAQContent} from './FAQContent';
 
-import {NetworksLogos} from '../../assets/NetworksLogos';
 import {LogoSquare} from '../../assets/LogoSquare';
 
 import './styles.scss';
@@ -224,13 +222,7 @@ const Landing: React.FC = () => {
       <span className="p-landing_section-title">Supported Networks</span>
 
       <Surface className="p-landing_networks">
-        <Marquee duration={40_000} reversed className="p-landing_networks_content">
-          {Object.entries(NetworksLogos).map(([key, logo]) => (
-            <Button key={key} theme="chip" as="div">
-              <logo.wide.component height={logo.wide.preferredHeight} />
-            </Button>
-          ))}
-        </Marquee>
+        <NetworksMarquee />
       </Surface>
 
       <div className="p-landing_features container g-0">
@@ -273,23 +265,7 @@ const Landing: React.FC = () => {
 
       <span className="p-landing_section-title">FAQ</span>
 
-      <Accordion as={Surface} className="p-landing_faq">
-        {FAQContent.map(([handle, content]) => (
-          <Accordion.Item
-            as={Surface}
-            className="p-landing_faq_item"
-            activeClassName="p-landing_faq_item--active"
-          >
-            <Accordion.Handle className="p-landing_faq_item_handle">
-              <span>{handle}</span>
-
-              <Accordion.Content>
-                <div className="p-landing_faq_item_content">{content}</div>
-              </Accordion.Content>
-            </Accordion.Handle>
-          </Accordion.Item>
-        ))}
-      </Accordion>
+      <FAQAccordion />
     </PageContainer>
   );
 };
