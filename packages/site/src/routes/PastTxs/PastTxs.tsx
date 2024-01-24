@@ -7,6 +7,7 @@ import {useClient} from 'wagmi';
 import {getAbiItem, FormattedTransaction, Log} from 'viem';
 import {getLogs, getBlockNumber, getTransaction} from 'viem/actions';
 import {Button, Surface, PageContainer, ActivityIndicator, NetworkButton} from '../../components';
+import {useDeployedNetworks} from '../../hooks';
 import {NetworksLogos} from '../../assets/NetworksLogos';
 import {Paths} from '../Paths';
 
@@ -24,6 +25,8 @@ const PastTxs: React.FC = () => {
   const [lastBlock, setLastBlock] = useState(-1);
   const [emptyBlocks, setEmptyBlocks] = useState(0);
   const [pastEvents, setPastEvents] = useState<{log: Log; tx: FormattedTransaction}[]>([]);
+
+  const {deployedNetworks, loading: deployedNetworksLoading} = useDeployedNetworks(address);
 
   const client = useClient({
     chainId: NetworksConfig[selectedNetwork as NetworkKeys]?.id,
@@ -118,9 +121,9 @@ const PastTxs: React.FC = () => {
   return (
     <PageContainer className={cx('p-past-txs')}>
       <PageContainer.Card title="Past Transactions" className="d-flex f-dir-col">
-        <h3 className="mb-0">Filter by chain</h3>
+        <h3 className="mb-2 mt-3">Filter by chain</h3>
         <div className="p-past-txs_networks">
-          {NetworkKeys.map((key) => {
+          {deployedNetworks.map((key) => {
             const network = NetworksConfig[key];
             const logo = NetworksLogos[key];
 
@@ -129,7 +132,7 @@ const PastTxs: React.FC = () => {
                 key={key}
                 left={<logo.square.component height={logo.square.preferredHeight} />}
                 active={selectedNetwork === key}
-                disabled={loading}
+                disabled={loading || deployedNetworksLoading}
                 onClick={() => setSelectedNetwork(key)}
               >
                 {network.name}
@@ -141,35 +144,55 @@ const PastTxs: React.FC = () => {
         <div className="p-past-txs_list">
           {pastEvents.map((event) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const isSuccessful = (event.log as any)?.args?.success;
+            const successStatus = (event.log as any)?.args?.success;
+
+            let isSuccessful: boolean | null = null;
+            if (successStatus === true) isSuccessful = true;
+            if (successStatus === false) isSuccessful = false;
 
             return (
-              <Surface
-                key={event.log.transactionHash}
-                className={cx('p-past-txs_list_card', {
-                  'p-past-txs_list_card--success': isSuccessful === true,
-                  'p-past-txs_list_card--error': isSuccessful === false,
-                })}
-              >
-                <div className="d-flex align-center">
-                  <div className="d-flex flex-1 f-dir-col">
-                    <span>Hash: {event.tx.hash}</span>
-                    <span>Block: {event.tx.blockNumber?.toString()}</span>
-                    <span>{isSuccessful ? 'Successful' : 'Failed'}</span>
+              <Surface className={cx('p-past-txs_list_card')}>
+                <div className="p-past-txs_list_card_status">
+                  <div
+                    className={cx('p-past-txs_list_card_status_circle', {
+                      'p-past-txs_list_card_status_circle--success': isSuccessful === true,
+                      'p-past-txs_list_card_status_circle--error': isSuccessful === false,
+                      'p-past-txs_list_card_status_circle--unknown': isSuccessful === null,
+                    })}
+                  />
+
+                  <span>
+                    {isSuccessful === true ? 'Success' : null}
+                    {isSuccessful === false ? 'Error' : null}
+                    {isSuccessful === null ? 'Unknown' : null}
+                  </span>
+                </div>
+
+                <div className="p-past-txs_list_card_divider" />
+
+                <div className="p-past-txs_list_card_content">
+                  <div className="p-past-txs_list_card_content_item">
+                    <span className="p-past-txs_list_card_content_item_title">Block:</span>
+                    <span>{event.tx.blockNumber?.toString()}</span>
                   </div>
 
-                  <div className="d-flex f-dir-col">
-                    <Button
-                      theme="rounded"
-                      disabled={!defaultBlockExplorer}
-                      as="a"
-                      href={`${defaultBlockExplorer}/tx/${event.tx.hash}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View on Block Explorer
-                    </Button>
+                  <div className="p-past-txs_list_card_content_item">
+                    <span className="p-past-txs_list_card_content_item_title">Hash:</span>
+                    <span>{`${event.tx.hash.slice(0, 12)}......${event.tx.hash.slice(-12)}`}</span>
                   </div>
+                </div>
+
+                <div className="d-flex align-center">
+                  <Button
+                    theme="rounded"
+                    disabled={!defaultBlockExplorer}
+                    as="a"
+                    href={`${defaultBlockExplorer}/tx/${event.tx.hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View on Block Explorer
+                  </Button>
                 </div>
               </Surface>
             );
@@ -184,10 +207,11 @@ const PastTxs: React.FC = () => {
           <Button
             theme="chip"
             className="d-flex gap-2"
-            disabled={loading || !selectedNetwork}
+            disabled={loading || deployedNetworksLoading || !selectedNetwork}
             onClick={loadMore}
           >
-            {loading ? <ActivityIndicator size="small" /> : null} Load More Transactions
+            {loading || deployedNetworksLoading ? <ActivityIndicator size="small" /> : null} Load
+            More Transactions
           </Button>
 
           {emptyBlocks > 0 ? (
