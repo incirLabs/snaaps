@@ -99,7 +99,7 @@ const Landing: React.FC = () => {
           </Col>
 
           <Col span={24} lg={15} className="d-flex">
-            {process.env.NODE_ENV !== 'development' ? (
+            {process.env.NODE_ENV === 'development' ? (
               <div className="p-landing_info_content">
                 <h1 className="p-landing_info_content_title">
                   snAAps Allows You to Use Your ERC4337 Accounts Directly On MetaMask
