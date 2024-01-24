@@ -19,6 +19,10 @@
     {
       "name": "Common",
       "path": "packages/common"
+    },
+    {
+      "name": "Docs",
+      "path": "packages/docs"
     }
   ],
   "settings": {

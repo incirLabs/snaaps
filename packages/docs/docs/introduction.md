@@ -1,8 +1,13 @@
-# SnAAps
+---
+id: introduction
+title: Introduction
+sidebar_position: 1
+slug: /
+---
+
+# Introduction to snAAps
 
 snAAps aims to be a one-stop hub for Account Abstraction (AA) wallets, allowing users to integrate their AA wallet or obtain a new ERC4337 wallet.
-
-## Welcome to snAAps!
 
 snAAps is a MetaMask Snap designed for ERC4337 Account Abstraction wallets.
 
@@ -20,17 +25,7 @@ Simply put, with snAAps, you can use any dApp with your AA wallet.
 - Perform transactions on any dApp using your integrated AA wallet.
 - Manage multiple AA wallets within MetaMask without the need for network switching.
 
-## Supported Wallets
-
-- Infinitism
-- CyberConnect (In Progress)
-- Please contact us to collaborate on adding your support for ERC4337 wallet
-
-## Currently Supported Networks
-
-Ethereum, Linea, Optimism, Arbitrum, Polygon, Scroll, Base, BNBChain, Gnosis Chain.
-
-### CALL FOR DEVS
+## Call For Devs
 
 If you find a bug or have a feature request, don't hesitate to reach out at:
 [team@usesnaaps.com](mailto:team@usesnaaps.com)
