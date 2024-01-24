@@ -3,10 +3,7 @@ name: Deploy Docs to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: [docs/**]
-  pull_request:
-    branches: [main]
-    paths: [docs/**]
+    paths: [packages/docs/**]
   workflow_dispatch:
 
 jobs:
@@ -27,17 +24,15 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Dependencies
-        working-directory: docs
         run: yarn install --frozen-lockfile
 
       - name: Build docs
-        working-directory: docs
-        run: yarn build
+        run: yarn workspace docs build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build
+          publish_dir: ./packages/docs/build
           user_name: github-actions[bot]
           user_email: 41898282+github-actions[bot]@users.noreply.github.com
