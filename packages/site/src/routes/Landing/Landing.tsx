@@ -2,7 +2,7 @@ import cx from 'classnames';
 import {useConnect} from 'wagmi';
 import {injected} from 'wagmi/connectors';
 import {Link} from 'react-router-dom';
-import {Button, Surface, PageContainer, Marquee, Row, Col} from '../../components';
+import {Accordion, Button, Surface, PageContainer, Marquee, Row, Col} from '../../components';
 import {useMetamask, useProviderState} from '../../hooks';
 import {Paths} from '../Paths';
 
@@ -10,6 +10,7 @@ import {NetworksLogos} from '../../assets/NetworksLogos';
 import {LogoSquare} from '../../assets/LogoSquare';
 
 import './styles.scss';
+import {FAQContent} from './FAQ';
 
 const Landing: React.FC = () => {
   const [, , installSnap] = useMetamask();
@@ -111,7 +112,7 @@ const Landing: React.FC = () => {
         </Row>
       </PageContainer.Card>
 
-      <span className="p-landing_networks-title">Supported Networks</span>
+      <span className="p-landing_section-title">Supported Networks</span>
 
       <Surface className="p-landing_networks">
         <Marquee duration={40_000} reversed className="p-landing_networks_content">
@@ -160,6 +161,26 @@ const Landing: React.FC = () => {
           </Col>
         </Row>
       </div>
+
+      <span className="p-landing_section-title">FAQ</span>
+
+      <Accordion as={Surface} className="p-landing_faq">
+        {FAQContent.map(([handle, content]) => (
+          <Accordion.Item
+            as={Surface}
+            className="p-landing_faq_item"
+            activeClassName="p-landing_faq_item--active"
+          >
+            <Accordion.Handle className="p-landing_faq_item_handle">
+              <span>{handle}</span>
+
+              <Accordion.Content>
+                <div className="p-landing_faq_item_content">{content}</div>
+              </Accordion.Content>
+            </Accordion.Handle>
+          </Accordion.Item>
+        ))}
+      </Accordion>
     </PageContainer>
   );
 };

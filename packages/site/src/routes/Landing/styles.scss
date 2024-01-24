@@ -97,10 +97,10 @@
     }
   }
 
-  &_networks-title {
+  &_section-title {
     display: block;
     width: 100%;
-    margin: spacing(large) 0 spacing(normal) 0;
+    margin: spacing(2xlarge) 0 spacing(normal) 0;
     font-size: rem(16px);
     font-weight: 600;
     text-align: center;
@@ -154,6 +154,34 @@
       font-size: rem(13px);
       font-weight: 600;
       text-align: center;
+    }
+  }
+
+  &_faq {
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    border-radius: 6px;
+
+    &_item {
+      padding: 0;
+      border: 3px solid $g-colors-white;
+      border-radius: 6px;
+      transition: background-color $g-transition-default;
+
+      &--active,
+      &:hover {
+        background-color: $g-colors-white;
+      }
+
+      &_handle {
+        padding: spacing(medium) spacing(3xlarge);
+      }
+
+      &_content {
+        display: block;
+        padding: spacing(medium) spacing(normal);
+      }
     }
   }
 }
