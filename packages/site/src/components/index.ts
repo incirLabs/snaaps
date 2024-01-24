@@ -12,3 +12,4 @@ export {ActivityIndicator} from './ActivityIndicator/ActivityIndicator';
 export {AccountCard} from './AccountCard/AccountCard';
 export {Bubble} from './Bubble/Bubble';
 export {NetworkButton} from './NetworkButton/NetworkButton';
+export {PseudoButton} from './PseudoButton/PseudoButton';
