@@ -1,0 +1,98 @@
+@use 'sass:color';
+@use 'sass:map';
+
+@import '../../styles';
+
+.p-past-txs {
+  &_content {
+    flex: 1;
+  }
+
+  &_networks {
+    display: flex;
+    gap: spacing(small);
+    flex-flow: row wrap;
+    margin-bottom: spacing(2xlarge);
+  }
+
+  &_list {
+    display: flex;
+    gap: spacing(small);
+    flex: 1;
+    flex-direction: column;
+    margin-bottom: spacing(large);
+
+    &_card {
+      $card-spacing: spacing(large);
+
+      display: flex;
+      gap: $card-spacing;
+      flex-direction: row;
+      padding: 0 $card-spacing;
+      border-color: $g-colors-border;
+      box-shadow: $g-shadow-default;
+
+      &_status {
+        display: flex;
+        gap: spacing(small);
+        align-items: center;
+        justify-content: center;
+        color: $g-colors-text-strong;
+        font-size: rem(16px);
+        font-weight: 700;
+
+        &_circle {
+          width: rem(16px);
+          height: rem(16px);
+          border-radius: 99px;
+
+          &--success {
+            $colors: map.get($g-colors-status, success);
+
+            background-color: map.get($colors, light);
+            box-shadow: 0 0 4px 0 map.get($colors, dark);
+          }
+
+          &--error {
+            $colors: map.get($g-colors-status, error);
+
+            background-color: map.get($colors, light);
+            box-shadow: 0 0 4px 0 map.get($colors, dark);
+          }
+
+          &--unknown {
+            background-color: $g-colors-border;
+            box-shadow: 0 0 4px 0 $g-colors-gray;
+          }
+        }
+      }
+
+      &_divider {
+        min-width: 1px;
+        max-width: 1px;
+        flex: 1;
+        background-color: $g-colors-border;
+      }
+
+      &_content {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: spacing(medium) 0;
+
+        &_item {
+          display: flex;
+          flex: 1;
+          color: $g-colors-text-strong;
+          font-size: rem(14px);
+          font-weight: 400;
+
+          &_title {
+            margin-right: spacing(small);
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}

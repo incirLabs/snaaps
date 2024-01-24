@@ -13,12 +13,20 @@
       "path": "packages/snap"
     },
     {
+      "name": "API",
+      "path": "packages/api"
+    },
+    {
       "name": "Contracts",
       "path": "packages/contracts"
     },
     {
       "name": "Common",
       "path": "packages/common"
+    },
+    {
+      "name": "Docs",
+      "path": "packages/docs"
     }
   ],
   "settings": {

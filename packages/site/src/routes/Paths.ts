@@ -18,8 +18,9 @@ export const RawPaths = {
   },
   MySnaap: {
     Root: '/my-snaap/:address',
-    MySnaap: '/',
     Networks: '/networks',
+    MySnaap: '/',
+    PastTxs: '/past-txs',
     Plugins: '/plugins',
   },
 } as const;

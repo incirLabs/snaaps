@@ -29,7 +29,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 spacing(7xlarge);
+      padding: 0 spacing(2xlarge);
 
       @media (max-width: 576px) {
         padding: 0 spacing(2xsmall);
@@ -44,6 +44,49 @@
         background: -webkit-linear-gradient(#303642, #4c5878);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+      }
+
+      &_register {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        padding: 2px;
+        margin-top: spacing(2xlarge);
+        border: 1px solid $g-colors-border;
+        background-color: $g-colors-white;
+        border-radius: 999px;
+
+        input {
+          min-width: 0;
+          flex: 1;
+          padding: 0 spacing(xlarge);
+          border: 0;
+          border-bottom-left-radius: 999px;
+          border-top-left-radius: 999px;
+          font-size: rem(14px);
+          font-weight: 700;
+          outline: none;
+        }
+
+        button {
+          padding: spacing(normal) spacing(xlarge);
+          white-space: nowrap;
+        }
+      }
+
+      &_register-small {
+        display: flex;
+        gap: spacing(small);
+        flex-direction: column;
+
+        > div {
+          margin: 0;
+
+          input {
+            padding: spacing(small) spacing(xlarge);
+            border-radius: 999px;
+          }
+        }
       }
 
       &_buttons-group {
@@ -68,10 +111,10 @@
     }
   }
 
-  &_networks-title {
+  &_section-title {
     display: block;
     width: 100%;
-    margin: spacing(large) 0 spacing(normal) 0;
+    margin: spacing(2xlarge) 0 spacing(normal) 0;
     font-size: rem(16px);
     font-weight: 600;
     text-align: center;
@@ -119,10 +162,50 @@
       flex: 1;
       flex-direction: column;
       align-items: center;
+      padding: spacing(medium) spacing(5xlarge);
       background: transparent;
       color: $g-colors-text-light;
       font-size: rem(13px);
       font-weight: 600;
+      text-align: center;
+    }
+  }
+
+  &_faq {
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    border-radius: 6px;
+
+    &_item {
+      padding: 0;
+      border: 3px solid $g-colors-white;
+      border-radius: 6px;
+      transition: background-color $g-transition-default;
+
+      &--active,
+      &:hover {
+        background-color: $g-colors-white;
+      }
+
+      &_handle {
+        padding: spacing(medium) spacing(3xlarge);
+      }
+
+      &_content {
+        display: block;
+        padding: spacing(medium) spacing(normal);
+      }
+
+      @media (max-width: 576px) {
+        &_handle {
+          padding: spacing(normal) spacing(large);
+        }
+
+        &_content {
+          padding: spacing(normal) spacing(small);
+        }
+      }
     }
   }
 }
