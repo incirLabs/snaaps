@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
-    "start": "dotenv -e ../../.env ts-node ./index.ts",
+    "start": "BROWSER=none dotenv -e ../../.env netlify dev --functions=netlify",
     "watch": "dotenv -e ../../.env nodemon ./index.ts",
     "test": "dotenv -e ../../.env jest ./tests --passWithNoTests",
     "build": "yarn clean-build && yarn rollup-build",
@@ -43,6 +43,7 @@
     "@types/uuid": "^9.0.1",
     "dotenv-cli": "^7.2.1",
     "eslint": "^8.5.0",
+    "netlify-cli": "^17.15.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "rimraf": "^5.0.1",
