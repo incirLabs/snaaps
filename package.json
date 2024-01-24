@@ -19,6 +19,7 @@
     "start": "yarn workspace contracts hardhat compile && yarn workspaces foreach --parallel --verbose --interlaced run start",
     "build": "yarn workspace contracts hardhat compile && yarn workspaces foreach --parallel --verbose --topological run build",
     "test": "yarn workspaces foreach --parallel --verbose run test",
+    "docs": "yarn workspaces foreach --parallel --verbose --interlaced run docs",
     "lint": "yarn workspaces foreach --parallel --verbose run lint",
     "lint:check": "yarn workspaces foreach --parallel --verbose run lint:check",
     "format": "yarn workspaces foreach --parallel --verbose run format",
