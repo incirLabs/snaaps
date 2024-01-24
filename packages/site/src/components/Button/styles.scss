@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use 'sass:map';
 
 @import '../../styles';
 
@@ -82,7 +83,7 @@
 
   &_color {
     &--danger {
-      color: $g-colors-error-text;
+      color: map.get(map.get($g-colors-status, error), dark);
     }
 
     &--dark {
