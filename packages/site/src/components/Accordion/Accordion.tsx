@@ -9,6 +9,7 @@ import {
 } from 'react';
 import cx from 'classnames';
 import {PseudoButton} from '../PseudoButton/PseudoButton';
+import {useWindowDimensions} from '../../hooks';
 import {createAsAble} from '../../utils/createAsAble';
 
 import './styles.scss';
@@ -102,6 +103,7 @@ export const AccordionContent = createAsAble<'div', PropsWithActiveClassName>(
 
     const contentRef = useRef<HTMLDivElement>(null);
     const [scrollHeight, setScrollHeight] = useState<number>(0);
+    const {width, height} = useWindowDimensions();
 
     const [active] = useContext(AccordionContext);
     const id = useContext(AccordionItemContext);
@@ -111,7 +113,7 @@ export const AccordionContent = createAsAble<'div', PropsWithActiveClassName>(
       if (!contentRef.current) return;
 
       setScrollHeight(contentRef.current.scrollHeight);
-    }, [isActive]);
+    }, [isActive, width, height]);
 
     return (
       <AsAble

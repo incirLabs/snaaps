@@ -15,7 +15,7 @@ import {
   showToast,
   ActivityIndicator,
 } from '../../components';
-import {useMetamask, useProviderState} from '../../hooks';
+import {useMetamask, useProviderState, useResponsive} from '../../hooks';
 import {Paths} from '../Paths';
 import {FAQContent} from './FAQContent';
 
@@ -28,6 +28,7 @@ const Landing: React.FC = () => {
   const [, , installSnap] = useMetamask();
   const providerState = useProviderState();
   const {connect} = useConnect();
+  const responsive = useResponsive();
 
   const [emailLoading, setEmailLoading] = useState(false);
 
@@ -100,7 +101,7 @@ const Landing: React.FC = () => {
           </Col>
 
           <Col span={24} lg={15} className="d-flex">
-            {process.env.NODE_ENV === 'development' ? (
+            {process.env.NODE_ENV !== 'development' ? (
               <div className="p-landing_info_content">
                 <h1 className="p-landing_info_content_title">
                   snAAps Allows You to Use Your ERC4337 Accounts Directly On MetaMask
@@ -171,20 +172,39 @@ const Landing: React.FC = () => {
 
                 <div className="p-landing_info_content_buttons w-100">
                   <form className="w-100" method="GET" onSubmit={onEmailSubmit}>
-                    <div className="p-landing_info_content_register">
-                      <input name="email" type="email" placeholder="Drop Your Email Here to" />
+                    {!responsive.sm ? (
+                      <div className="p-landing_info_content_register-small">
+                        <div className="p-landing_info_content_register">
+                          <input name="email" type="email" placeholder="Drop Your Email Here to" />
+                        </div>
 
-                      <Button
-                        type="submit"
-                        theme="chip"
-                        color="dark"
-                        className="d-flex align-center gap-2"
-                        disabled={emailLoading}
-                      >
-                        {emailLoading ? <ActivityIndicator size="small" color="white" /> : null}
-                        Register For Alpha
-                      </Button>
-                    </div>
+                        <Button
+                          type="submit"
+                          theme="chip"
+                          color="dark"
+                          className="d-flex align-center gap-2 text-center"
+                          disabled={emailLoading}
+                        >
+                          {emailLoading ? <ActivityIndicator size="small" color="white" /> : null}
+                          <span className="d-block w-100">Register For Alpha</span>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-landing_info_content_register">
+                        <input name="email" type="email" placeholder="Drop Your Email Here to" />
+
+                        <Button
+                          type="submit"
+                          theme="chip"
+                          color="dark"
+                          className="d-flex align-center gap-2"
+                          disabled={emailLoading}
+                        >
+                          {emailLoading ? <ActivityIndicator size="small" color="white" /> : null}
+                          Register For Alpha
+                        </Button>
+                      </div>
+                    )}
                   </form>
                 </div>
               </div>

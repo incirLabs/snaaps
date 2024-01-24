@@ -50,8 +50,6 @@
         display: flex;
         width: 100%;
         flex-direction: row;
-        align-items: center;
-        justify-content: center;
         padding: 2px;
         margin-top: spacing(2xlarge);
         border: 1px solid $g-colors-border;
@@ -59,7 +57,7 @@
         border-radius: 999px;
 
         input {
-          height: 100%;
+          min-width: 0;
           flex: 1;
           padding: 0 spacing(xlarge);
           border: 0;
@@ -72,6 +70,22 @@
 
         button {
           padding: spacing(normal) spacing(xlarge);
+          white-space: nowrap;
+        }
+      }
+
+      &_register-small {
+        display: flex;
+        gap: spacing(small);
+        flex-direction: column;
+
+        > div {
+          margin: 0;
+
+          input {
+            padding: spacing(small) spacing(xlarge);
+            border-radius: 999px;
+          }
         }
       }
 
@@ -181,6 +195,16 @@
       &_content {
         display: block;
         padding: spacing(medium) spacing(normal);
+      }
+
+      @media (max-width: 576px) {
+        &_handle {
+          padding: spacing(normal) spacing(large);
+        }
+
+        &_content {
+          padding: spacing(normal) spacing(small);
+        }
       }
     }
   }
