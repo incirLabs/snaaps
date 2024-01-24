@@ -1,4 +1,4 @@
-import {Env, InternalSnapMethod} from 'common';
+import {InternalSnapMethod} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
 import {Link, useNavigate} from 'react-router-dom';
@@ -7,6 +7,7 @@ import {AccountCard, ActivityIndicator, Button, PageContainer} from '../../compo
 import {useMount, useSnapAccounts} from '../../hooks';
 import {invokeSnap} from '../../utils/Snap';
 import {getWalletAddress} from '../../utils/Networks';
+import {SNAP_ORIGIN} from '../../utils/Env';
 import {Paths} from '../Paths';
 
 import './styles.scss';
@@ -67,7 +68,7 @@ const CreateNew: React.FC = () => {
 
   const onSetupClick = async (wallet: Wallet) => {
     try {
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+      const client = new KeyringSnapRpcClient(SNAP_ORIGIN, window.ethereum);
 
       const account = await client.createAccount({
         address: wallet.walletAddress,

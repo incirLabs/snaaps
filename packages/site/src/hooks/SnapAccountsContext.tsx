@@ -1,7 +1,7 @@
-import {Env} from 'common';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {KeyringAccount, KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {useAccountEffect} from 'wagmi';
+import {SNAP_ORIGIN} from '../utils/Env';
 
 export type SnapAccountsContextType = [
   snapAccounts: Record<string, KeyringAccount>,
@@ -31,7 +31,7 @@ export const SnapAccountsProvider: React.FC<SnapAccountsProviderProps> = (props)
     setLoading(true);
 
     try {
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+      const client = new KeyringSnapRpcClient(SNAP_ORIGIN, window.ethereum);
 
       const accounts = await client.listAccounts();
 

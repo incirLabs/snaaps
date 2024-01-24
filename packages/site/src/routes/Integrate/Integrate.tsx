@@ -1,4 +1,4 @@
-import {Env, NetworksConfig} from 'common';
+import {NetworksConfig} from 'common';
 import {useState} from 'react';
 import cx from 'classnames';
 import {isAddress, isHash} from 'viem';
@@ -6,8 +6,9 @@ import {KeyringSnapRpcClient} from '@metamask/keyring-api';
 import {useNavigate} from 'react-router-dom';
 import {Button, PageContainer, Input, NetworkButton, ActivityIndicator} from '../../components';
 import {useDeployedNetworks} from '../../hooks';
-import {Paths} from '../Paths';
 import {addHexPrefix, stripHexPrefix} from '../../utils/Networks';
+import {SNAP_ORIGIN} from '../../utils/Env';
+import {Paths} from '../Paths';
 
 import {NetworksLogos} from '../../assets/NetworksLogos';
 
@@ -48,7 +49,7 @@ const Integrate: React.FC = () => {
 
       setPrivateKeyError(undefined);
 
-      const client = new KeyringSnapRpcClient(Env.SNAP_ORIGIN, window.ethereum);
+      const client = new KeyringSnapRpcClient(SNAP_ORIGIN, window.ethereum);
 
       const account = await client.createAccount({
         address: addHexPrefix(address),
