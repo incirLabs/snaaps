@@ -7,9 +7,10 @@ import Integrate from './Integrate/Integrate';
 import CreateNew from './CreateNew/CreateNew';
 
 import MySnaaps from './MySnaaps/MySnaaps';
-import MySnaap from './MySnaap/MySnaap';
-import Plugins from './Plugins/Plugins';
 import Networks from './Networks/Networks';
+import MySnaap from './MySnaap/MySnaap';
+import PastTxs from './PastTxs/PastTxs';
+import Plugins from './Plugins/Plugins';
 
 const Router: React.FC = () => (
   <Routes>
@@ -26,6 +27,7 @@ const Router: React.FC = () => (
 
     <Route path={PathsStatic.MySnaap.Root} element={<MySnaapPageLayout />}>
       <Route path={PathsStatic.MySnaap.MySnaap} element={<MySnaap />} />
+      <Route path={PathsStatic.MySnaap.PastTxs} element={<PastTxs />} />
       <Route path={PathsStatic.MySnaap.Plugins} element={<Plugins />} />
     </Route>
 

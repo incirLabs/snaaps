@@ -1,0 +1,36 @@
+@use 'sass:color';
+
+@import '../../styles';
+
+.p-past-txs {
+  &_content {
+    flex: 1;
+  }
+
+  &_networks {
+    display: flex;
+    gap: spacing(small);
+    flex-flow: row wrap;
+    margin-bottom: spacing(2xlarge);
+  }
+
+  &_list {
+    display: flex;
+    gap: spacing(small);
+    flex: 1;
+    flex-direction: column;
+    margin-bottom: spacing(large);
+
+    &_card {
+      &--fail {
+        background-color: color.adjust($g-colors-error-border, $alpha: -0.95);
+        border-color: $g-colors-error-border;
+      }
+
+      &--success {
+        background-color: color.adjust($g-colors-success-border, $alpha: -0.95);
+        border-color: $g-colors-success-border;
+      }
+    }
+  }
+}
