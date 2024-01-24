@@ -27,68 +27,86 @@ const Landing: React.FC = () => {
           </Col>
 
           <Col span={24} lg={15} className="d-flex">
-            <div className="p-landing_info_content">
-              <h1 className="p-landing_info_content_title">
-                Control Your AA Wallet on Metamask Snaps
-              </h1>
+            {process.env.NODE_ENV === 'development' ? (
+              <div className="p-landing_info_content">
+                <h1 className="p-landing_info_content_title">
+                  Control Your AA Wallet on Metamask Snaps
+                </h1>
 
-              {!providerState.flaskInstalled ? (
-                <div className="p-landing_info_content_buttons">
-                  <Button
-                    theme="chip"
-                    color="dark"
-                    as="a"
-                    href="https://metamask.io/flask/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Install MetaMask🦊 Flask
-                  </Button>
-                </div>
-              ) : null}
+                {!providerState.flaskInstalled ? (
+                  <div className="p-landing_info_content_buttons">
+                    <Button
+                      theme="chip"
+                      color="dark"
+                      as="a"
+                      href="https://metamask.io/flask/"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Install MetaMask🦊 Flask
+                    </Button>
+                  </div>
+                ) : null}
 
-              {providerState.flaskInstalled && !providerState.connected ? (
-                <div className="p-landing_info_content_buttons">
-                  <Button
-                    theme="chip"
-                    color="dark"
-                    onClick={() => connect({connector: injected()})}
-                  >
-                    Connect Your MetaMask🦊 Wallet
-                  </Button>
-                </div>
-              ) : null}
+                {providerState.flaskInstalled && !providerState.connected ? (
+                  <div className="p-landing_info_content_buttons">
+                    <Button
+                      theme="chip"
+                      color="dark"
+                      onClick={() => connect({connector: injected()})}
+                    >
+                      Connect Your MetaMask🦊 Wallet
+                    </Button>
+                  </div>
+                ) : null}
 
-              {providerState.connected && !providerState.snapInstalled ? (
-                <div className="p-landing_info_content_buttons">
-                  <Button theme="chip" color="dark" onClick={() => installSnap()}>
-                    Install SnAAp  
-                  </Button>
-                </div>
-              ) : null}
+                {providerState.connected && !providerState.snapInstalled ? (
+                  <div className="p-landing_info_content_buttons">
+                    <Button theme="chip" color="dark" onClick={() => installSnap()}>
+                      Install SnAAp
+                    </Button>
+                  </div>
+                ) : null}
 
-              {providerState.connected && providerState.snapInstalled ? (
-                <div className="p-landing_info_content_buttons w-50">
-                  <Button
-                    theme="chip"
-                    color="dark"
-                    className="p-landing_info_open-snaaps-button"
-                    as={Link}
-                    to={Paths.MySnaaps.Root}
-                  >
-                    <LogoSquare width={18} fill="#fff" /> Open snAAps
-                  </Button>
-                </div>
-              ) : null}
+                {providerState.connected && providerState.snapInstalled ? (
+                  <div className="p-landing_info_content_buttons w-50">
+                    <Button
+                      theme="chip"
+                      color="dark"
+                      className="p-landing_info_open-snaaps-button"
+                      as={Link}
+                      to={Paths.MySnaaps.Root}
+                    >
+                      <LogoSquare width={18} fill="#fff" /> Open snAAps
+                    </Button>
+                  </div>
+                ) : null}
 
-              {process.env.NODE_ENV === 'development' ? (
-                <div className="p-landing_info_content_buttons">
-                  <Button theme="chip" onClick={() => installSnap()}>
-                    Reinstall SnAAp  
-                  </Button>
+                {process.env.NODE_ENV === 'development' ? (
+                  <div className="p-landing_info_content_buttons">
+                    <Button theme="chip" onClick={() => installSnap()}>
+                      Reinstall SnAAp
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="p-landing_info_content">
+                <h1 className="p-landing_info_content_title">
+                  Control Your AA Wallet on Metamask Snaps
+                </h1>
+
+                <div className="p-landing_info_content_buttons w-100">
+                  <div className="p-landing_info_content_register">
+                    <input type="text" placeholder="Drop Your Email Here to" />
+
+                    <Button theme="chip" color="dark">
+                      Register For Alpha
+                    </Button>
+                  </div>
                 </div>
-              ) : null}
-            </div>
+              </div>
+            )}
           </Col>
         </Row>
       </PageContainer.Card>

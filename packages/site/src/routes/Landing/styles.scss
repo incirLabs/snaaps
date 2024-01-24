@@ -46,6 +46,35 @@
         -webkit-text-fill-color: transparent;
       }
 
+      &_register {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: 2px;
+        margin-top: spacing(2xlarge);
+        border: 1px solid $g-colors-border;
+        background-color: $g-colors-white;
+        border-radius: 999px;
+
+        input {
+          height: 100%;
+          flex: 1;
+          padding: 0 spacing(xlarge);
+          border: 0;
+          border-bottom-left-radius: 999px;
+          border-top-left-radius: 999px;
+          font-size: rem(14px);
+          font-weight: 700;
+          outline: none;
+        }
+
+        button {
+          padding: spacing(normal) spacing(xlarge);
+        }
+      }
+
       &_buttons-group {
         display: flex;
         gap: spacing(xsmall);
