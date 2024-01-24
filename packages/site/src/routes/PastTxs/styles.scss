@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use 'sass:map';
 
 @import '../../styles';
 
@@ -46,13 +47,17 @@
           border-radius: 99px;
 
           &--success {
-            background-color: $g-colors-success-border;
-            box-shadow: 0 0 4px 0 $g-colors-success-text;
+            $colors: map.get($g-colors-status, success);
+
+            background-color: map.get($colors, light);
+            box-shadow: 0 0 4px 0 map.get($colors, dark);
           }
 
           &--error {
-            background-color: $g-colors-error-border;
-            box-shadow: 0 0 4px 0 $g-colors-error-text;
+            $colors: map.get($g-colors-status, error);
+
+            background-color: map.get($colors, light);
+            box-shadow: 0 0 4px 0 map.get($colors, dark);
           }
 
           &--unknown {

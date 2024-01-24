@@ -1,0 +1,78 @@
+@use 'sass:map';
+
+@import '../../styles';
+
+.c-toast-container {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  display: flex;
+  max-width: 25%;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: rem(24px);
+  padding-right: rem(24px);
+
+  &_toast {
+    $l-selector: &;
+
+    position: relative;
+    display: flex;
+    margin-bottom: rem(12px);
+
+    &_card {
+      background-color: $g-colors-white;
+      border-radius: 6px;
+    }
+
+    &_top {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    &_title {
+      flex: 1;
+      margin-bottom: rem(9px);
+      font-size: rem(16px);
+      font-weight: 600;
+    }
+
+    &_close-button {
+      display: flex;
+      width: rem(22px);
+      height: rem(22px);
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 99px;
+      transition: background-color $g-transition-default;
+    }
+
+    &_content {
+      padding: rem(6px) rem(12px);
+      color: inherit;
+      font-size: rem(14px);
+      font-weight: 500;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    @each $status, $colors in $g-colors-status {
+      &--#{$status} {
+        #{$l-selector}_card {
+          border-left: 6px solid map.get($colors, light);
+        }
+
+        #{$l-selector}_close-button {
+          background-color: map.get($colors, light);
+
+          &:hover {
+            background-color: map.get($colors, dark);
+          }
+        }
+      }
+    }
+  }
+}

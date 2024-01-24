@@ -34,10 +34,22 @@ $g-colors-selection: #67759e !default;
 $g-colors-border: #d9d9d9 !default;
 $g-colors-hr: rgba(255, 255, 255, 0.6) !default;
 
-// Errors
-$g-colors-error-border: #ff8a8a !default;
-$g-colors-error-text: #ff4747 !default;
-
-// Success
-$g-colors-success-border: #9af5de !default;
-$g-colors-success-text: #4dffd1 !default;
+// Status
+$g-colors-status: (
+  error: (
+    light: #ff8a8a,
+    dark: #ff4747,
+  ),
+  success: (
+    light: #9af5de,
+    dark: #4dffd1,
+  ),
+  warning: (
+    light: #fedf65,
+    dark: #fcbd00,
+  ),
+  info: (
+    light: #75baff,
+    dark: #1979ff,
+  ),
+);
