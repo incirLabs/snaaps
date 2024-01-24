@@ -170,7 +170,7 @@ const Landing: React.FC = () => {
                 </h1>
 
                 <div className="p-landing_info_content_buttons w-100">
-                  <form method="GET" onSubmit={onEmailSubmit}>
+                  <form className="w-100" method="GET" onSubmit={onEmailSubmit}>
                     <div className="p-landing_info_content_register">
                       <input name="email" type="email" placeholder="Drop Your Email Here to" />
 
