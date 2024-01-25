@@ -2,6 +2,8 @@
 
 snAAps aims to be a one-stop hub for Account Abstraction (AA) wallets, allowing users to integrate their AA wallet or obtain a new ERC4337 wallet.
 
+For more information, please visit Docs: [https://docs.usesnaaps.com](https://docs.usesnaaps.com)
+
 ## Welcome to snAAps!
 
 snAAps is a MetaMask Snap designed for ERC4337 Account Abstraction wallets.
