@@ -37,7 +37,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/incirLabs/snaaps/blob/main/docs',
+          editUrl: 'https://github.com/incirLabs/snaaps/blob/main/packages/docs',
           routeBasePath: '/',
         },
         blog: false,
@@ -50,11 +50,11 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/incirLabs-social-card.png',
+    image: 'img/snaaps-social-card.png',
     navbar: {
-      title: 'incirLabs',
+      title: 'snAAps',
       logo: {
-        alt: 'incirLabs Logo',
+        alt: 'snAAps Logo',
         src: 'img/logo.svg',
         srcDark: 'img/logo-dark.svg',
       },
@@ -63,7 +63,7 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'snAAps Docs',
+          label: 'Docs',
         },
         {
           href: 'https://github.com/incirLabs/snaaps',
