@@ -8,7 +8,7 @@ import {
   OptimismLogo,
   PolygonLogo,
   EthereumLogo,
-  EthereumGoerliLogo,
+  EthereumSepoliaLogo,
   GnosisLogo,
   BaseLogo,
   BNBChainLogo,
@@ -20,7 +20,7 @@ import {
   OptimismLogoSquare,
   PolygonLogoSquare,
   EthereumLogoSquare,
-  EthereumGoerliLogoSquare,
+  EthereumSepoliaLogoSquare,
   GnosisLogoSquare,
   BaseLogoSquare,
   BNBChainLogoSquare,
@@ -104,14 +104,14 @@ export const NetworksLogos: Record<NetworkKeys, NetworkLogos> = {
     },
   },
 
-  ethereumGoerli: {
+  ethereumSepolia: {
     square: {
       preferredHeight: 20,
-      component: EthereumGoerliLogoSquare,
+      component: EthereumSepoliaLogoSquare,
     },
     wide: {
       preferredHeight: 22,
-      component: EthereumGoerliLogo,
+      component: EthereumSepoliaLogo,
     },
   },
 

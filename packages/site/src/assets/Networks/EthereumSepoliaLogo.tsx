@@ -1,4 +1,4 @@
-export const EthereumGoerliLogo: React.FC<JSX.IntrinsicElements['svg']> = (props) => {
+export const EthereumSepoliaLogo: React.FC<JSX.IntrinsicElements['svg']> = (props) => {
   return (
     <svg viewBox="0 0 117 30" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path

@@ -14,7 +14,7 @@ export const FAQContent: [handle: React.ReactNode, content: React.ReactNode][] =
       Currently we only support the following networks:
       <ul>
         <li>Ethereum Mainnet</li>
-        <li>Ethereum Goerli</li>
+        <li>Ethereum Sepolia</li>
         <li>Linea</li>
         <li>Arbitrum One</li>
         <li>Optimism</li>
