@@ -1,6 +1,6 @@
 {
   "name": "@snaaps/snap",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "snAAps Account Abstraction snap for MetaMask",
   "keywords": [
     "metamask",
@@ -54,7 +54,6 @@
     "@metamask/utils": "^8.1.0",
     "common": "*",
     "ethereum-cryptography": "^2.1.2",
-    "permissionless": "^0.0.12",
     "uuid": "^9.0.0",
     "zod": "^3.22.4"
   },

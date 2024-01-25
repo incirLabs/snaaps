@@ -7731,7 +7731,6 @@ __metadata:
     dotenv-cli: ^7.3.0
     eslint: ^8.7.0
     ethereum-cryptography: ^2.1.2
-    permissionless: ^0.0.12
     prettier: ^2.2.1
     rimraf: ^3.0.2
     typescript: ^4.7.4
@@ -28398,15 +28397,6 @@ __metadata:
     estree-walker: ^3.0.0
     is-reference: ^3.0.0
   checksum: 2153244352e58a0d76e7e8d9263e66fe74509495f809af388da20045fb30aa3e93f2f94468dc0b9166ecf206fcfc0d73d2c7641c6fbedc07b1de858b710142cb
-  languageName: node
-  linkType: hard
-
-"permissionless@npm:^0.0.12":
-  version: 0.0.12
-  resolution: "permissionless@npm:0.0.12"
-  peerDependencies:
-    viem: ^1.14.0
-  checksum: ed56c7f1628d8c6ced235421a726a59fba6d7d4299a4cd302d96d58e7241e980ca4f54cf8d63584948411cd87bd54a4c5d6ea43212327d56d0bf77df18a1253a
   languageName: node
   linkType: hard
 
