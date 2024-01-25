@@ -14,7 +14,7 @@ sidebar_position: 5
 ## Demo video
 
 <video width="100%" controls>
-  <source src="demo-video.mp4" type="video/mp4" />
+  <source src="/demo-video.mp4" type="video/mp4" />
 </video>
 
 ## Steps
